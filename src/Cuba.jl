@@ -132,21 +132,4 @@ Vegas(integrand::Function;
                 verbose, seed, trunc(Integer, mineval), trunc(Integer, maxeval),
                 nstart, nincrease, nbatch, gridno, statefile, spin)
 
-### Example of integrand function, just for test
-function func(ndim::Cint,
-              xx::Ptr{Cdouble},
-              ncomp::Cint,
-              ff::Ptr{Cdouble},
-              userdata::Ptr{Void}=USERDATA_DEF
-              )
-    x = pointer_to_array(xx, (ndim,))
-    f = pointer_to_array(ff, (ncomp,))
-    for i = 1:ncomp
-        f[i] = sin(x[1])*cos(x[2])*exp(x[3])
-    end
-    xx = pointer_from_objref(x)
-    ff = pointer_from_objref(f)
-    return Cint(0)::Cint
-end
-
 end # module
