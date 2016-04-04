@@ -22,7 +22,7 @@
 
 module Cuba
 
-export Vegas
+export Vegas, Suave
 
 const libcuba = joinpath(Pkg.dir("Cuba"), "deps", "libcuba")
 
@@ -43,6 +43,10 @@ NBATCH_DEF    = 1000
 GRIDNO_DEF    = 0
 STATEFILE_DEF = ""
 SPIN_DEF      = C_NULL
+
+NNEW_DEF     = 1000
+NMIN_DEF     = 2
+FLATNESS_DEF = 25.
 
 ### Vegas
 function Vegas(integrand::Function,
@@ -102,9 +106,12 @@ function Vegas(integrand::Function,
                     Ptr{Cdouble}, # error
                     Ptr{Cdouble}  # prob
                     ),
+                   # Input
                    ndim, ncomp, integrand_ptr, userdata, nvec, epsrel, epsabs,
                    verbose, seed, mineval, maxeval, nstart, nincrease,
-                   nbatch, gridno, statefile, spin, neval, fail,
+                   nbatch, gridno, statefile, spin,
+                   # Output
+                   neval, fail,
                    integral, error, prob
                    )
 
@@ -131,5 +138,95 @@ Vegas(integrand::Function;
       ) = Vegas(integrand, ndim, ncomp, userdata, nvec, epsrel, epsabs,
                 verbose, seed, trunc(Integer, mineval), trunc(Integer, maxeval),
                 nstart, nincrease, nbatch, gridno, statefile, spin)
+
+### Suave
+function Suave(integrand::Function,
+               ndim::Integer,
+               ncomp::Integer,
+               userdata::Ptr{Void},
+               nvec::Integer,
+               epsrel::Real,
+               epsabs::Real,
+               verbose::Integer,
+               seed::Integer,
+               mineval::Integer,
+               maxeval::Integer,
+               nnew::Integer,
+               nmin::Integer,
+               flatness::AbstractFloat,
+               statefile::AbstractString,
+               spin::Ptr{Void}
+               )
+
+    nregions = Ref{Cdouble}(0.0)
+    neval    = Ref{Cint}(0)
+    fail     = Ref{Cint}(0)
+    integral = zeros(typeof(1.0), ncomp)
+    error    = zeros(typeof(1.0), ncomp)
+    prob     = zeros(typeof(1.0), ncomp)
+
+    const integrand_ptr = cfunction(integrand, Cint,
+                                    (Ref{Cint}, # ndim
+                                     Ptr{Cdouble}, # x
+                                     Ref{Cint}, # ncomp
+                                     Ptr{Cdouble}, # f
+                                     Ptr{Void} # userdata
+                                     ))
+
+    result = ccall((:Suave, libcuba), Cdouble,
+                   (Cint, # ndim
+                    Cint, # ncomp
+                    Ptr{Void}, # integrand
+                    Ptr{Void}, # userdata
+                    Cint, # nvec
+                    Cdouble, # epsrel
+                    Cdouble, # epsabs
+                    Cint, # verbose
+                    Cint, # seed
+                    Cint, # mineval
+                    Cint, # maxeval
+                    Cint, # nnew
+                    Cint, # nmin
+                    Cdouble, # flatness
+                    Ptr{Cchar}, # statefile
+                    Ptr{Void}, # spin
+                    Ptr{Cdouble}, # nregions
+                    Ptr{Cint}, # neval
+                    Ptr{Cint}, # fail
+                    Ptr{Cdouble}, # integral
+                    Ptr{Cdouble}, # error
+                    Ptr{Cdouble}  # prob
+                    ),
+                   # Input
+                   ndim, ncomp, integrand_ptr, userdata, nvec, epsrel, epsabs,
+                   verbose, seed, mineval, maxeval, nnew, nmin,
+                   flatness, statefile, spin,
+                   # Output
+                   nregions, neval, fail,
+                   integral, error, prob
+                   )
+
+    return integral, error, prob, nregions[], neval[], fail[]
+end
+
+Suave(integrand::Function;
+      ndim::Integer=NDIM_DEF,
+      ncomp::Integer=NCOMP_DEF,
+      userdata::Ptr{Void}=USERDATA_DEF,
+      nvec::Integer=NVEC_DEF,
+      epsrel::Real=EPSREL_DEF,
+      epsabs::Real=EPSABS_DEF,
+      verbose::Integer=VERBOSE_DEF,
+      seed::Integer=SEED_DEF,
+      mineval::Real=MINEVAL_DEF,
+      maxeval::Real=MAXEVAL_DEF,
+      nnew::Integer=NNEW_DEF,
+      nmin::Integer=NMIN_DEF,
+      flatness::Real=FLATNESS_DEF,
+      statefile::AbstractString=STATEFILE_DEF,
+      spin::Ptr{Void}=SPIN_DEF
+      ) = Suave(integrand, ndim, ncomp, userdata, nvec, epsrel, epsabs,
+                verbose, seed, trunc(Integer, mineval), trunc(Integer, maxeval),
+                nnew, nmin, flatness, statefile, spin)
 
 end # module
