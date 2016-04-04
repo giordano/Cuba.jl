@@ -24,7 +24,9 @@ module Cuba
 
 export Vegas, Suave, Divonne, Cuhre
 
-const libcuba = joinpath(Pkg.dir("Cuba"), "deps", "libcuba")
+# Note: don't use Pkg.dir("PkgName") here because the package may be installed
+# elsewhere.
+const libcuba = joinpath(dirname(@__FILE__), "..", "deps", "libcuba")
 
 ### Default values of parameters
 NDIM_DEF      = 3
