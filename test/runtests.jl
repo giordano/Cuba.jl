@@ -23,7 +23,7 @@ end
 # Test results and make sure the estimation of error is exact.
 let
     local result
-    @time result = Vegas(func, ndim=3, ncomp=3, epsabs=1e-6)
+    result = Vegas(func, ndim=3, ncomp=3, epsabs=1e-6)
     @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   result[2][1]
     @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     result[2][2]
     @test_approx_eq_eps result[1][3]   zeta(3)                   result[2][3]
