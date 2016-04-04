@@ -24,6 +24,8 @@ module Cuba
 
 export Vegas
 
+const libcuba = joinpath(Pkg.dir("Cuba"), "deps", "libcuba")
+
 ### Default values of parameters
 NDIM_DEF      = 3
 NCOMP_DEF     = 1
@@ -76,7 +78,7 @@ function Vegas(integrand::Function,
                                      Ptr{Void} # userdata
                                      ))
 
-    result = ccall((:Vegas, "libcuba"), Cdouble,
+    result = ccall((:Vegas, libcuba), Cdouble,
                    (Cint, # ndim
                     Cint, # ncomp
                     Ptr{Void}, # integrand
