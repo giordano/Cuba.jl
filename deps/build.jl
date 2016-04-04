@@ -23,7 +23,7 @@
 local_dir  = "cuba-shared-object"
 local_file = local_dir*".tar.gz"
 libcuba = joinpath(Pkg.dir("Cuba"), "deps", "libcuba")
-@linux? (object="libcuba.so") : (@osx? object="libcuba.dylib" : object="")
+@linux? (object="libcuba.so") : (@osx? (object="libcuba.dylib") : (object=""))
 
 # Clean already existing shared object, archive and buil directory in order to
 # perform a new clean build.
