@@ -23,6 +23,7 @@
 local_dir  = "cuba-shared-object"
 local_file = local_dir*".tar.gz"
 libcuba = joinpath(Pkg.dir("Cuba"), "deps", "libcuba")
+@linux? (object="libcuba.so") : (@osx? object="libcuba.dylib" : object="")
 
 # Clean already existing shared object, archive and buil directory in order to
 # perform a new clean build.
@@ -36,8 +37,8 @@ run(`tar xzf $local_file`)
 info("Building libcuba...")
 cd(local_dir) do
     run(`./configure`)
-    run(`make libcuba.so`)
-    run(`mv libcuba.so ..`)
+    run(`make shared`)
+    run(`mv $object ..`)
 end
 
 # Make sure Julia is able to see the library.
