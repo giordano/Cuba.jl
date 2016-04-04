@@ -22,6 +22,7 @@
 
 local_dir  = "cuba-shared-object"
 local_file = local_dir*".tar.gz"
+libcuba = joinpath(Pkg.dir("Cuba"), "deps", "libcuba")
 
 # Clean already existing shared object, archive and buil directory in order to
 # perform a new clean build.
@@ -40,7 +41,7 @@ cd(local_dir) do
 end
 
 # Make sure Julia is able to see the library.
-if length(Libdl.find_library(["libcuba"])) > 0
+if length(Libdl.find_library([libcuba])) > 0
     info("libcuba successfully installed!")
 else
     error("Installation of libcuba failed")
