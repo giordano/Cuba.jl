@@ -23,6 +23,7 @@
 using Cuba
 using Base.Test
 
+# This is the integrand function.  This is just like one would do in C.
 function func(ndim::Cint,
               xx::Ptr{Cdouble},
               ncomp::Cint,

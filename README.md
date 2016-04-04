@@ -1,18 +1,35 @@
 # Cuba
 
-[![Build Status](https://travis-ci.org/giordano/Cuba.jl.svg?branch=master)](https://travis-ci.org/giordano/Cuba.jl)
+[![Build Status](https://travis-ci.org/giordano/Cuba.jl.svg?branch=master)](https://travis-ci.org/giordano/Cuba.jl) [![Coverage Status](https://coveralls.io/repos/github/giordano/Cuba.jl/badge.svg?branch=master)](https://coveralls.io/github/giordano/Cuba.jl?branch=master) [![codecov.io](https://codecov.io/github/giordano/Cuba.jl/coverage.svg?branch=master)](https://codecov.io/github/giordano/Cuba.jl?branch=master) [![Cuba](http://pkg.julialang.org/badges/Cuba_0.4.svg)](http://pkg.julialang.org/?pkg=Cuba) [![Cuba](http://pkg.julialang.org/badges/Cuba_0.5.svg)](http://pkg.julialang.org/?pkg=Cuba)
 
-Library for multidimensional numerical integration with different algorithms.
-Sampling of the integrand is multi-threaded.
+Introduction
+------------
+
+`Cuba.jl` is a library for multidimensional numerical integration with different
+algorithms in [Julia](http://julialang.org/).  Sampling of the integrand is
+multi-threaded.
 
 This is just a Julia wrapper around the C
-[Cuba library](http://www.feynarts.de/cuba/) by **Thomas Hahn**.  All the credits
-goes to him for the underlying functions, blame me for any problem with the
-Julia interface.  Feel free to report bugs at
+[Cuba library](http://www.feynarts.de/cuba/) by **Thomas Hahn**.  All the
+credits goes to him for the underlying functions, blame me for any problem with
+the Julia interface.  Feel free to report bugs at
 https://github.com/giordano/Cuba.jl/issues.
 
-Note: Cuba library works only on GNU/Linux and OS X systems.  Currently, this
-Julia package works only on GNU/Linux, support for OS X will come soon-ish.
+All algorithms provided by Cuba library are supported in `Cuba.jl`:
+* `Vegas` (type: Monte Carlo; variance reduction with importance sampling)
+* `Suave` (type: Monte Carlo; variance reduction with globally adaptive
+  subdivision + importance sampling)
+* `Divonne` (type: Monte Carlo or deterministic; variance reduction with
+  stratified sampling, aided by methods from numerical optimization)
+* `Cuhre` (type: deterministic; variance reduction with globally adaptive
+  subdivision)
+
+For more details on the algorithms see the manual included in Cuba library and
+available at in `deps/cuba-shared-object/cuba.pdf` after successful installation
+of `Cuba.jl`.
+
+**Note:** This package works on the same operating systems for which the Cuba
+library is available, i.e. GNU/Linux and OS X systems.
 
 Usage
 -----
