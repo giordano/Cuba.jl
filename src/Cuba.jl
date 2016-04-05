@@ -65,6 +65,17 @@ PEAKFINDER_DEF   = C_NULL
 
 KEY_DEF = 0
 
+# Return pointer for "func", to be passed as "integrand" argument to Cuba
+# functions.
+function func_ptr(func::Function)
+    return cfunction(func, Cint,
+                     (Ref{Cint}, # ndim
+                      Ptr{Cdouble}, # x
+                      Ref{Cint}, # ncomp
+                      Ptr{Cdouble}, # f
+                      Ptr{Void})) # userdata
+end
+
 ### Vegas
 function Vegas(integrand::Function,
                ndim::Integer,
@@ -91,14 +102,6 @@ function Vegas(integrand::Function,
     error    = zeros(typeof(1.0), ncomp)
     prob     = zeros(typeof(1.0), ncomp)
 
-    const integrand_ptr = cfunction(integrand, Cint,
-                                    (Ref{Cint}, # ndim
-                                     Ptr{Cdouble}, # x
-                                     Ref{Cint}, # ncomp
-                                     Ptr{Cdouble}, # f
-                                     Ptr{Void} # userdata
-                                     ))
-
     result = ccall((:Vegas, libcuba), Cdouble,
                    (Cint, # ndim
                     Cint, # ncomp
@@ -124,7 +127,8 @@ function Vegas(integrand::Function,
                     Ptr{Cdouble}  # prob
                     ),
                    # Input
-                   ndim, ncomp, integrand_ptr, userdata, nvec, epsrel, epsabs,
+                   ndim, ncomp, func_ptr(integrand), userdata, nvec,
+                   epsrel, epsabs,
                    verbose, seed, mineval, maxeval, nstart, nincrease,
                    nbatch, gridno, statefile, spin,
                    # Output
@@ -183,14 +187,6 @@ function Suave(integrand::Function,
     error    = zeros(typeof(1.0), ncomp)
     prob     = zeros(typeof(1.0), ncomp)
 
-    const integrand_ptr = cfunction(integrand, Cint,
-                                    (Ref{Cint}, # ndim
-                                     Ptr{Cdouble}, # x
-                                     Ref{Cint}, # ncomp
-                                     Ptr{Cdouble}, # f
-                                     Ptr{Void} # userdata
-                                     ))
-
     result = ccall((:Suave, libcuba), Cdouble,
                    (Cint, # ndim
                     Cint, # ncomp
@@ -216,7 +212,8 @@ function Suave(integrand::Function,
                     Ptr{Cdouble}  # prob
                     ),
                    # Input
-                   ndim, ncomp, integrand_ptr, userdata, nvec, epsrel, epsabs,
+                   ndim, ncomp, func_ptr(integrand), userdata, nvec,
+                   epsrel, epsabs,
                    verbose, seed, mineval, maxeval, nnew, nmin,
                    flatness, statefile, spin,
                    # Output
@@ -282,14 +279,6 @@ function Divonne{F<:AbstractFloat}(integrand::Function,
     error    = zeros(typeof(1.0), ncomp)
     prob     = zeros(typeof(1.0), ncomp)
 
-    const integrand_ptr = cfunction(integrand, Cint,
-                                    (Ref{Cint}, # ndim
-                                     Ptr{Cdouble}, # x
-                                     Ref{Cint}, # ncomp
-                                     Ptr{Cdouble}, # f
-                                     Ptr{Void} # userdata
-                                     ))
-
     result = ccall((:Divonne, libcuba), Cdouble,
                    (Cint, # ndim
                     Cint, # ncomp
@@ -324,7 +313,8 @@ function Divonne{F<:AbstractFloat}(integrand::Function,
                     Ptr{Cdouble}  # prob
                     ),
                    # Input
-                   ndim, ncomp, integrand_ptr, userdata, nvec, epsrel, epsabs,
+                   ndim, ncomp, func_ptr(integrand), userdata, nvec,
+                   epsrel, epsabs,
                    verbose, seed, mineval, maxeval, key1, key2, key3, maxpass,
                    border, maxchisq, mindeviation, ngiven, ldxgiven, xgiven,
                    nextra, peakfinder, statefile, spin,
@@ -394,14 +384,6 @@ function Cuhre(integrand::Function,
     error    = zeros(typeof(1.0), ncomp)
     prob     = zeros(typeof(1.0), ncomp)
 
-    const integrand_ptr = cfunction(integrand, Cint,
-                                    (Ref{Cint}, # ndim
-                                     Ptr{Cdouble}, # x
-                                     Ref{Cint}, # ncomp
-                                     Ptr{Cdouble}, # f
-                                     Ptr{Void} # userdata
-                                     ))
-
     result = ccall((:Cuhre, libcuba), Cdouble,
                    (Cint, # ndim
                     Cint, # ncomp
@@ -424,7 +406,8 @@ function Cuhre(integrand::Function,
                     Ptr{Cdouble}  # prob
                     ),
                    # Input
-                   ndim, ncomp, integrand_ptr, userdata, nvec, epsrel, epsabs,
+                   ndim, ncomp, func_ptr(integrand), userdata, nvec,
+                   epsrel, epsabs,
                    verbose, mineval, maxeval, key,
                    statefile, spin,
                    # Output
