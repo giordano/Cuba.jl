@@ -47,6 +47,10 @@ function func(ndim::Cint,
     return Cint(0)::Cint
 end
 
+# Accelerators and cores settings
+Cuba.accel(0,1000)
+Cuba.cores(0,1000)
+
 # Test results and make sure the estimation of error is exact.
 let
     local result, res1, res2, res3
@@ -74,3 +78,7 @@ let
     @test_approx_eq_eps result[1][2]  res2  result[2][2]
     @test_approx_eq_eps result[1][3]  res3  result[2][3]
 end
+
+# Test other function
+Cuba.init(C_NULL, C_NULL)
+Cuba.exit(C_NULL, C_NULL)

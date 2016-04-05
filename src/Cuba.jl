@@ -436,4 +436,25 @@ Cuhre(integrand::Function;
                 verbose, trunc(Integer, mineval), trunc(Integer, maxeval),
                 key, statefile, spin)
 
+### Other functions, not exported
+function cores(n::Integer, p::Integer)
+    ccall((:cubacores, libcuba), Ptr{Void}, (Cint, Cint), n, p)
+    return 0
+end
+
+function accel(n::Integer, p::Integer)
+    ccall((:cubaaccel, libcuba), Ptr{Void}, (Cint, Cint), n, p)
+    return 0
+end
+
+function init(f::Ptr{Void}, arg::Ptr{Void})
+    ccall((:cubainit, libcuba), Ptr{Void}, (Ptr{Void}, Ptr{Void}), f, arg)
+    return 0
+end
+
+function exit(f::Ptr{Void}, arg::Ptr{Void})
+    ccall((:cubaexit, libcuba), Ptr{Void}, (Ptr{Void}, Ptr{Void}), f, arg)
+    return 0
+end
+
 end # module
