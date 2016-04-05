@@ -23,6 +23,10 @@
 using Cuba
 using Base.Test
 
+f1(x,y,z) = sin(x)*cos(y)*exp(z)
+f2(x,y,z) = exp(-(x*x + y*y + z*z))
+f3(x,y,z) = 1/(1 - x*y*z)
+
 # This is the integrand function.  This is just like one would do in C.
 function func(ndim::Cint,
               xx::Ptr{Cdouble},
@@ -34,9 +38,9 @@ function func(ndim::Cint,
     f = pointer_to_array(ff, (ncomp,))
 
     # Define components of the integrand function.
-    f[1] = sin(x[1])*cos(x[2])*exp(x[3])
-    f[2] = exp(-(x[1]*x[1] + x[2]*x[2] + x[3]*x[3]))
-    f[3] = 1/(1 - x[1]*x[2]*x[3])
+    f[1] = f1(x[1], x[2], x[3])
+    f[2] = f2(x[1], x[2], x[3])
+    f[3] = f3(x[1], x[2], x[3])
 
     xx = pointer_from_objref(x)
     ff = pointer_from_objref(f)
@@ -45,25 +49,28 @@ end
 
 # Test results and make sure the estimation of error is exact.
 let
-    local result
+    local result, res1, res2, res3
+    res1 = (e-1)*(1-cos(1))*sin(1)
+    res2 = (sqrt(pi)*erf(1)/2)^3
+    res3 = zeta(3)
     # Vegas
-    result = Vegas(func, ndim=3, ncomp=3, epsabs=1e-4, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   result[2][1]
-    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     result[2][2]
-    @test_approx_eq_eps result[1][3]   zeta(3)                   result[2][3]
+    result = Vegas(func, 3, 3, epsabs=1e-4, epsrel=1e-8)
+    @test_approx_eq_eps result[1][1]  res1  result[2][1]
+    @test_approx_eq_eps result[1][2]  res2  result[2][2]
+    @test_approx_eq_eps result[1][3]  res3  result[2][3]
     # Suave
-    result = Suave(func, ndim=3, ncomp=3, epsabs=1e-3, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   result[2][1]
-    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     result[2][2]
-    @test_approx_eq_eps result[1][3]   zeta(3)                   result[2][3]
+    result = Suave(func, 3, 3, epsabs=1e-3, epsrel=1e-8)
+    @test_approx_eq_eps result[1][1]  res1  result[2][1]
+    @test_approx_eq_eps result[1][2]  res2  result[2][2]
+    @test_approx_eq_eps result[1][3]  res3  result[2][3]
     # Divonne
-    result = Divonne(func, ndim=3, ncomp=3, epsabs=1e-4, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   result[2][1]
-    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     result[2][2]
-    # @test_approx_eq_eps result[1][3]   zeta(3)                   result[2][3] # <== This integral diverges!
+    result = Divonne(func, 3, 3, epsabs=1e-4, epsrel=1e-8)
+    @test_approx_eq_eps result[1][1]  res1  result[2][1]
+    @test_approx_eq_eps result[1][2]  res2  result[2][2]
+    # @test_approx_eq_eps result[1][3]  res3  result[2][3] # <== This integral diverges!
     # Cuhre
-    result = Cuhre(func, ndim=3, ncomp=3, epsabs=1e-8, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   result[2][1]
-    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     result[2][2]
-    @test_approx_eq_eps result[1][3]   zeta(3)                   result[2][3]
+    result = Cuhre(func, 3, 3, epsabs=1e-8, epsrel=1e-8)
+    @test_approx_eq_eps result[1][1]  res1  result[2][1]
+    @test_approx_eq_eps result[1][2]  res2  result[2][2]
+    @test_approx_eq_eps result[1][3]  res3  result[2][3]
 end
