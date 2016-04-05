@@ -43,30 +43,27 @@ function func(ndim::Cint,
     return Cint(0)::Cint
 end
 
+# Test results and make sure the estimation of error is exact.
 let
-    local result, tol
+    local result
     # Vegas
-    tol = 1e-4
-    result = Vegas(func, ndim=3, ncomp=3, epsabs=tol, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   tol
-    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     tol
-    @test_approx_eq_eps result[1][3]   zeta(3)                   tol
+    result = Vegas(func, ndim=3, ncomp=3, epsabs=1e-4, epsrel=1e-8)
+    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   result[2][1]
+    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     result[2][2]
+    @test_approx_eq_eps result[1][3]   zeta(3)                   result[2][3]
     # Suave
-    tol = 1e-3
-    result = Suave(func, ndim=3, ncomp=3, epsabs=tol, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   tol
-    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     tol
-    @test_approx_eq_eps result[1][3]   zeta(3)                   tol
+    result = Suave(func, ndim=3, ncomp=3, epsabs=1e-3, epsrel=1e-8)
+    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   result[2][1]
+    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     result[2][2]
+    @test_approx_eq_eps result[1][3]   zeta(3)                   result[2][3]
     # Divonne
-    tol = 1e-4
-    result = Divonne(func, ndim=3, ncomp=3, epsabs=tol, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   tol
-    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     tol
-    # @test_approx_eq_eps result[1][3]   zeta(3)                   tol # <== This integral diverges!
+    result = Divonne(func, ndim=3, ncomp=3, epsabs=1e-4, epsrel=1e-8)
+    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   result[2][1]
+    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     result[2][2]
+    # @test_approx_eq_eps result[1][3]   zeta(3)                   result[2][3] # <== This integral diverges!
     # Cuhre
-    tol = 1e-8
-    result = Cuhre(func, ndim=3, ncomp=3, epsabs=tol, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   tol
-    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     tol
-    @test_approx_eq_eps result[1][3]   zeta(3)                   tol
+    result = Cuhre(func, ndim=3, ncomp=3, epsabs=1e-8, epsrel=1e-8)
+    @test_approx_eq_eps result[1][1]   (e-1)*(1-cos(1))*sin(1)   result[2][1]
+    @test_approx_eq_eps result[1][2]   (sqrt(pi)*erf(1)/2)^3     result[2][2]
+    @test_approx_eq_eps result[1][3]   zeta(3)                   result[2][3]
 end
