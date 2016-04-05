@@ -29,41 +29,47 @@ export Vegas, Suave, Divonne, Cuhre
 const libcuba = joinpath(dirname(@__FILE__), "..", "deps", "libcuba")
 
 ### Default values of parameters
-NDIM_DEF      = 3
-NCOMP_DEF     = 1
-USERDATA_DEF  = C_NULL
-NVEC_DEF      = 1
-EPSREL_DEF    = 1e-4
-EPSABS_DEF    = 1e-12
-VERBOSE_DEF   = 0
-SEED_DEF      = 0
-MINEVAL_DEF   = 0
-MAXEVAL_DEF   = 1000000
-NSTART_DEF    = 1000
-NINCREASE_DEF = 500
-NBATCH_DEF    = 1000
-GRIDNO_DEF    = 0
-STATEFILE_DEF = ""
-SPIN_DEF      = C_NULL
+# Common arguments.
+const USERDATA  = C_NULL
+const NVEC      = 1
+const EPSREL    = 1e-4
+const EPSABS    = 1e-12
+const VERBOSE   = 0
+const SEED      = 0
+const MINEVAL   = 0
+const MAXEVAL   = 1000000
+const STATEFILE = ""
+const SPIN      = C_NULL
 
-NNEW_DEF     = 1000
-NMIN_DEF     = 2
-FLATNESS_DEF = 25.
+# Vegas-specific arguments.
+const NSTART    = 1000
+const NINCREASE = 500
+const NBATCH    = 1000
+const GRIDNO    = 0
 
-KEY1_DEF         = 47
-KEY2_DEF         = 1
-KEY3_DEF         = 1
-MAXPASS_DEF      = 5
-BORDER_DEF       = 0.
-MAXCHISQ_DEF     = 10.
-MINDEVIATION_DEF = .25
-NGIVEN_DEF       = 0
-LDXGIVEN_DEF     = 0
-XGIVEN_DEF       = zeros(typeof(1.0), LDXGIVEN_DEF, NGIVEN_DEF)
-NEXTRA_DEF       = 0
-PEAKFINDER_DEF   = C_NULL
+# Suave-specific arguments.
+const NNEW     = 1000
+const NMIN     = 2
+const FLATNESS = 25.
 
-KEY_DEF = 0
+# Divonne-specific arguments.
+const KEY1         = 47
+const KEY2         = 1
+const KEY3         = 1
+const MAXPASS      = 5
+const BORDER       = 0.
+const MAXCHISQ     = 10.
+const MINDEVIATION = .25
+const NGIVEN       = 0
+const LDXGIVEN     = 0
+const XGIVEN       = zeros(typeof(1.0), LDXGIVEN, NGIVEN)
+const NEXTRA       = 0
+const PEAKFINDER   = C_NULL
+
+# Cuhre-specific argument.
+const KEY = 0
+
+### Functions
 
 # Return pointer for "func", to be passed as "integrand" argument to Cuba
 # functions.
@@ -77,364 +83,245 @@ function func_ptr(func::Function)
 end
 
 ### Vegas
-function Vegas(integrand::Function,
-               ndim::Integer,
-               ncomp::Integer,
-               userdata::Ptr{Void},
-               nvec::Integer,
-               epsrel::Real,
-               epsabs::Real,
-               verbose::Integer,
-               seed::Integer,
-               mineval::Integer,
-               maxeval::Integer,
-               nstart::Integer,
-               nincrease::Integer,
-               nbatch::Integer,
-               gridno::Integer,
-               statefile::AbstractString,
-               spin::Ptr{Void}
-               )
-
+function Vegas(integrand::Function, ndim::Integer, ncomp::Integer,
+               userdata::Ptr{Void}, nvec::Integer, epsrel::Real,
+               epsabs::Real, verbose::Integer, seed::Integer,
+               mineval::Integer, maxeval::Integer, nstart::Integer,
+               nincrease::Integer, nbatch::Integer, gridno::Integer,
+               statefile::AbstractString, spin::Ptr{Void})
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)
     integral = zeros(typeof(1.0), ncomp)
     error    = zeros(typeof(1.0), ncomp)
     prob     = zeros(typeof(1.0), ncomp)
-
-    result = ccall((:Vegas, libcuba), Cdouble,
-                   (Cint, # ndim
-                    Cint, # ncomp
-                    Ptr{Void}, # integrand
-                    Ptr{Void}, # userdata
-                    Cint, # nvec
-                    Cdouble, # epsrel
-                    Cdouble, # epsabs
-                    Cint, # verbose
-                    Cint, # seed
-                    Cint, # mineval
-                    Cint, # maxeval
-                    Cint, # nstart
-                    Cint, # nincrease
-                    Cint, # nbatch
-                    Cint, # gridno
-                    Ptr{Cchar}, # statefile
-                    Ptr{Void}, # spin
-                    Ptr{Cint}, # neval
-                    Ptr{Cint}, # fail
-                    Ptr{Cdouble}, # integral
-                    Ptr{Cdouble}, # error
-                    Ptr{Cdouble}  # prob
-                    ),
-                   # Input
-                   ndim, ncomp, func_ptr(integrand), userdata, nvec,
-                   epsrel, epsabs,
-                   verbose, seed, mineval, maxeval, nstart, nincrease,
-                   nbatch, gridno, statefile, spin,
-                   # Output
-                   neval, fail,
-                   integral, error, prob
-                   )
-
+    ccall((:Vegas, libcuba), Cdouble,
+          (Cint, # ndim
+           Cint, # ncomp
+           Ptr{Void}, # integrand
+           Ptr{Void}, # userdata
+           Cint, # nvec
+           Cdouble, # epsrel
+           Cdouble, # epsabs
+           Cint, # verbose
+           Cint, # seed
+           Cint, # mineval
+           Cint, # maxeval
+           Cint, # nstart
+           Cint, # nincrease
+           Cint, # nbatch
+           Cint, # gridno
+           Ptr{Cchar}, # statefile
+           Ptr{Void}, # spin
+           Ptr{Cint}, # neval
+           Ptr{Cint}, # fail
+           Ptr{Cdouble}, # integral
+           Ptr{Cdouble}, # error
+           Ptr{Cdouble}),# prob
+          # Input
+          ndim, ncomp, func_ptr(integrand), userdata, nvec,
+          epsrel, epsabs, verbose, seed, mineval, maxeval,
+          nstart, nincrease, nbatch, gridno, statefile, spin,
+          # Output
+          neval, fail, integral, error, prob)
     return integral, error, prob, neval[], fail[], 0
 end
 
-Vegas(integrand::Function;
-      ndim::Integer=NDIM_DEF,
-      ncomp::Integer=NCOMP_DEF,
-      userdata::Ptr{Void}=USERDATA_DEF,
-      nvec::Integer=NVEC_DEF,
-      epsrel::Real=EPSREL_DEF,
-      epsabs::Real=EPSABS_DEF,
-      verbose::Integer=VERBOSE_DEF,
-      seed::Integer=SEED_DEF,
-      mineval::Real=MINEVAL_DEF,
-      maxeval::Real=MAXEVAL_DEF,
-      nstart::Integer=NSTART_DEF,
-      nincrease::Integer=NINCREASE_DEF,
-      nbatch::Integer=NBATCH_DEF,
-      gridno::Integer=GRIDNO_DEF,
-      statefile::AbstractString=STATEFILE_DEF,
-      spin::Ptr{Void}=SPIN_DEF
-      ) = Vegas(integrand, ndim, ncomp, userdata, nvec, float(epsrel),
-                float(epsabs),
-                verbose, seed, trunc(Integer, mineval), trunc(Integer, maxeval),
-                nstart, nincrease, nbatch, gridno, statefile, spin)
+Vegas(integrand::Function; ndim::Integer=NDIM, ncomp::Integer=NCOMP,
+      userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC, epsrel::Real=EPSREL,
+      epsabs::Real=EPSABS, verbose::Integer=VERBOSE, seed::Integer=SEED,
+      mineval::Real=MINEVAL, maxeval::Real=MAXEVAL, nstart::Integer=NSTART,
+      nincrease::Integer=NINCREASE, nbatch::Integer=NBATCH,
+      gridno::Integer=GRIDNO, statefile::AbstractString=STATEFILE,
+      spin::Ptr{Void}=SPIN) =
+          Vegas(integrand, ndim, ncomp, userdata, nvec, float(epsrel),
+                float(epsabs), verbose, seed, trunc(Integer, mineval),
+                trunc(Integer, maxeval), nstart, nincrease, nbatch,
+                gridno, statefile, spin)
 
 ### Suave
-function Suave(integrand::Function,
-               ndim::Integer,
-               ncomp::Integer,
-               userdata::Ptr{Void},
-               nvec::Integer,
-               epsrel::Real,
-               epsabs::Real,
-               verbose::Integer,
-               seed::Integer,
-               mineval::Integer,
-               maxeval::Integer,
-               nnew::Integer,
-               nmin::Integer,
-               flatness::AbstractFloat,
-               statefile::AbstractString,
-               spin::Ptr{Void}
-               )
-
+function Suave(integrand::Function, ndim::Integer, ncomp::Integer,
+               userdata::Ptr{Void}, nvec::Integer, epsrel::Real,
+               epsabs::Real, verbose::Integer, seed::Integer,
+               mineval::Integer, maxeval::Integer, nnew::Integer,
+               nmin::Integer, flatness::AbstractFloat,
+               statefile::AbstractString, spin::Ptr{Void})
     nregions = Ref{Cdouble}(0.0)
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)
     integral = zeros(typeof(1.0), ncomp)
     error    = zeros(typeof(1.0), ncomp)
     prob     = zeros(typeof(1.0), ncomp)
-
-    result = ccall((:Suave, libcuba), Cdouble,
-                   (Cint, # ndim
-                    Cint, # ncomp
-                    Ptr{Void}, # integrand
-                    Ptr{Void}, # userdata
-                    Cint, # nvec
-                    Cdouble, # epsrel
-                    Cdouble, # epsabs
-                    Cint, # verbose
-                    Cint, # seed
-                    Cint, # mineval
-                    Cint, # maxeval
-                    Cint, # nnew
-                    Cint, # nmin
-                    Cdouble, # flatness
-                    Ptr{Cchar}, # statefile
-                    Ptr{Void}, # spin
-                    Ptr{Cdouble}, # nregions
-                    Ptr{Cint}, # neval
-                    Ptr{Cint}, # fail
-                    Ptr{Cdouble}, # integral
-                    Ptr{Cdouble}, # error
-                    Ptr{Cdouble}  # prob
-                    ),
-                   # Input
-                   ndim, ncomp, func_ptr(integrand), userdata, nvec,
-                   epsrel, epsabs,
-                   verbose, seed, mineval, maxeval, nnew, nmin,
-                   flatness, statefile, spin,
-                   # Output
-                   nregions, neval, fail,
-                   integral, error, prob
-                   )
+    ccall((:Suave, libcuba), Cdouble,
+          (Cint, # ndim
+           Cint, # ncomp
+           Ptr{Void}, # integrand
+           Ptr{Void}, # userdata
+           Cint, # nvec
+           Cdouble, # epsrel
+           Cdouble, # epsabs
+           Cint, # verbose
+           Cint, # seed
+           Cint, # mineval
+           Cint, # maxeval
+           Cint, # nnew
+           Cint, # nmin
+           Cdouble, # flatness
+           Ptr{Cchar}, # statefile
+           Ptr{Void}, # spin
+           Ptr{Cdouble}, # nregions
+           Ptr{Cint}, # neval
+           Ptr{Cint}, # fail
+           Ptr{Cdouble}, # integral
+           Ptr{Cdouble}, # error
+           Ptr{Cdouble}),# prob
+          # Input
+          ndim, ncomp, func_ptr(integrand), userdata, nvec,
+          epsrel, epsabs, verbose, seed, mineval, maxeval,
+          nnew, nmin, flatness, statefile, spin,
+          # Output
+          nregions, neval, fail, integral, error, prob)
 
     return integral, error, prob, neval[], fail[], nregions[]
 end
 
-Suave(integrand::Function;
-      ndim::Integer=NDIM_DEF,
-      ncomp::Integer=NCOMP_DEF,
-      userdata::Ptr{Void}=USERDATA_DEF,
-      nvec::Integer=NVEC_DEF,
-      epsrel::Real=EPSREL_DEF,
-      epsabs::Real=EPSABS_DEF,
-      verbose::Integer=VERBOSE_DEF,
-      seed::Integer=SEED_DEF,
-      mineval::Real=MINEVAL_DEF,
-      maxeval::Real=MAXEVAL_DEF,
-      nnew::Integer=NNEW_DEF,
-      nmin::Integer=NMIN_DEF,
-      flatness::Real=FLATNESS_DEF,
-      statefile::AbstractString=STATEFILE_DEF,
-      spin::Ptr{Void}=SPIN_DEF
-      ) = Suave(integrand, ndim, ncomp, userdata, nvec, float(epsrel), float(epsabs),
-                verbose, seed, trunc(Integer, mineval), trunc(Integer, maxeval),
-                nnew, nmin, float(flatness), statefile, spin)
+Suave(integrand::Function; ndim::Integer=NDIM, ncomp::Integer=NCOMP,
+      userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC, epsrel::Real=EPSREL,
+      epsabs::Real=EPSABS, verbose::Integer=VERBOSE, seed::Integer=SEED,
+      mineval::Real=MINEVAL, maxeval::Real=MAXEVAL, nnew::Integer=NNEW,
+      nmin::Integer=NMIN, flatness::Real=FLATNESS,
+      statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
+          Suave(integrand, ndim, ncomp, userdata, nvec, float(epsrel),
+                float(epsabs), verbose, seed, trunc(Integer, mineval),
+                trunc(Integer, maxeval), nnew, nmin, float(flatness),
+                statefile, spin)
 
 ### Divonne
-function Divonne{F<:AbstractFloat}(integrand::Function,
-                                   ndim::Integer,
-                                   ncomp::Integer,
-                                   userdata::Ptr{Void},
-                                   nvec::Integer,
-                                   epsrel::Real,
-                                   epsabs::Real,
-                                   verbose::Integer,
-                                   seed::Integer,
-                                   mineval::Integer,
-                                   maxeval::Integer,
-                                   key1::Integer,
-                                   key2::Integer,
-                                   key3::Integer,
-                                   maxpass::Integer,
-                                   border::F,
-                                   maxchisq::F,
-                                   mindeviation::F,
-                                   ngiven::Integer,
-                                   ldxgiven::Integer,
-                                   xgiven::AbstractArray{F},
-                                   nextra::Integer,
-                                   peakfinder::Ptr{Void},
-                                   statefile::AbstractString,
-                                   spin::Ptr{Void}
-                                   )
-
+function Divonne{F<:AbstractFloat}(integrand::Function, ndim::Integer,
+                                   ncomp::Integer, userdata::Ptr{Void},
+                                   nvec::Integer, epsrel::Real, epsabs::Real,
+                                   verbose::Integer, seed::Integer,
+                                   mineval::Integer, maxeval::Integer,
+                                   key1::Integer, key2::Integer, key3::Integer,
+                                   maxpass::Integer, border::F, maxchisq::F,
+                                   mindeviation::F, ngiven::Integer,
+                                   ldxgiven::Integer, xgiven::AbstractArray{F},
+                                   nextra::Integer, peakfinder::Ptr{Void},
+                                   statefile::AbstractString, spin::Ptr{Void})
     nregions = Ref{Cdouble}(0.0)
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)
     integral = zeros(typeof(1.0), ncomp)
     error    = zeros(typeof(1.0), ncomp)
     prob     = zeros(typeof(1.0), ncomp)
-
-    result = ccall((:Divonne, libcuba), Cdouble,
-                   (Cint, # ndim
-                    Cint, # ncomp
-                    Ptr{Void}, # integrand
-                    Ptr{Void}, # userdata
-                    Cint, # nvec
-                    Cdouble, # epsrel
-                    Cdouble, # epsabs
-                    Cint, # verbose
-                    Cint, # seed
-                    Cint, # mineval
-                    Cint, # maxeval
-                    Cint, # key1
-                    Cint, # key2
-                    Cint, # key3
-                    Cint, # maxpass
-                    Cdouble, # border
-                    Cdouble, # maxchisq
-                    Cdouble, # mindeviation
-                    Cint, # ngiven
-                    Cint, # ldxgiven
-                    Ptr{Cdouble}, # xgiven
-                    Cint, # nextra
-                    Ptr{Void}, # peakfinder
-                    Ptr{Cchar}, # statefile
-                    Ptr{Void}, # spin
-                    Ptr{Cdouble}, # nregions
-                    Ptr{Cint}, # neval
-                    Ptr{Cint}, # fail
-                    Ptr{Cdouble}, # integral
-                    Ptr{Cdouble}, # error
-                    Ptr{Cdouble}  # prob
-                    ),
-                   # Input
-                   ndim, ncomp, func_ptr(integrand), userdata, nvec,
-                   epsrel, epsabs,
-                   verbose, seed, mineval, maxeval, key1, key2, key3, maxpass,
-                   border, maxchisq, mindeviation, ngiven, ldxgiven, xgiven,
-                   nextra, peakfinder, statefile, spin,
-                   # Output
-                   nregions, neval, fail,
-                   integral, error, prob
-                   )
-
+    ccall((:Divonne, libcuba), Cdouble,
+          (Cint, # ndim
+           Cint, # ncomp
+           Ptr{Void}, # integrand
+           Ptr{Void}, # userdata
+           Cint, # nvec
+           Cdouble, # epsrel
+           Cdouble, # epsabs
+           Cint, # verbose
+           Cint, # seed
+           Cint, # mineval
+           Cint, # maxeval
+           Cint, # key1
+           Cint, # key2
+           Cint, # key3
+           Cint, # maxpass
+           Cdouble, # border
+           Cdouble, # maxchisq
+           Cdouble, # mindeviation
+           Cint, # ngiven
+           Cint, # ldxgiven
+           Ptr{Cdouble}, # xgiven
+           Cint, # nextra
+           Ptr{Void}, # peakfinder
+           Ptr{Cchar}, # statefile
+           Ptr{Void}, # spin
+           Ptr{Cdouble}, # nregions
+           Ptr{Cint}, # neval
+           Ptr{Cint}, # fail
+           Ptr{Cdouble}, # integral
+           Ptr{Cdouble}, # error
+           Ptr{Cdouble}),# prob
+          # Input
+          ndim, ncomp, func_ptr(integrand), userdata, nvec, epsrel,
+          epsabs, verbose, seed, mineval, maxeval, key1, key2, key3,
+          maxpass, border, maxchisq, mindeviation, ngiven, ldxgiven,
+          xgiven, nextra, peakfinder, statefile, spin,
+          # Output
+          nregions, neval, fail, integral, error, prob)
     return integral, error, prob, neval[], fail[], nregions[]
 end
 
-Divonne{R<:Real}(integrand::Function;
-                 ndim::Integer=NDIM_DEF,
-                 ncomp::Integer=NCOMP_DEF,
-                 userdata::Ptr{Void}=USERDATA_DEF,
-                 nvec::Integer=NVEC_DEF,
-                 epsrel::Real=EPSREL_DEF,
-                 epsabs::Real=EPSABS_DEF,
-                 verbose::Integer=VERBOSE_DEF,
-                 seed::Integer=SEED_DEF,
-                 mineval::Real=MINEVAL_DEF,
-                 maxeval::Real=MAXEVAL_DEF,
-                 key1::Integer=KEY1_DEF,
-                 key2::Integer=KEY2_DEF,
-                 key3::Integer=KEY3_DEF,
-                 maxpass::Integer=MAXPASS_DEF,
-                 border::Real=BORDER_DEF,
-                 maxchisq::Real=MAXCHISQ_DEF,
-                 mindeviation::Real=MINDEVIATION_DEF,
-                 ngiven::Integer=NGIVEN_DEF,
-                 ldxgiven::Integer=LDXGIVEN_DEF,
-                 xgiven::AbstractArray{R}=XGIVEN_DEF,
-                 nextra::Integer=NEXTRA_DEF,
-                 peakfinder::Ptr{Void}=PEAKFINDER_DEF,
-                 statefile::AbstractString=STATEFILE_DEF,
-                 spin::Ptr{Void}=SPIN_DEF
-                 ) = Divonne(integrand, ndim, ncomp, userdata, nvec,
-                             float(epsrel), float(epsabs),
-                             verbose, seed, trunc(Integer, mineval),
-                             trunc(Integer, maxeval),
-                             key1, key2, key3, maxpass,
-                             float(border), float(maxchisq),
-                             float(mindeviation), ngiven, ldxgiven,
-                             xgiven,
-                             nextra, peakfinder, statefile, spin)
+Divonne{R<:Real}(integrand::Function; ndim::Integer=NDIM, ncomp::Integer=NCOMP,
+                 userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC,
+                 epsrel::Real=EPSREL, epsabs::Real=EPSABS,
+                 verbose::Integer=VERBOSE, seed::Integer=SEED,
+                 mineval::Real=MINEVAL, maxeval::Real=MAXEVAL,
+                 key1::Integer=KEY1, key2::Integer=KEY2, key3::Integer=KEY3,
+                 maxpass::Integer=MAXPASS, border::Real=BORDER,
+                 maxchisq::Real=MAXCHISQ, mindeviation::Real=MINDEVIATION,
+                 ngiven::Integer=NGIVEN, ldxgiven::Integer=LDXGIVEN,
+                 xgiven::AbstractArray{R}=XGIVEN, nextra::Integer=NEXTRA,
+                 peakfinder::Ptr{Void}=PEAKFINDER,
+                 statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
+                     Divonne(integrand, ndim, ncomp, userdata, nvec,
+                             float(epsrel), float(epsabs), verbose, seed,
+                             trunc(Integer, mineval), trunc(Integer, maxeval),
+                             key1, key2, key3, maxpass, float(border),
+                             float(maxchisq), float(mindeviation), ngiven,
+                             ldxgiven, xgiven, nextra, peakfinder, statefile,
+                             spin)
 
 ### Cuhre
-function Cuhre(integrand::Function,
-               ndim::Integer,
-               ncomp::Integer,
-               userdata::Ptr{Void},
-               nvec::Integer,
-               epsrel::Real,
-               epsabs::Real,
-               verbose::Integer,
-               mineval::Integer,
-               maxeval::Integer,
-               key::Integer,
-               statefile::AbstractString,
-               spin::Ptr{Void}
-               )
-
+function Cuhre(integrand::Function, ndim::Integer, ncomp::Integer,
+               userdata::Ptr{Void}, nvec::Integer, epsrel::Real, epsabs::Real,
+               verbose::Integer, mineval::Integer, maxeval::Integer,
+               key::Integer, statefile::AbstractString, spin::Ptr{Void})
     nregions = Ref{Cdouble}(0.0)
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)
     integral = zeros(typeof(1.0), ncomp)
     error    = zeros(typeof(1.0), ncomp)
     prob     = zeros(typeof(1.0), ncomp)
-
-    result = ccall((:Cuhre, libcuba), Cdouble,
-                   (Cint, # ndim
-                    Cint, # ncomp
-                    Ptr{Void}, # integrand
-                    Ptr{Void}, # userdata
-                    Cint, # nvec
-                    Cdouble, # epsrel
-                    Cdouble, # epsabs
-                    Cint, # verbose
-                    Cint, # mineval
-                    Cint, # maxeval
-                    Cint, # key
-                    Ptr{Cchar}, # statefile
-                    Ptr{Void}, # spin
-                    Ptr{Cdouble}, # nregions
-                    Ptr{Cint}, # neval
-                    Ptr{Cint}, # fail
-                    Ptr{Cdouble}, # integral
-                    Ptr{Cdouble}, # error
-                    Ptr{Cdouble}  # prob
-                    ),
-                   # Input
-                   ndim, ncomp, func_ptr(integrand), userdata, nvec,
-                   epsrel, epsabs,
-                   verbose, mineval, maxeval, key,
-                   statefile, spin,
-                   # Output
-                   nregions, neval, fail,
-                   integral, error, prob
-                   )
-
+    ccall((:Cuhre, libcuba), Cdouble,
+          (Cint, # ndim
+           Cint, # ncomp
+           Ptr{Void}, # integrand
+           Ptr{Void}, # userdata
+           Cint, # nvec
+           Cdouble, # epsrel
+           Cdouble, # epsabs
+           Cint, # verbose
+           Cint, # mineval
+           Cint, # maxeval
+           Cint, # key
+           Ptr{Cchar}, # statefile
+           Ptr{Void}, # spin
+           Ptr{Cdouble}, # nregions
+           Ptr{Cint}, # neval
+           Ptr{Cint}, # fail
+           Ptr{Cdouble}, # integral
+           Ptr{Cdouble}, # error
+           Ptr{Cdouble}),# prob
+          # Input
+          ndim, ncomp, func_ptr(integrand), userdata, nvec, epsrel,
+          epsabs, verbose, mineval, maxeval, key, statefile, spin,
+          # Output
+          nregions, neval, fail, integral, error, prob)
     return integral, error, prob, neval[], fail[], nregions[]
 end
 
-Cuhre(integrand::Function;
-      ndim::Integer=NDIM_DEF,
-      ncomp::Integer=NCOMP_DEF,
-      userdata::Ptr{Void}=USERDATA_DEF,
-      nvec::Integer=NVEC_DEF,
-      epsrel::Real=EPSREL_DEF,
-      epsabs::Real=EPSABS_DEF,
-      verbose::Integer=VERBOSE_DEF,
-      mineval::Real=MINEVAL_DEF,
-      maxeval::Real=MAXEVAL_DEF,
-      key::Integer=KEY_DEF,
-      statefile::AbstractString=STATEFILE_DEF,
-      spin::Ptr{Void}=SPIN_DEF
-      ) = Cuhre(integrand, ndim, ncomp, userdata, nvec, float(epsrel),
-                float(epsabs),
-                verbose, trunc(Integer, mineval), trunc(Integer, maxeval),
-                key, statefile, spin)
+Cuhre(integrand::Function; ndim::Integer=NDIM, ncomp::Integer=NCOMP,
+      userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC, epsrel::Real=EPSREL,
+      epsabs::Real=EPSABS, verbose::Integer=VERBOSE, mineval::Real=MINEVAL,
+      maxeval::Real=MAXEVAL, key::Integer=KEY,
+      statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
+          Cuhre(integrand, ndim, ncomp, userdata, nvec, float(epsrel),
+                float(epsabs), verbose, trunc(Integer, mineval),
+                trunc(Integer, maxeval), key, statefile, spin)
 
 ### Other functions, not exported
 function cores(n::Integer, p::Integer)
