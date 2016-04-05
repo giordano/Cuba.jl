@@ -126,7 +126,7 @@ function Vegas(integrand::Function, ndim::Integer, ncomp::Integer,
     return integral, error, prob, neval[], fail[], 0
 end
 
-Vegas(integrand::Function; ndim::Integer=NDIM, ncomp::Integer=NCOMP,
+Vegas(integrand::Function, ndim::Integer, ncomp::Integer;
       userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC, epsrel::Real=EPSREL,
       epsabs::Real=EPSABS, verbose::Integer=VERBOSE, seed::Integer=SEED,
       mineval::Real=MINEVAL, maxeval::Real=MAXEVAL, nstart::Integer=NSTART,
@@ -184,7 +184,7 @@ function Suave(integrand::Function, ndim::Integer, ncomp::Integer,
     return integral, error, prob, neval[], fail[], nregions[]
 end
 
-Suave(integrand::Function; ndim::Integer=NDIM, ncomp::Integer=NCOMP,
+Suave(integrand::Function, ndim::Integer, ncomp::Integer;
       userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC, epsrel::Real=EPSREL,
       epsabs::Real=EPSABS, verbose::Integer=VERBOSE, seed::Integer=SEED,
       mineval::Real=MINEVAL, maxeval::Real=MAXEVAL, nnew::Integer=NNEW,
@@ -255,7 +255,7 @@ function Divonne{F<:AbstractFloat}(integrand::Function, ndim::Integer,
     return integral, error, prob, neval[], fail[], nregions[]
 end
 
-Divonne{R<:Real}(integrand::Function; ndim::Integer=NDIM, ncomp::Integer=NCOMP,
+Divonne{R<:Real}(integrand::Function, ndim::Integer, ncomp::Integer;
                  userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC,
                  epsrel::Real=EPSREL, epsabs::Real=EPSABS,
                  verbose::Integer=VERBOSE, seed::Integer=SEED,
@@ -314,7 +314,7 @@ function Cuhre(integrand::Function, ndim::Integer, ncomp::Integer,
     return integral, error, prob, neval[], fail[], nregions[]
 end
 
-Cuhre(integrand::Function; ndim::Integer=NDIM, ncomp::Integer=NCOMP,
+Cuhre(integrand::Function, ndim::Integer, ncomp::Integer;
       userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC, epsrel::Real=EPSREL,
       epsabs::Real=EPSABS, verbose::Integer=VERBOSE, mineval::Real=MINEVAL,
       maxeval::Real=MAXEVAL, key::Integer=KEY,

@@ -58,22 +58,22 @@ let
     res2 = (sqrt(pi)*erf(1)/2)^3
     res3 = zeta(3)
     # Vegas
-    result = Vegas(func, ndim=3, ncomp=3, epsabs=1e-4, epsrel=1e-8)
+    result = Vegas(func, 3, 3, epsabs=1e-4, epsrel=1e-8)
     @test_approx_eq_eps result[1][1]  res1  result[2][1]
     @test_approx_eq_eps result[1][2]  res2  result[2][2]
     @test_approx_eq_eps result[1][3]  res3  result[2][3]
     # Suave
-    result = Suave(func, ndim=3, ncomp=3, epsabs=1e-3, epsrel=1e-8)
+    result = Suave(func, 3, 3, epsabs=1e-3, epsrel=1e-8)
     @test_approx_eq_eps result[1][1]  res1  result[2][1]
     @test_approx_eq_eps result[1][2]  res2  result[2][2]
     @test_approx_eq_eps result[1][3]  res3  result[2][3]
     # Divonne
-    result = Divonne(func, ndim=3, ncomp=3, epsabs=1e-4, epsrel=1e-8)
+    result = Divonne(func, 3, 3, epsabs=1e-4, epsrel=1e-8)
     @test_approx_eq_eps result[1][1]  res1  result[2][1]
     @test_approx_eq_eps result[1][2]  res2  result[2][2]
     # @test_approx_eq_eps result[1][3]  res3  result[2][3] # <== This integral diverges!
     # Cuhre
-    result = Cuhre(func, ndim=3, ncomp=3, epsabs=1e-8, epsrel=1e-8)
+    result = Cuhre(func, 3, 3, epsabs=1e-8, epsrel=1e-8)
     @test_approx_eq_eps result[1][1]  res1  result[2][1]
     @test_approx_eq_eps result[1][2]  res2  result[2][2]
     @test_approx_eq_eps result[1][3]  res3  result[2][3]

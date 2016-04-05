@@ -67,16 +67,16 @@ function test(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
 end
 
 info("Ignore these times...")
-@time Vegas(test, ndim=ndim, ncomp=ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Suave(test, ndim=ndim, ncomp=ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Divonne(test, ndim=ndim, ncomp=ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Cuhre(test, ndim=ndim, ncomp=ncomp, epsabs=epsabs, epsrel=epsrel);
+@time Vegas(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
+@time Suave(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
+@time Divonne(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
+@time Cuhre(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
 
 info("Performance of Cuba.jl:")
-@time Vegas(test, ndim=ndim, ncomp=ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Suave(test, ndim=ndim, ncomp=ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Divonne(test, ndim=ndim, ncomp=ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Cuhre(test, ndim=ndim, ncomp=ncomp, epsabs=epsabs, epsrel=epsrel);
+@time Vegas(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
+@time Suave(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
+@time Divonne(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
+@time Cuhre(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
 
 cd(dirname(@__FILE__))
 cp("../deps/cuba-shared-object/libcuba.a", "libcuba.a", remove_destination=true)
