@@ -32,7 +32,7 @@ ncomp=11
 epsabs=1e-8
 epsrel=1e-8
 
-Cuba.cores(0,1000)
+Cuba.cores(0,10000)
 
 Sq(x)      = x*x
 rsq(x,y,z) = Sq(x) + Sq(y) + Sq(z)

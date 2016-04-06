@@ -20,7 +20,7 @@
  *
  * Commentary:
  *
- * Based on file demo/demo-c.c of Cuba Library, by Thomas Hanh, released with
+ * Based on file demo/demo-c.c of Cuba Library, by Thomas Hahn, released with
  * the same license.
  *
  * Code: */

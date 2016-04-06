@@ -28,21 +28,17 @@ f2(x,y,z) = exp(-(x*x + y*y + z*z))
 f3(x,y,z) = 1/(1 - x*y*z)
 
 # This is the integrand function.  This is just like one would do in C.
-function func(ndim::Cint,
-              xx::Ptr{Cdouble},
-              ncomp::Cint,
-              ff::Ptr{Cdouble},
-              userdata::Ptr{Void}=USERDATA_DEF
-              )
+
+function func(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint, ff::Ptr{Cdouble},
+              userdata::Ptr{Void})
+    # Take arrays from "xx" and "ff" pointers.
     x = pointer_to_array(xx, (ndim,))
     f = pointer_to_array(ff, (ncomp,))
-
     # Define components of the integrand function.
     f[1] = f1(x[1], x[2], x[3])
     f[2] = f2(x[1], x[2], x[3])
     f[3] = f3(x[1], x[2], x[3])
-
-    xx = pointer_from_objref(x)
+    # Store back the results to "ff"
     ff = pointer_from_objref(f)
     return Cint(0)::Cint
 end
