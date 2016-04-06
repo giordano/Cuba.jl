@@ -47,13 +47,13 @@ Cuba.accel(0,1000)
 Cuba.cores(0,1000)
 
 # Test results and make sure the estimation of error is exact.
-epsabs = Dict(Vegas=>1e-4, Suave=>1e-3, Divonne=>1e-7, Cuhre=>1e-8)
+epsabs = Dict(Vegas=>1e-4, Suave=>1e-3, Divonne=>1e-4, Cuhre=>1e-8)
 answer = [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
 ncomp = 3
 for alg in (:Vegas, :Suave, :Divonne, :Cuhre)
     info("Testing $(string(alg)) algorithm")
     result = @eval $alg($func, 3, $ncomp, epsabs=$epsabs[$alg],
-                        epsrel=1e-12, maxeval=5e7)
+                        epsrel=1e-8)
     for i = 1:ncomp
         println("Component $i: ", result[1][i], " ± ", result[2][i],
                 isfinite(result[1][i]) ? "" : " (skipping test)")
