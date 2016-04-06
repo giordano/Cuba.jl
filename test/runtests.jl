@@ -28,7 +28,6 @@ f2(x,y,z) = exp(-(x*x + y*y + z*z))
 f3(x,y,z) = 1/(1 - x*y*z)
 
 # This is the integrand function.  This is just like one would do in C.
-
 function func(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint, ff::Ptr{Cdouble},
               userdata::Ptr{Void})
     # Take arrays from "xx" and "ff" pointers.
@@ -48,31 +47,21 @@ Cuba.accel(0,1000)
 Cuba.cores(0,1000)
 
 # Test results and make sure the estimation of error is exact.
-let
-    local result, res1, res2, res3
-    res1 = (e-1)*(1-cos(1))*sin(1)
-    res2 = (sqrt(pi)*erf(1)/2)^3
-    res3 = zeta(3)
-    # Vegas
-    result = Vegas(func, 3, 3, epsabs=1e-4, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]  res1  result[2][1]
-    @test_approx_eq_eps result[1][2]  res2  result[2][2]
-    @test_approx_eq_eps result[1][3]  res3  result[2][3]
-    # Suave
-    result = Suave(func, 3, 3, epsabs=1e-3, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]  res1  result[2][1]
-    @test_approx_eq_eps result[1][2]  res2  result[2][2]
-    @test_approx_eq_eps result[1][3]  res3  result[2][3]
-    # Divonne
-    result = Divonne(func, 3, 3, epsabs=1e-4, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]  res1  result[2][1]
-    @test_approx_eq_eps result[1][2]  res2  result[2][2]
-    # @test_approx_eq_eps result[1][3]  res3  result[2][3] # <== This integral diverges!
-    # Cuhre
-    result = Cuhre(func, 3, 3, epsabs=1e-8, epsrel=1e-8)
-    @test_approx_eq_eps result[1][1]  res1  result[2][1]
-    @test_approx_eq_eps result[1][2]  res2  result[2][2]
-    @test_approx_eq_eps result[1][3]  res3  result[2][3]
+epsabs = Dict(Vegas=>1e-4, Suave=>1e-3, Divonne=>1e-7, Cuhre=>1e-8)
+answer = [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
+ncomp = 3
+for alg in (:Vegas, :Suave, :Divonne, :Cuhre)
+    info("Testing $(string(alg)) algorithm")
+    result = @eval $alg($func, 3, $ncomp, epsabs=$epsabs[$alg],
+                        epsrel=1e-12, maxeval=5e7)
+    for i = 1:ncomp
+        println("Component $i: ", result[1][i], " ± ", result[2][i],
+                isfinite(result[1][i]) ? "" : " (skipping test)")
+        println("Should be:   ", answer[i])
+        if isfinite(result[1][i])
+            @test_approx_eq_eps result[1][i] answer[i] result[2][i]
+        end
+    end
 end
 
 # Test other function
