@@ -136,12 +136,12 @@ end
 result = Cuhre(func, 3, 3, epsabs=1e-12, epsrel=1e-10)
 println("Results of Cuba:")
 println("Component 1: ", result[1][1], " ± ", result[2][1])
-println("Component 1: ", result[1][2], " ± ", result[2][2])
-println("Component 1: ", result[1][3], " ± ", result[2][3])
+println("Component 2: ", result[1][2], " ± ", result[2][2])
+println("Component 3: ", result[1][3], " ± ", result[2][3])
 println("Exact results:")
 println("Component 1: ", (e-1)*(1-cos(1))*sin(1))
-println("Component 1: ", (sqrt(pi)*erf(1)/2)^3)
-println("Component 1: ", zeta(3))
+println("Component 2: ", (sqrt(pi)*erf(1)/2)^3)
+println("Component 3: ", zeta(3))
 ```
 
 This is the output
@@ -149,12 +149,12 @@ This is the output
 ```
 Results of Cuba:
 Component 1: 0.6646696797813739 ± 1.0050367631018485e-13
-Component 1: 0.4165383858806454 ± 2.932866749838454e-11
-Component 1: 1.2020569031649702 ± 1.1958522385908214e-10
+Component 2: 0.4165383858806454 ± 2.932866749838454e-11
+Component 3: 1.2020569031649702 ± 1.1958522385908214e-10
 Exact results:
 Component 1: 0.6646696797813771
-Component 1: 0.41653838588663805
-Component 1: 1.2020569031595951
+Component 2: 0.41653838588663805
+Component 3: 1.2020569031595951
 ```
 
 Performance
