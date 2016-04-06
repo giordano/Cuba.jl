@@ -24,11 +24,12 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
   subdivision)
 
 For more details on the algorithms see the manual included in Cuba library and
-available at in `deps/cuba-shared-object/cuba.pdf` after successful installation
+available in `deps/cuba-shared-object/cuba.pdf` after successful installation
 of `Cuba.jl`.
 
-**Note:** This package works on the same operating systems for which the Cuba
-library is available, i.e. GNU/Linux and OS X systems.
+**Note:** This package has been tested only on GNU/Linux and OS X systems.
+Trying to install on Windows will likely fail, please report if you manage to
+install on this system.
 
 Installation
 ------------
@@ -135,9 +136,8 @@ end
 
 result = Cuhre(func, 3, 3, epsabs=1e-12, epsrel=1e-10)
 println("Results of Cuba:")
-println("Component 1: ", result[1][1], " ± ", result[2][1])
-println("Component 2: ", result[1][2], " ± ", result[2][2])
-println("Component 3: ", result[1][3], " ± ", result[2][3])
+printres(i) = println("Component $i: ", result[1][i], " ± ", result[2][i])
+for i=1:3; printres(i); end
 println("Exact results:")
 println("Component 1: ", (e-1)*(1-cos(1))*sin(1))
 println("Component 2: ", (sqrt(pi)*erf(1)/2)^3)
@@ -166,7 +166,7 @@ variable is set to `0`.  This is the result of running the benchmark test
 present in `test` directory.
 
 ```
-$ CUBACORES=0 julia -f test/benchmark.jl
+$ CUBACORES=0 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
   [...]
 INFO: Performance of Cuba.jl:
   0.338188 seconds (6.05 M allocations: 184.480 MB, 2.55% gc time)
@@ -184,7 +184,7 @@ Native C Cuba Library outperforms `Cuba.jl` when higher values of `CUBACORES` ar
 used, for example:
 
 ```
-$ CUBACORES=1 julia -f test/benchmark.jl
+$ CUBACORES=1 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
   [...]
 INFO: Performance of Cuba.jl:
   0.341448 seconds (6.05 M allocations: 184.480 MB, 2.60% gc time)
@@ -197,15 +197,6 @@ INFO: Performance of Cuba C Library:
   0.156459 seconds (Divonne)
   0.085269 seconds (Cuhre)
 ```
-
-In `Cuba.jl`, the number of cores and accelerators to be used can be set with
-
-``` julia
-Cuba.cores(n, p)
-Cuba.accel(n, p)
-```
-
-See Cuba manual for more information on these functions.
 
 Related projects
 ----------------
