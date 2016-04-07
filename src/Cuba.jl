@@ -89,6 +89,7 @@ function Vegas(integrand::Function, ndim::Integer, ncomp::Integer,
                mineval::Integer, maxeval::Integer, nstart::Integer,
                nincrease::Integer, nbatch::Integer, gridno::Integer,
                statefile::AbstractString, spin::Ptr{Void})
+    Cuba.cores(0, 10000)
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)
     integral = zeros(typeof(1.0), ncomp)
@@ -145,6 +146,7 @@ function Suave(integrand::Function, ndim::Integer, ncomp::Integer,
                mineval::Integer, maxeval::Integer, nnew::Integer,
                nmin::Integer, flatness::AbstractFloat,
                statefile::AbstractString, spin::Ptr{Void})
+    Cuba.cores(0, 10000)
     nregions = Ref{Cdouble}(0.0)
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)
@@ -180,7 +182,6 @@ function Suave(integrand::Function, ndim::Integer, ncomp::Integer,
           nnew, nmin, flatness, statefile, spin,
           # Output
           nregions, neval, fail, integral, error, prob)
-
     return integral, error, prob, neval[], fail[], nregions[]
 end
 
@@ -207,6 +208,7 @@ function Divonne{F<:AbstractFloat}(integrand::Function, ndim::Integer,
                                    ldxgiven::Integer, xgiven::AbstractArray{F},
                                    nextra::Integer, peakfinder::Ptr{Void},
                                    statefile::AbstractString, spin::Ptr{Void})
+    Cuba.cores(0, 10000)
     nregions = Ref{Cdouble}(0.0)
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)
@@ -280,6 +282,7 @@ function Cuhre(integrand::Function, ndim::Integer, ncomp::Integer,
                userdata::Ptr{Void}, nvec::Integer, epsrel::Real, epsabs::Real,
                verbose::Integer, mineval::Integer, maxeval::Integer,
                key::Integer, statefile::AbstractString, spin::Ptr{Void})
+    Cuba.cores(0, 10000)
     nregions = Ref{Cdouble}(0.0)
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)

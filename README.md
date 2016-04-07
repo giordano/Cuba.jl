@@ -27,6 +27,18 @@ For more details on the algorithms see the manual included in Cuba library and
 available in `deps/cuba-shared-object/cuba.pdf` after successful installation
 of `Cuba.jl`.
 
+Integration is performed on the n-dimensional hypercube [0, 1]^n.  If you want
+to compute an integral over a different set, you have to scale the integrand
+function in order to have an equivalent integral on [0, 1]^n.  For example,
+recall that in one dimension
+
+```
+∫_a^b dx f[x] → ∫_0^1 dy f[a + (b - a) y] (b - a)
+```
+
+where the final `(b - a)` is the one-dimensional version of the Jacobian.  This
+generalizes straightforwardly to more than one dimension.
+
 **Note:** This package has been tested only on GNU/Linux and OS X systems.
 Trying to install on Windows will likely fail, please report if you manage to
 install on this system.
@@ -45,7 +57,6 @@ julia> Pkg.add("Cuba")
 
 You may need to update your package list with `Pkg.update()` in order to get the
 latest version of `Cuba.jl`.
-
 
 Usage
 -----
@@ -160,10 +171,12 @@ Component 3: 1.2020569031595951
 Performance
 -----------
 
-`Cuba.jl` has performances comparable with (if not slightly better than) an
-equivalent native C code based on Cuba library when `CUBACORES` environment
-variable is set to `0`.  This is the result of running the benchmark test
-present in `test` directory.
+`Cuba.jl` cannot (yet?) take advantage of parallelization capabilities of Cuba
+Library.  Nonetheless, it has performances comparable with (if not slightly
+better than) an equivalent native C code based on Cuba library when `CUBACORES`
+environment variable is set to `0` (i.e., multithreading is disabled).  This is
+the result of running the benchmark present in `test` directory on a 64-bit
+GNU/Linux system running Julia 0.4.
 
 ```
 $ CUBACORES=0 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
@@ -180,8 +193,8 @@ INFO: Performance of Cuba C Library:
   0.306150 seconds (Cuhre)
 ```
 
-Native C Cuba Library outperforms `Cuba.jl` when higher values of `CUBACORES` are
-used, for example:
+Of course, a native C code making use of Cuba Library outperforms `Cuba.jl` when
+higher values of `CUBACORES` are used, for example:
 
 ```
 $ CUBACORES=1 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
@@ -197,6 +210,12 @@ INFO: Performance of Cuba C Library:
   0.156459 seconds (Divonne)
   0.085269 seconds (Cuhre)
 ```
+
+`Cuba.jl` internally fixes `CUBACORES` to 0 in order to prevent from forking
+`julia` processes that would only slow down calculations eating up the memory,
+without actually taking advantage of concurrency.  Furthemore, without this
+measure, adding more Julia processes with `addprocs()` would only make the
+program segfault.
 
 Related projects
 ----------------
