@@ -9,10 +9,10 @@ Introduction
 algorithms in [Julia](http://julialang.org/).
 
 This is just a Julia wrapper around the C
-[Cuba library](http://www.feynarts.de/cuba/) by **Thomas Hahn**.  All the
-credits goes to him for the underlying functions, blame me for any problem with
-the Julia interface.  Feel free to report bugs and make suggestions at
-https://github.com/giordano/Cuba.jl/issues.
+[Cuba library](http://www.feynarts.de/cuba/), version 4.2, by **Thomas Hahn**.
+All the credits goes to him for the underlying functions, blame me for any
+problem with the Julia interface.  Feel free to report bugs and make suggestions
+at https://github.com/giordano/Cuba.jl/issues.
 
 All algorithms provided by Cuba library are supported in `Cuba.jl`:
 * `Vegas` (type: Monte Carlo; variance reduction with importance sampling)
@@ -27,10 +27,10 @@ For more details on the algorithms see the manual included in Cuba library and
 available in `deps/cuba-shared-object/cuba.pdf` after successful installation
 of `Cuba.jl`.
 
-Integration is performed on the n-dimensional hypercube [0, 1]^n.  If you want
-to compute an integral over a different set, you have to scale the integrand
-function in order to have an equivalent integral on [0, 1]^n.  For example,
-recall that in one dimension
+Integration is performed on the n-dimensional unit hypercube [0, 1]^n.  If you
+want to compute an integral over a different set, you have to scale the
+integrand function in order to have an equivalent integral on [0, 1]^n.  For
+example, recall that in one dimension
 
 ```
 ∫_a^b dx f[x] → ∫_0^1 dy f[a + (b - a) y] (b - a)
@@ -123,7 +123,7 @@ component of the integral with `result[1][i]` and the associated error with
 More extended documentation of `Cuba.jl` will come later.
 
 **Note:** admittedly, this user interface is not REPL-friendly, help on
-improving is welcome.
+improving it is welcome.
 
 Example
 -------
@@ -135,7 +135,7 @@ Here is an example of a 3-component integral in 3D space (so `ndim=3` and
 using Cuba
 
 function func(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint, ff::Ptr{Cdouble},
-              userdata::Ptr{Void}=USERDATA_DEF)
+              userdata::Ptr{Void})
     x = pointer_to_array(xx, (ndim,))
     f = pointer_to_array(ff, (ncomp,))
     f[1] = sin(x[1])*cos(x[2])*exp(x[3])
@@ -147,8 +147,7 @@ end
 
 result = Cuhre(func, 3, 3, epsabs=1e-12, epsrel=1e-10)
 println("Results of Cuba:")
-printres(i) = println("Component $i: ", result[1][i], " ± ", result[2][i])
-for i=1:3; printres(i); end
+for i=1:3; println("Component $i: ", result[1][i], " ± ", result[2][i]); end
 println("Exact results:")
 println("Component 1: ", (e-1)*(1-cos(1))*sin(1))
 println("Component 2: ", (sqrt(pi)*erf(1)/2)^3)
