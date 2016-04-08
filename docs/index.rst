@@ -71,25 +71,29 @@ or put this command into your Julia script.
 
 ``Cuba.jl`` provides four functions to integrate, one for each algorithm:
 
-.. code-block:: julia
+.. function:: Vegas(function, ndim, ncomp[, keywords...])
+.. function:: Suave(function, ndim, ncomp[, keywords...])
+.. function:: Divonne(function, ndim, ncomp[, keywords...])
+.. function:: Cuhre(function, ndim, ncomp[, keywords...])
 
-    Vegas(function, ndim, ncomp[, keywords...])
-    Suave(function, ndim, ncomp[, keywords...])
-    Divonne(function, ndim, ncomp[, keywords...])
-    Cuhre(function, ndim, ncomp[, keywords...])
+Large parts of the following sections are borrowed from Cuba manual.  Refer to
+it for more information on the details.
 
-Mandatory arguments are:
+Mandatory Arguments
+'''''''''''''''''''
 
--  ``function``: the name of the function to be integrated
--  ``ndim``: the number of dimensions of the integral
--  ``ncomp``: the number of components of the integrand
+Mandatory arguments of integrator functions are:
+
+- ``function`` (type: ``Function``): the name of the function to be integrated
+- ``ndim`` (type: ``Integer``): the number of dimensions of the integral
+- ``ncomp`` (type: ``Integer``): the number of components of the integrand
 
 The ``function`` must be of this type:
 
 .. code-block:: julia
 
-    function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint, ff::Ptr{Cdouble},
-                       userdata::Ptr{Void})
+    function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
+                       ff::Ptr{Cdouble}, userdata::Ptr{Void})
         # Take arrays from "xx" and "ff" pointers.
         x = pointer_to_array(xx, (ndim,))
         f = pointer_to_array(ff, (ncomp,))
@@ -100,29 +104,308 @@ The ``function`` must be of this type:
     return Cint(0)::Cint
     end
 
-Note that ``xx`` and ``ff`` arguments are passed as pointers, so you
-have to translate them to Julia objects before actually performing
-calculations, and finally store the results into ``ff``.
+Note that ``xx`` and ``ff`` arguments are passed as pointers, so you have to
+translate them to Julia objects before actually performing calculations, and
+finally convert back ``f`` into the pointer ``ff``.
 
-All other arguments listed in Cuba documentation can be passed as
-optional keywords.
+The integrand receives ``nvec`` samples in ``x`` and is supposed to fill the
+array ``f`` with the corresponding integrand values.  Note that ``nvec``
+indicates the actual number of points passed to the integrand here and may be
+smaller than the ``nvec`` given to the integrator (see `Common Keywords`_
+below).
 
-The integrating functions ``Vegas``, ``Suave``, ``Divonne``, and
-``Cuhre`` return the 6-tuple
+**Note:** admittedly, this user interface is not REPL-friendly, help on
+improving it is welcome.
+
+Optional Keywords
+'''''''''''''''''
+
+All other arguments required by Cuba routines can be passed as optional
+keywords.  ``Cuba.jl`` uses some reasonable default values in order to enable
+users to invoke integrator functions with a minimal set of arguments.  Anyway,
+if you want to make sure future changes to some default values of keywords will
+affect your current script, explicitely specify the value of the keywords.
+
+Common Keywords
+~~~~~~~~~~~~~~~
+
+These are optional keywords common to all functions:
+
+- ``userdata`` (type: ``Ptr{Void}``, default: ``C_NULL``): user data passed to the integrand
+- ``nvec`` (type: ``Integer``, default: ``1``): the maximum number of points to
+  be given to the integrand routine in each invocation.  Usually this is 1 but
+  if the integrand can profit from e.g. Single Instruction Multiple Data (SIMD)
+  vectorization, a larger value can be chosen
+- ``epsrel`` (type: ``Real``, default: ``1e-4``), and ``epsabs`` (type:
+  ``Real``, default: ``1e-12``): the requested relative
+  (:math:`\varepsilon_{\text{rel}}`) and absolute
+  (:math:`\varepsilon_{\text{abs}}`) accuracies.  The integrator tries to find
+  an estimate :math:`\hat{I}` for the integral :math:`I` which for every
+  component :math:`c` fulfills :math:`|\hat{I}_c - I_c|\leqslant
+  \max(\varepsilon_{\text{abs}}, \varepsilon_{\text{rel}} |I_c|)`.
+- ``flags`` (type: ``Integer``, default: ``0``): flags governing the integration:
+
+  - Bits 0 and 1 are taken as the verbosity level, i.e. ``0`` to ``3``, unless
+    the ``CUBAVERBOSE`` environment variable contains an even higher value (used
+    for debugging).
+
+    Level ``0`` does not print any output, level ``1`` prints "reasonable"
+    information on the progress of the integration, level ``2`` also echoes the
+    input parameters, and level ``3`` further prints the subregion results (if
+    applicable).
+  - Bit 2 = ``0``: all sets of samples collected on a subregion during the
+    various iterations or phases contribute to the final result.
+
+    Bit 2 = ``1``, only the last (largest) set of samples is used in the final
+    result.
+  - (Vegas and Suave only)
+
+    Bit 3 = ``0``, apply additional smoothing to the importance function, this
+    moderately improves convergence for many integrands.
+
+    Bit 3 = ``1``, use the importance function without smoothing, this should be
+    chosen if the integrand has sharp edges.
+  - Bit 4 = ``0``, delete the state file (if one is chosen) when the integration
+    terminates successfully.
+
+    Bit 4 = ``1``, retain the state file.
+  - (Vegas only)
+
+    Bit 5 = ``0``, take the integrator's state from the state file, if one is
+    present.
+
+    Bit 5 = ``1``, reset the integrator's state even if a state file is present,
+    i.e. keep only the grid.  Together with Bit 4 this allows a grid adapted by
+    one integration to be used for another integrand.
+  - Bits 8--31 =: ``level`` determines the random-number generator.
+
+  To select e.g. last samples only and verbosity level 2, pass ``6 = 4 + 2`` for
+  the flags.
+
+- ``seed`` (type: ``Integer``, default: ``0``): the seed for the
+  pseudo-random-number generator (see Cuba documentation for details)
+- ``mineval`` (type: ``Real``, default: ``0``): the minimum number of integrand
+  evaluations required
+- ``maxeval`` (type: ``Real``, default: ``1000000``): the (approximate) maximum
+  number of integrand evaluations allowed
+- ``statefile`` (type: ``AbstractString``, default: ``""``): a filename for
+  storing the internal state.  To not store the internal state, put ``""``
+  (empty string, this is the default) or ``C_NULL`` (C null pointer).
+
+  Cuba can store its entire internal state (i.e. all the information to resume
+  an interrupted integration) in an external file.  The state file is updated
+  after every iteration.  If, on a subsequent invocation, a Cuba routine finds a
+  file of the specified name, it loads the internal state and continues from the
+  point it left off.  Needless to say, using an existing state file with a
+  different integrand generally leads to wrong results.
+
+  This feature is useful mainly to define "check-points" in long-running
+  integrations from which the calculation can be restarted.
+
+  Once the integration reaches the prescribed accuracy, the state file is
+  removed, unless bit 4 of ``flags`` (see above) explicitly requests that it be
+  kept.
+
+- ``spin`` (type: ``Ptr{Void}``, default: ``C_NULL``): this is the placeholder
+  for the "spinning cores" pointer.  `Cuba.jl` does not support parallelization,
+  so this keyword should not have a value different from ``C_NULL``.
+
+
+Vegas-Specific Keywords
+~~~~~~~~~~~~~~~~~~~~~~~
+
+These optional keywords can be passed only to :func:`Vegas`:
+
+- ``nstart`` (type: ``Integer``, default: ``1000``): the number of integrand
+  evaluations per iteration to start with
+- ``nincrease`` (type: ``Integer``, default: ``500``): the increase in the
+  number of integrand evaluations per iteration
+- ``nbatch`` (type: ``Integer``, default: ``1000``): the batch size for sampling
+
+  Vegas samples points not all at once, but in batches of size ``nbatch``, to
+  avoid excessive memory consumption.  ``1000`` is a reasonable value, though it
+  should not affect performance too much
+- ``gridno`` (type: ``Integer``, default: ``0``): the slot in the internal grid table.
+
+  It may accelerate convergence to keep the grid accumulated during one
+  integration for the next one, if the integrands are reasonably similar to each
+  other.  Vegas maintains an internal table with space for ten grids for this
+  purpose.  The slot in this grid is specified by ``gridno``.
+
+  If a grid number between ``1`` and ``10`` is selected, the grid is not
+  discarded at the end of the integration, but stored in the respective slot of
+  the table for a future invocation.  The grid is only re-used if the dimension
+  of the subsequent integration is the same as the one it originates from.
+
+  In repeated invocations it may become necessary to flush a slot in memory, in
+  which case the negative of the grid number should be set.
+
+Suave-Specific Keywords
+~~~~~~~~~~~~~~~~~~~~~~~
+
+These optional keywords can be passed only to :func:`Suave`:
+
+- ``nnew`` (type: ``Integer``, default: ``1000``): the number of new integrand
+  evaluations in each subdivision
+- ``nmin`` (type: ``Integer``, default: ``2``): the minimum number of samples a
+  former pass must contribute to a subregion to be considered in that region's
+  compound integral value.  Increasing ``nmin`` may reduce jumps in the
+  :math:`\chi^2` value
+- ``flatness`` (type: ``Real``, default: ``.25``): the type of norm used to
+  compute the fluctuation of a sample.  This determines how prominently
+  "outliers", i.e. individual samples with a large fluctuation, figure in the
+  total fluctuation, which in turn determines how a region is split up.  As
+  suggested by its name, ``flatness`` should be chosen large for "flat"
+  integrands and small for "volatile" integrands with high peaks.  Note that
+  since ``flatness`` appears in the exponent, one should not use too large
+  values (say, no more than a few hundred) lest terms be truncated internally to
+  prevent overflow.
+
+Divonne-Specific Keywords
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These optional keywords can be passed only to :func:`Divonne`:
+
+- ``key1`` (type: ``Integer``, default: ``47``): determines sampling in the
+  partitioning phase: ``key1`` :math:`= 7, 9, 11, 13` selects the cubature rule
+  of degree ``key1``.  Note that the degree-11 rule is available only in 3
+  dimensions, the degree-13 rule only in 2 dimensions.
+
+  For other values of ``key1``, a quasi-random sample of :math:`n_1 =
+  |\verb|key1||` points is used, where the sign of ``key1`` determines the type
+  of sample,
+
+  - ``key1`` :math:`> 0`, use a Korobov quasi-random sample,
+  - ``key1`` :math:`< 0`, use a "standard" sample (a Sobol quasi-random sample
+    if ``seed`` :math:`= 0`, otherwise a pseudo-random sample).
+
+  - ``key2`` (type: ``Integer``, default: ``1``): determines sampling in the
+    final integration phase:
+
+    ``key2`` :math:`= 7, 9, 11, 13` selects the cubature rule of degree ``key2``.
+    Note that the degree-11 rule is available only in 3 dimensions, the
+    degree-13 rule only in 2 dimensions.
+
+    For other values of ``key2``, a quasi-random sample is used, where the sign
+    of ``key2`` determines the type of sample,
+
+    - ``key2`` :math:`> 0`, use a Korobov quasi-random sample,
+    - ``key2`` :math:`< 0`, use a "standard" sample (see description of ``key1``
+       above),
+
+    and :math:`n_2 = |\verb|key2||` determines the number of points,
+
+    - :math:`n_2\geqslant 40`, sample :math:`n_2` points,
+    - :math:`n_2 < 40`, sample :math:`n_2\,n_{\text{need}}` points, where
+      :math:`n_{\text{need}}` is the number of points needed to reach the
+      prescribed accuracy, as estimated by Divonne from the results of the
+      partitioning phase
+
+- ``key3`` (type: ``Integer``, default: ``1``): sets the strategy for the refinement phase:
+
+  ``key3`` :math:`= 0`, do not treat the subregion any further.
+
+  ``key3`` :math:`= 1`, split the subregion up once more.
+
+  Otherwise, the subregion is sampled a third time with ``key3`` specifying the
+  sampling parameters exactly as ``key2`` above.
+
+- ``maxpass`` (type: ``Integer``, default: ``5``): controls the thoroughness of
+  the partitioning phase: The partitioning phase terminates when the estimated
+  total number of integrand evaluations (partitioning plus final integration)
+  does not decrease for ``maxpass`` successive iterations.
+
+  A decrease in points generally indicates that Divonne discovered new
+  structures of the integrand and was able to find a more effective
+  partitioning.  ``maxpass`` can be understood as the number of "safety"
+  iterations that are performed before the partition is accepted as final and
+  counting consequently restarts at zero whenever new structures are found.
+
+- ``border`` (type: ``Real``, default: ``0.``): the width of the border of the
+  integration region.  Points falling into this border region will not be
+  sampled directly, but will be extrapolated from two samples from the interior.
+  Use a non-zero ``border`` if the integrand function cannot produce values
+  directly on the integration boundary
+- ``maxchisq`` (type: ``Real``, default: ``10.``): the :math:`\chi^2` value a
+  single subregion is allowed to have in the final integration phase.  Regions
+  which fail this :math:`\chi^2` test and whose sample averages differ by more
+  than ``mindeviation`` move on to the refinement phase.
+- ``mindeviation`` (type: ``Real``, default: ``0.25``): a bound, given as the
+  fraction of the requested error of the entire integral, which determines
+  whether it is worthwhile further examining a region that failed the
+  :math:`\chi^2` test.  Only if the two sampling averages obtained for the
+  region differ by more than this bound is the region further treated.
+- ``ngiven`` (type: ``Integer``, default: ``0``): the number of points in the
+  ``xgiven`` array
+- ``ldxgiven`` (type: ``Integer``, default: ``0``): the leading dimension of
+  ``xgiven``, i.e. the offset between one point and the next in memory
+- ``xgiven`` (type: ``AbstractArray{Real}``, default: ``zeros(typeof(0.0),
+  ldxgiven, ngiven)``): a list of points where the integrand might have peaks.
+  Divonne will consider these points when partitioning the integration region.
+  The idea here is to help the integrator find the extrema of the integrand in
+  the presence of very narrow peaks.  Even if only the approximate location of
+  such peaks is known, this can considerably speed up convergence.
+- ``nextra`` (type: ``Integer``, default: ``0``): the maximum number of extra
+  points the peak-finder subroutine will return.  If ``nextra`` is zero,
+  ``peakfinder`` is not called and an arbitrary object may be passed in its
+  place, e.g. just 0
+- ``peakfinder`` (type: ``Ptr{Void}``, default: ``C_NULL``): the peak-finder
+  subroutine
+
+Cuhre-Specific Keyword
+~~~~~~~~~~~~~~~~~~~~~~
+
+This optional keyword can be passed only to :func:`Cuhre`:
+
+- ``key`` (type: ``Integer``, default: ``0``): chooses the basic integration rule:
+
+  ``key`` :math:`= 7, 9, 11, 13` selects the cubature rule of degree ``key``.
+  Note that the degree-11 rule is available only in 3 dimensions, the degree-13
+  rule only in 2 dimensions.
+
+  For other values, the default rule is taken, which is the degree-13 rule in 2
+  dimensions, the degree-11 rule in 3 dimensions, and the degree-9 rule
+  otherwise.
+
+Output
+''''''
+
+The integrating functions ``Vegas``, ``Suave``, ``Divonne``, and ``Cuhre``
+return the 6-tuple
 
 .. code-block:: julia
 
     (integral, error, probability, neval, fail, nregions)
 
-The first three terms of the tuple are arrays with length ``ncomp``, the
-last three ones are scalars. In particular, if you assign the output of
-integration functions to the variable named ``result``, you can access
-the value of the ``i``-th component of the integral with
-``result[1][i]`` and the associated error with ``result[2][i]``. The
-details of other quantities can be found in Cuba manual.
+The first three terms of the tuple are arrays with length ``ncomp``, the last
+three ones are scalars. In particular, if you assign the output of integrator
+functions to the variable named ``result``, you can access the value of the
+``i``-th component of the integral with ``result[1][i]`` and the associated
+error with ``result[2][i]``.
 
-**Note:** admittedly, this user interface is not REPL-friendly, help on
-improving it is welcome.
+- ``integral`` (type: ``Cdouble`` array with ``ncomp`` components): the integral
+  of ``integrand`` over the unit hypercube
+- ``error`` (type: ``Cdouble`` array with ``ncomp`` components): the presumed
+  absolute error for each component of ``integral``
+- ``prob`` (type: ``Cdouble`` array with ``ncomp`` components): the
+  :math:`\chi^2` -probability (not the :math:`\chi^2` -value itself!) that
+  ``error`` is not a reliable estimate of the true integration error.  To judge
+  the reliability of the result expressed through ``prob``, remember that it is
+  the null hypothesis that is tested by the :math:`\chi^2` test, which is that
+  ``error`` `is` a reliable estimate.  In statistics, the null hypothesis may be
+  rejected only if ``prob`` is fairly close to unity, say ``prob`` :math:`>.95`
+- ``neval`` (type: ``Cint``): the actual number of integrand evaluations needed
+- ``fail`` (type: ``Cint``): an error flag:
+
+  - ``fail`` = ``0``, the desired accuracy was reached
+  - ``fail`` = ``-1``, dimension out of range
+  - ``fail`` > ``0``, the accuracy goal was not met within the allowed maximum
+    number of integrand evaluations.  While Vegas, Suave, and Cuhre simply
+    return ``1``, Divonne can estimate the number of points by which ``maxeval``
+    needs to be increased to reach the desired accuracy and returns this value.
+
+- ``nregions`` (type: ``Cint``): the actual number of subregions needed (always
+  ``0`` in ``Vegas``)
 
 Example
 -------
