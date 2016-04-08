@@ -42,7 +42,7 @@ cd(local_dir) do
 end
 
 # Make sure Julia is able to see the library.
-if length((VERSION >= v"0.4" ? Base.Libdl.find_library : Base.find_library)([libcuba])) > 0
+if length(Libdl.find_library([libcuba])) > 0
     info("libcuba successfully installed!")
 else
     error("Installation of libcuba failed")
