@@ -120,7 +120,9 @@ functions to the variable named `result`, you can access the value of the `i`-th
 component of the integral with `result[1][i]` and the associated error with
 `result[2][i]`.  The details of other quantities can be found in Cuba manual.
 
-More extended documentation of `Cuba.jl` will come later.
+More extended documentation of `Cuba.jl` is available at
+http://cubajl.readthedocs.org/.  You can also download the PDF version of the
+manual from https://media.readthedocs.org/pdf/cubajl/latest/cubajl.pdf.
 
 **Note:** admittedly, this user interface is not REPL-friendly, help on
 improving it is welcome.

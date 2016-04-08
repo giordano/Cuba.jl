@@ -4,8 +4,9 @@ Cuba
 Introduction
 ------------
 
-``Cuba.jl`` is a library for multidimensional numerical integration with
-different algorithms in `Julia <http://julialang.org/>`__.
+``Cuba.jl`` is a `Julia <http://julialang.org/>`__ library for multidimensional
+numerical integration of real-valued functions of real arguments, using
+different algorithms.
 
 This is just a Julia wrapper around the C `Cuba library
 <http://www.feynarts.de/cuba/>`__, version 4.2, by **Thomas Hahn**. All the
@@ -34,7 +35,7 @@ For example, `recall
 <https://en.wikipedia.org/wiki/Integration_by_substitution>`__ that in one
 dimension
 
-.. math::  \int_{a}^{b} \mathrm{d}\,x\,\,f[x] = \int_{0}^{1} \mathrm{d}\,y\,\,f[a + (b - a) y] (b - a)
+.. math::  \int_{a}^{b} \mathrm{d}x\,f[x] = \int_{0}^{1} \mathrm{d}y\,f[a + (b - a) y] (b - a)
 
 where the final :math:`(b - a)` is the one-dimensional version of the Jacobian.
 This generalizes straightforwardly to more than one dimension.
@@ -71,10 +72,10 @@ or put this command into your Julia script.
 
 ``Cuba.jl`` provides four functions to integrate, one for each algorithm:
 
-.. function:: Vegas(function, ndim, ncomp[, keywords...])
-.. function:: Suave(function, ndim, ncomp[, keywords...])
-.. function:: Divonne(function, ndim, ncomp[, keywords...])
-.. function:: Cuhre(function, ndim, ncomp[, keywords...])
+.. function:: Vegas(integrand, ndim, ncomp[, keywords...])
+.. function:: Suave(integrand, ndim, ncomp[, keywords...])
+.. function:: Divonne(integrand, ndim, ncomp[, keywords...])
+.. function:: Cuhre(integrand, ndim, ncomp[, keywords...])
 
 Large parts of the following sections are borrowed from Cuba manual.  Refer to
 it for more information on the details.
@@ -84,11 +85,11 @@ Mandatory Arguments
 
 Mandatory arguments of integrator functions are:
 
-- ``function`` (type: ``Function``): the name of the function to be integrated
+- ``integrand`` (type: ``Function``): the name of the function to be integrated
 - ``ndim`` (type: ``Integer``): the number of dimensions of the integral
 - ``ncomp`` (type: ``Integer``): the number of components of the integrand
 
-The ``function`` must be of this type:
+Function ``integrand`` must be of this type:
 
 .. code-block:: julia
 
@@ -106,7 +107,11 @@ The ``function`` must be of this type:
 
 Note that ``xx`` and ``ff`` arguments are passed as pointers, so you have to
 translate them to Julia objects before actually performing calculations, and
-finally convert back ``f`` into the pointer ``ff``.
+finally convert back ``f`` into the pointer ``ff``.  ``x`` and ``f`` are both
+arrays of ``Cdouble`` type (alias for ``Float64``), so `Cuba.jl` can be used to
+integrate real-valued functions of real arguments.  If you want to integrate a
+complex-valued function of complex arguments you just have to treat complex
+quantities as 2-component arrays.
 
 The integrand receives ``nvec`` samples in ``x`` and is supposed to fill the
 array ``f`` with the corresponding integrand values.  Note that ``nvec``
@@ -120,18 +125,20 @@ improving it is welcome.
 Optional Keywords
 '''''''''''''''''
 
-All other arguments required by Cuba routines can be passed as optional
-keywords.  ``Cuba.jl`` uses some reasonable default values in order to enable
-users to invoke integrator functions with a minimal set of arguments.  Anyway,
-if you want to make sure future changes to some default values of keywords will
-affect your current script, explicitely specify the value of the keywords.
+All other arguments required by Cuba integrator routines can be passed as
+optional keywords.  ``Cuba.jl`` uses some reasonable default values in order to
+enable users to invoke integrator functions with a minimal set of arguments.
+Anyway, if you want to make sure future changes to some default values of
+keywords will not affect your current script, explicitely specify the value of
+the keywords.
 
 Common Keywords
 ~~~~~~~~~~~~~~~
 
 These are optional keywords common to all functions:
 
-- ``userdata`` (type: ``Ptr{Void}``, default: ``C_NULL``): user data passed to the integrand
+- ``userdata`` (type: ``Ptr{Void}``, default: ``C_NULL``): user data passed to
+  the integrand
 - ``nvec`` (type: ``Integer``, default: ``1``): the maximum number of points to
   be given to the integrand routine in each invocation.  Usually this is 1 but
   if the integrand can profit from e.g. Single Instruction Multiple Data (SIMD)
@@ -407,19 +414,47 @@ error with ``result[2][i]``.
 - ``nregions`` (type: ``Cint``): the actual number of subregions needed (always
   ``0`` in ``Vegas``)
 
+Vectorization
+-------------
+
+Vectorization means evaluating the integrand function for several points at
+once.  This is also known as Single Instruction Multiple Data (SIMD) paradigm
+and is different from ordinary parallelization where independent threads are
+executed concurrently.  It is usually possible to employ vectorization on top of
+parallelization.
+
+``Cuba.jl`` cannot automatically vectorize the integrand function, of course,
+but it does pass (up to) ``nvec`` points per integrand call (`Common
+Keywords`_).  This value need not correspond to the hardware vector length --
+computing several points in one call can also make sense e.g. if the
+computations have significant intermediate results in common.
+
+A note for disambiguation: The ``nbatch`` argument of Vegas is related in
+purpose but not identical to ``nvec``.  It internally partitions the sampling
+done by Vegas but has no bearing on the number of points given to the integrand.
+On the other hand, it it pointless to choose ``nvec`` > ``nbatch`` for Vegas.
+
+
 Example
 -------
 
-Here is an example of a 3-component integral in 3D space (so ``ndim=3``
-and ``ncomp=3``) using the integrand function tested in
-``test/runtests.jl``:
+Consider the integral
+
+.. math:: \int\limits_{\Omega} \boldsymbol{f}(x,y,z)\,\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z
+
+where :math:`\Omega = [0, 1]^{3}` and
+
+.. math:: \boldsymbol{f}(x,y,z) = \left(\sin(x)\cos(y)\exp(z), \,\exp^{-(x^2 + y^2 +
+	  z^2)}, \,\frac{1}{1 - xyz}\right)
+
+This is the Julia script you can use to compute the above integral
 
 .. code-block:: julia
 
     using Cuba
 
-    function func(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint, ff::Ptr{Cdouble},
-                  userdata::Ptr{Void})
+    function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
+                       ff::Ptr{Cdouble}, userdata::Ptr{Void})
         x = pointer_to_array(xx, (ndim,))
         f = pointer_to_array(ff, (ncomp,))
         f[1] = sin(x[1])*cos(x[2])*exp(x[3])
@@ -429,7 +464,7 @@ and ``ncomp=3``) using the integrand function tested in
         return Cint(0)::Cint
     end
 
-    result = Cuhre(func, 3, 3, epsabs=1e-12, epsrel=1e-10)
+    result = Cuhre(integrand, 3, 3, epsabs=1e-12, epsrel=1e-10)
     println("Results of Cuba:")
     for i=1:3; println("Component $i: ", result[1][i], " ± ", result[2][i]); end
     println("Exact results:")
