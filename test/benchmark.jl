@@ -77,6 +77,12 @@ info("Performance of Cuba.jl:")
 @time Cuhre(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
 
 cd(dirname(@__FILE__))
-run(`gcc -I../deps/cuba-julia -o benchmark benchmark.c ../deps/cuba-julia/libcuba.a -lm`)
-info("Performance of Cuba C Library:")
-run(`./benchmark`)
+run(`gcc -I../deps/cuba-julia -o benchmark-c benchmark.c ../deps/cuba-julia/libcuba.a -lm`)
+info("Performance of Cuba Library in C:")
+run(`./benchmark-c`)
+
+if success(`which gfortran`)
+    run(`gfortran -cpp -o benchmark-fortran benchmark.f ../deps/cuba-julia/libcuba.a -lm`)
+    info("Performance of Cuba Library in Fortran:")
+    run(`./benchmark-fortran`)
+end

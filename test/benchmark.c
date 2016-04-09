@@ -1,4 +1,4 @@
-/* benchmark.jl --- Benchmark Cuba C Library
+/* benchmark.c --- Benchmark Cuba Library in C
  *
  * Copyright (C) 2016  Mosè Giordano
  *

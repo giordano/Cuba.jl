@@ -42,9 +42,9 @@ function func(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint, ff::Ptr{Cdouble},
     return Cint(0)::Cint
 end
 
-# Accelerators and cores settings
+# Make sure using "addprocs" doesn't make the program segfault.
+addprocs(1)
 Cuba.accel(0,1000)
-Cuba.cores(0,1000)
 
 # Test results and make sure the estimation of error is exact.
 epsabs = Dict(Vegas=>1e-4, Suave=>1e-3, Divonne=>1e-4, Cuhre=>1e-8)
@@ -64,6 +64,6 @@ for alg in (:Vegas, :Suave, :Divonne, :Cuhre)
     end
 end
 
-# Test other function
+# Make sure these functions don't crash.
 Cuba.init(C_NULL, C_NULL)
 Cuba.exit(C_NULL, C_NULL)

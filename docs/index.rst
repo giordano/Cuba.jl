@@ -540,11 +540,11 @@ Performance
 
 ``Cuba.jl`` cannot (yet?) take advantage of parallelization capabilities of Cuba
 Library. Nonetheless, it has performances comparable with (if not slightly
-better than) an equivalent native C code based on Cuba library when
+better than) equivalent native C or Fortran codes based on Cuba library when
 ``CUBACORES`` environment variable is set to ``0`` (i.e., multithreading is
 disabled). The following is the result of running the benchmark present in
 ``test`` directory on a 64-bit GNU/Linux system running Julia 0.4.  The C
-benchmark code has been built with GCC 5.3.1.
+and FORTRAN 77 benchmark codes have been built with GCC 5.3.1.
 
 ::
 
@@ -555,11 +555,16 @@ benchmark code has been built with GCC 5.3.1.
       0.659029 seconds (6.00 M allocations: 183.107 MB, 1.21% gc time)
       0.384740 seconds (6.00 M allocations: 183.165 MB, 1.99% gc time)
       0.304015 seconds (6.00 M allocations: 183.129 MB, 2.86% gc time)
-    INFO: Performance of Cuba C Library:
+    INFO: Performance of Cuba Library in C:
       0.346084 seconds (Vegas)
       0.661870 seconds (Suave)
       0.378409 seconds (Divonne)
       0.306150 seconds (Cuhre)
+    INFO: Performance of Cuba Library in Fortran:
+      0.328000 seconds (Vegas)
+      0.664000 seconds (Suave)
+      0.368000 seconds (Divonne)
+      0.292000 seconds (Cuhre)
 
 Of course, a native C code making use of Cuba Library outperforms
 ``Cuba.jl`` when higher values of ``CUBACORES`` are used, for example:
@@ -573,11 +578,16 @@ Of course, a native C code making use of Cuba Library outperforms
       0.660508 seconds (6.00 M allocations: 183.107 MB, 1.19% gc time)
       0.384731 seconds (6.00 M allocations: 183.165 MB, 2.01% gc time)
       0.302969 seconds (6.00 M allocations: 183.129 MB, 2.88% gc time)
-    INFO: Performance of Cuba C Library:
+    INFO: Performance of Cuba Library in C:
       0.119161 seconds (Vegas)
       0.608906 seconds (Suave)
       0.156459 seconds (Divonne)
       0.085269 seconds (Cuhre)
+    INFO: Performance of Cuba Library in Fortran:
+      0.104000 seconds (Vegas)
+      0.640000 seconds (Suave)
+      0.160000 seconds (Divonne)
+      0.084000 seconds (Cuhre)
 
 ``Cuba.jl`` internally fixes ``CUBACORES`` to 0 in order to prevent from
 forking ``julia`` processes that would only slow down calculations
