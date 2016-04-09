@@ -5,8 +5,8 @@ Introduction
 ------------
 
 ``Cuba.jl`` is a `Julia <http://julialang.org/>`__ library for multidimensional
-numerical integration of real-valued functions of real arguments, using
-different algorithms.
+`numerical integration <https://en.wikipedia.org/wiki/Numerical_integration>`__
+of real-valued functions of real arguments, using different algorithms.
 
 This is just a Julia wrapper around the C `Cuba library
 <http://www.feynarts.de/cuba/>`__, version 4.2, by **Thomas Hahn**. All the
@@ -16,33 +16,40 @@ https://github.com/giordano/Cuba.jl/issues.
 
 All algorithms provided by Cuba library are supported in ``Cuba.jl``:
 
-- ``Vegas`` (type: Monte Carlo; variance reduction with importance sampling)
-- ``Suave`` (type: Monte Carlo; variance reduction with globally adaptive
-  subdivision and importance sampling)
-- ``Divonne`` (type: Monte Carlo or deterministic; variance reduction with
-  stratified sampling, aided by methods from numerical optimization)
-- ``Cuhre`` (type: deterministic; variance reduction with globally adaptive
+- `Vegas <https://en.wikipedia.org/wiki/VEGAS_algorithm>`__ (type: `Monte Carlo
+  <https://en.wikipedia.org/wiki/Monte_Carlo_integration>`__; `variance
+  reduction <https://en.wikipedia.org/wiki/Variance_reduction>`__ with
+  `importance sampling <https://en.wikipedia.org/wiki/Importance_sampling>`__)
+- Suave (type: Monte Carlo; variance reduction with globally `adaptive
+  subdivision <https://en.wikipedia.org/wiki/Adaptive_quadrature>`__ and
+  importance sampling)
+- Divonne (type: Monte Carlo or deterministic; variance reduction with
+  `stratified sampling <https://en.wikipedia.org/wiki/Stratified_sampling>`__,
+  aided by methods from numerical optimization)
+- Cuhre (type: deterministic; variance reduction with globally adaptive
   subdivision)
 
 For more details on the algorithms see the manual included in Cuba library and
 available in ``deps/cuba-julia/cuba.pdf`` after successful installation
 of ``Cuba.jl``.
 
-Integration is performed on the n-dimensional unit hypercube :math:`[0, 1]^{n}`.
-If you want to compute an integral over a different set, you have to scale the
-integrand function in order to have an equivalent integral on :math:`[0, 1]^{n}`.
-For example, `recall
-<https://en.wikipedia.org/wiki/Integration_by_substitution>`__ that in one
-dimension
+Integration is performed on the :math:`n`-dimensional `unit hypercube
+<https://en.wikipedia.org/wiki/Hypercube>`__ :math:`[0, 1]^{n}`.  If you want to
+compute an integral over a different set, you have to scale the integrand
+function in order to have an equivalent integral on :math:`[0, 1]^{n}`.  For
+example, `recall <https://en.wikipedia.org/wiki/Integration_by_substitution>`__
+that in one dimension
 
 .. math::  \int_{a}^{b} \mathrm{d}x\,f[x] = \int_{0}^{1} \mathrm{d}y\,f[a + (b - a) y] (b - a)
 
 where the final :math:`(b - a)` is the one-dimensional version of the Jacobian.
-This generalizes straightforwardly to more than one dimension.
+This generalizes straightforwardly to more than one dimension.  In `Examples`_
+section you can find the computation of a 3-dimensional integral with
+non-constant boundaries using ``Cuba.jl``.
 
 **Note:** This package has been tested only on GNU/Linux and OS X systems.
 Trying to install on Windows will likely fail, please report if you manage to
-install on this system.
+install ``Cuba.jl`` on this system.
 
 Installation
 ------------
@@ -55,6 +62,9 @@ Julia session run the command
 .. code-block:: julia
 
     julia> Pkg.add("Cuba")
+
+The build script will download Cuba Library source code and build the Cuba
+shared object.  In order to accomplish this task a C compiler is needed.
 
 You may need to update your package list with ``Pkg.update()`` in order
 to get the latest version of ``Cuba.jl``.
@@ -108,9 +118,9 @@ Function ``integrand`` must be of this type:
 Note that ``xx`` and ``ff`` arguments are passed as pointers, so you have to
 translate them to Julia objects before actually performing calculations, and
 finally convert back ``f`` into the pointer ``ff``.  ``x`` and ``f`` are both
-arrays of ``Cdouble`` type (alias for ``Float64``), so `Cuba.jl` can be used to
-integrate real-valued functions of real arguments.  If you want to integrate a
-complex-valued function of complex arguments you just have to treat complex
+arrays of ``Cdouble`` type (alias for ``Float64``), so ``Cuba.jl`` can be used
+to integrate real-valued functions of real arguments.  If you want to integrate
+a complex-valued function of complex arguments you just have to treat complex
 quantities as 2-component arrays.
 
 The integrand receives ``nvec`` samples in ``x`` and is supposed to fill the
@@ -142,7 +152,7 @@ These are optional keywords common to all functions:
 - ``nvec`` (type: ``Integer``, default: ``1``): the maximum number of points to
   be given to the integrand routine in each invocation.  Usually this is 1 but
   if the integrand can profit from e.g. Single Instruction Multiple Data (SIMD)
-  vectorization, a larger value can be chosen
+  vectorization, a larger value can be chosen.  See `Vectorization`_ section.
 - ``epsrel`` (type: ``Real``, default: ``1e-4``), and ``epsabs`` (type:
   ``Real``, default: ``1e-12``): the requested relative
   (:math:`\varepsilon_{\text{rel}}`) and absolute
@@ -214,8 +224,9 @@ These are optional keywords common to all functions:
   kept.
 
 - ``spin`` (type: ``Ptr{Void}``, default: ``C_NULL``): this is the placeholder
-  for the "spinning cores" pointer.  `Cuba.jl` does not support parallelization,
-  so this keyword should not have a value different from ``C_NULL``.
+  for the "spinning cores" pointer.  ``Cuba.jl`` does not support
+  parallelization, so this keyword should not have a value different from
+  ``C_NULL``.
 
 
 Vegas-Specific Keywords
@@ -298,7 +309,7 @@ These optional keywords can be passed only to :func:`Divonne`:
 
     - ``key2`` :math:`> 0`, use a Korobov quasi-random sample,
     - ``key2`` :math:`< 0`, use a "standard" sample (see description of ``key1``
-       above),
+      above),
 
     and :math:`n_2 = |\verb|key2||` determines the number of points,
 
@@ -308,7 +319,8 @@ These optional keywords can be passed only to :func:`Divonne`:
       prescribed accuracy, as estimated by Divonne from the results of the
       partitioning phase
 
-- ``key3`` (type: ``Integer``, default: ``1``): sets the strategy for the refinement phase:
+- ``key3`` (type: ``Integer``, default: ``1``): sets the strategy for the
+  refinement phase:
 
   ``key3`` :math:`= 0`, do not treat the subregion any further.
 
@@ -377,8 +389,8 @@ This optional keyword can be passed only to :func:`Cuhre`:
 Output
 ''''''
 
-The integrating functions ``Vegas``, ``Suave``, ``Divonne``, and ``Cuhre``
-return the 6-tuple
+The integrating functions :func:`Vegas`, :func:`Suave`, :func:`Divonne`, and
+:func:`Cuhre` return the 6-tuple
 
 .. code-block:: julia
 
@@ -435,8 +447,8 @@ done by Vegas but has no bearing on the number of points given to the integrand.
 On the other hand, it it pointless to choose ``nvec`` > ``nbatch`` for Vegas.
 
 
-Example
--------
+Examples
+--------
 
 Consider the integral
 
@@ -444,8 +456,8 @@ Consider the integral
 
 where :math:`\Omega = [0, 1]^{3}` and
 
-.. math:: \boldsymbol{f}(x,y,z) = \left(\sin(x)\cos(y)\exp(z), \,\exp^{-(x^2 + y^2 +
-	  z^2)}, \,\frac{1}{1 - xyz}\right)
+.. math:: \boldsymbol{f}(x,y,z) = \left(\sin(x)\cos(y)\exp(z), \,\exp(-(x^2 + y^2 +
+	  z^2)), \,\frac{1}{1 - xyz}\right)
 
 This is the Julia script you can use to compute the above integral
 
@@ -485,16 +497,54 @@ This is the output
     Component 2: 0.41653838588663805
     Component 3: 1.2020569031595951
 
+Now consider the integral
+
+.. math:: \int_{-y}^{y}\int_{0}^{z}\int_{0}^{\pi} \cos(x)\sin(y)\exp(z)\,\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z
+
+By applying the substitution rule repeatedly, you can scale the integrand
+function and get this equivalent integral over :math:`\Omega = [0, 1]^{3}`
+
+.. math:: \int\limits_{\Omega} 2\pi^{3}yz^2 \cos(\pi yz(2x - 1)) \sin(\pi yz)
+	  \exp(\pi z)\,\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z
+
+that can be computed with ``Cuba.jl`` using the following Julia script
+
+.. code-block:: julia
+
+    using Cuba
+
+    function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
+                       ff::Ptr{Cdouble}, userdata::Ptr{Void})
+        x = pointer_to_array(xx, (ndim,))
+        f = pointer_to_array(ff, (ncomp,))
+        f[1] = 2pi^3*x[2]*x[3]^2*cos(pi*x[2]*x[3]*(2*x[1] - 1.0))*
+               sin(pi*x[2]*x[3])*exp(pi*x[3])
+        ff = pointer_from_objref(f)
+        return Cint(0)::Cint
+    end
+
+    result = Cuhre(integrand, 3, 1, epsabs=1e-12, epsrel=1e-10)
+    println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
+    println("Exact result:   ", pi*e^pi - (4e^pi - 4)/5)
+
+This is the output
+
+::
+
+    Result of Cuba: 54.98607586826157 ± 5.460606521639899e-9
+    Exact result:   54.98607586789537
+
+
 Performance
 -----------
 
-``Cuba.jl`` cannot (yet?) take advantage of parallelization capabilities
-of Cuba Library. Nonetheless, it has performances comparable with (if
-not slightly better than) an equivalent native C code based on Cuba
-library when ``CUBACORES`` environment variable is set to ``0`` (i.e.,
-multithreading is disabled). This is the result of running the benchmark
-present in ``test`` directory on a 64-bit GNU/Linux system running Julia
-0.4.
+``Cuba.jl`` cannot (yet?) take advantage of parallelization capabilities of Cuba
+Library. Nonetheless, it has performances comparable with (if not slightly
+better than) an equivalent native C code based on Cuba library when
+``CUBACORES`` environment variable is set to ``0`` (i.e., multithreading is
+disabled). The following is the result of running the benchmark present in
+``test`` directory on a 64-bit GNU/Linux system running Julia 0.4.  The C
+benchmark code has been built with GCC 5.3.1.
 
 ::
 

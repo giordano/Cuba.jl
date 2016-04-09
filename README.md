@@ -15,6 +15,7 @@ problem with the Julia interface.  Feel free to report bugs and make suggestions
 at https://github.com/giordano/Cuba.jl/issues.
 
 All algorithms provided by Cuba library are supported in `Cuba.jl`:
+
 * `Vegas` (type: Monte Carlo; variance reduction with importance sampling)
 * `Suave` (type: Monte Carlo; variance reduction with globally adaptive
   subdivision + importance sampling)
@@ -27,9 +28,9 @@ For more details on the algorithms see the manual included in Cuba library and
 available in `deps/cuba-julia/cuba.pdf` after successful installation
 of `Cuba.jl`.
 
-Integration is performed on the n-dimensional unit hypercube [0, 1]^n.  If you
+Integration is performed on the n-dimensional unit hypercube $[0, 1]^n$.  If you
 want to compute an integral over a different set, you have to scale the
-integrand function in order to have an equivalent integral on [0, 1]^n.  For
+integrand function in order to have an equivalent integral on $[0, 1]^n$.  For
 example, recall that in one dimension
 
 ```
@@ -54,6 +55,9 @@ In a Julia session run the command
 ```julia
 julia> Pkg.add("Cuba")
 ```
+
+Installation script will download Cuba Library source code and build the Cuba
+shared object.  In order to accomplish this task a C compiler is needed.
 
 You may need to update your package list with `Pkg.update()` in order to get the
 latest version of `Cuba.jl`.
@@ -175,9 +179,10 @@ Performance
 `Cuba.jl` cannot (yet?) take advantage of parallelization capabilities of Cuba
 Library.  Nonetheless, it has performances comparable with (if not slightly
 better than) an equivalent native C code based on Cuba library when `CUBACORES`
-environment variable is set to `0` (i.e., multithreading is disabled).  This is
-the result of running the benchmark present in `test` directory on a 64-bit
-GNU/Linux system running Julia 0.4.
+environment variable is set to `0` (i.e., multithreading is disabled).  The
+following is the result of running the benchmark present in `test` directory on
+a 64-bit GNU/Linux system running Julia 0.4.  The C benchmark code has been
+built with GCC 5.3.1.
 
 ```
 $ CUBACORES=0 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
