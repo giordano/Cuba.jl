@@ -64,17 +64,17 @@ function test(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
     return Cint(0)::Cint
 end
 
-info("Ignore these times...")
-@time Vegas(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Suave(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Divonne(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Cuhre(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
-
 info("Performance of Cuba.jl:")
-@time Vegas(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Suave(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Divonne(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
-@time Cuhre(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
+for alg in (:Vegas, :Suave, :Divonne, :Cuhre)
+    @eval (# Run the integrator a first time to compile the function.
+           $alg($test, $ndim, $ncomp, epsabs=$epsabs,
+                epsrel=$epsrel);
+           tic();
+           $alg($test, $ndim, $ncomp, epsabs=$epsabs,
+                epsrel=$epsrel);
+           println(@sprintf("%10.6f%s%s%s", toq(), " seconds (",
+                            string($alg)[6:end], ")")))
+end
 
 cd(dirname(@__FILE__))
 run(`gcc -I../deps/cuba-julia -o benchmark-c benchmark.c ../deps/cuba-julia/libcuba.a -lm`)
