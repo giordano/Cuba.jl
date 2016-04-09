@@ -20,7 +20,7 @@
 
 ### Code:
 
-local_dir  = "cuba-shared-object"
+local_dir  = "cuba-julia"
 local_file = local_dir*".tar.gz"
 libcuba = joinpath(dirname(@__FILE__), "libcuba")
 @linux? (object="libcuba.so") : (@osx? (object="libcuba.dylib") : (object=""))
@@ -31,7 +31,7 @@ run(`rm -rf $local_file $local_dir libcuba.so`)
 
 # Download Cuba and build the shared object.
 info("Downloading Cuba source...")
-download("https://github.com/giordano/cuba/archive/shared-object.tar.gz",
+download("https://github.com/giordano/cuba/archive/julia.tar.gz",
          local_file)
 run(`tar xzf $local_file`)
 info("Building libcuba...")

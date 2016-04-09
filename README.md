@@ -24,7 +24,7 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
   subdivision)
 
 For more details on the algorithms see the manual included in Cuba library and
-available in `deps/cuba-shared-object/cuba.pdf` after successful installation
+available in `deps/cuba-julia/cuba.pdf` after successful installation
 of `Cuba.jl`.
 
 Integration is performed on the n-dimensional unit hypercube [0, 1]^n.  If you

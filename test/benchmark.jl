@@ -77,8 +77,6 @@ info("Performance of Cuba.jl:")
 @time Cuhre(test, ndim, ncomp, epsabs=epsabs, epsrel=epsrel);
 
 cd(dirname(@__FILE__))
-cp("../deps/cuba-shared-object/libcuba.a", "libcuba.a", remove_destination=true)
-cp("../deps/cuba-shared-object/cuba.h", "cuba.h", remove_destination=true)
-run(`gcc -o benchmark benchmark.c libcuba.a -lm`)
+run(`gcc -I../deps/cuba-julia -o benchmark benchmark.c ../deps/cuba-julia/libcuba.a -lm`)
 info("Performance of Cuba C Library:")
 run(`./benchmark`)
