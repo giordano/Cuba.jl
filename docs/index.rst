@@ -16,18 +16,51 @@ https://github.com/giordano/Cuba.jl/issues.
 
 All algorithms provided by Cuba library are supported in ``Cuba.jl``:
 
-- `Vegas <https://en.wikipedia.org/wiki/VEGAS_algorithm>`__ (type: `Monte Carlo
-  <https://en.wikipedia.org/wiki/Monte_Carlo_integration>`__; `variance
-  reduction <https://en.wikipedia.org/wiki/Variance_reduction>`__ with
-  `importance sampling <https://en.wikipedia.org/wiki/Importance_sampling>`__)
-- Suave (type: Monte Carlo; variance reduction with globally `adaptive
-  subdivision <https://en.wikipedia.org/wiki/Adaptive_quadrature>`__ and
-  importance sampling)
-- Divonne (type: Monte Carlo or deterministic; variance reduction with
-  `stratified sampling <https://en.wikipedia.org/wiki/Stratified_sampling>`__,
-  aided by methods from numerical optimization)
-- Cuhre (type: deterministic; variance reduction with globally adaptive
-  subdivision)
++-----------+-----------------------------------------------+-----------------+----------------------------------+
+| Algorithm | Basic integration method                      | Type            | `Variance reduction`_            |
++===========+===============================================+=================+==================================+
+| Vegas_    | `Sobol quasi-random sample`_                  | `Monte Carlo`_  | `importance sampling`_           |
+|           +-----------------------------------------------+-----------------+                                  |
+|           | `or` `Mersenne Twister pseudo-random sample`_ | Monte Carlo     |                                  |
+|           +-----------------------------------------------+-----------------+                                  |
+|           | `or` `Ranlux pseudo-random sample`_           | Monte Carlo     |                                  |
++-----------+-----------------------------------------------+-----------------+----------------------------------+
+| Suave     | Sobol quasi-random sample                     | Monte Carlo     | globally `adaptive subdivision`_ |
+|           +-----------------------------------------------+-----------------+                                  |
+|           | `or` Mersenne Twister pseudo-random sample    | Monte Carlo     | and importance sampling          |
+|           +-----------------------------------------------+-----------------+                                  |
+|           | `or` Ranlux pseudo-random sample              | Monte Carlo     |                                  |
++-----------+-----------------------------------------------+-----------------+----------------------------------+
+| Divonne   | Korobov quasi-random sample                   | Monte Carlo     | `stratified sampling`_           |
+|           +-----------------------------------------------+-----------------+                                  |
+|           | `or` Sobol quasi-random sample                | Monte Carlo     | aided by methods from            |
+|           +-----------------------------------------------+-----------------+                                  |
+|           | `or` Mersenne Twister pseudo-random sample    | Monte Carlo     | numerical optimization           |
+|           +-----------------------------------------------+-----------------+                                  |
+|           | `or` Ranlux pseudo-random sample              | Monte Carlo     |                                  |
+|           +-----------------------------------------------+-----------------+                                  |
+|           | `or` cubature rules                           | deterministic   |                                  |
++-----------+-----------------------------------------------+-----------------+----------------------------------+
+| Cuhre     | cubature rules                                | deterministic   | globally adaptive subdivision    |
++-----------+-----------------------------------------------+-----------------+----------------------------------+
+
+.. _`Variance reduction`: https://en.wikipedia.org/wiki/Variance_reduction
+
+.. _Vegas: https://en.wikipedia.org/wiki/VEGAS_algorithm
+
+.. _`Sobol quasi-random sample`: https://en.wikipedia.org/wiki/Sobol_sequence
+
+.. _`Monte Carlo`: https://en.wikipedia.org/wiki/Monte_Carlo_integration
+
+.. _`importance sampling`: https://en.wikipedia.org/wiki/Importance_sampling
+
+.. _`Mersenne Twister pseudo-random sample`: https://en.wikipedia.org/wiki/Mersenne_Twister
+
+.. _`Ranlux pseudo-random sample`: http://arxiv.org/abs/hep-lat/9309020
+
+.. _`adaptive subdivision`: https://en.wikipedia.org/wiki/Adaptive_quadrature
+
+.. _`stratified sampling`: <https://en.wikipedia.org/wiki/Stratified_sampling>
 
 For more details on the algorithms see the manual included in Cuba library and
 available in ``deps/cuba-julia/cuba.pdf`` after successful installation
@@ -117,11 +150,13 @@ Function ``integrand`` must be of this type:
 
 Note that ``xx`` and ``ff`` arguments are passed as pointers, so you have to
 translate them to Julia objects before actually performing calculations, and
-finally convert back ``f`` into the pointer ``ff``.  ``x`` and ``f`` are both
-arrays of ``Cdouble`` type (alias for ``Float64``), so ``Cuba.jl`` can be used
-to integrate real-valued functions of real arguments.  If you want to integrate
-a complex-valued function of complex arguments you just have to treat complex
-quantities as 2-component arrays.
+finally convert back ``f`` into the pointer ``ff``.  In section `Examples`_ you
+can find concrete example of ``Cuba.jl`` use.
+
+Note that ``x`` and ``f`` are both arrays of ``Cdouble`` type (alias for
+``Float64``), so ``Cuba.jl`` can be used to integrate real-valued functions of
+real arguments.  See how to work with complex quantitites in the example
+`Complex integrand`_.
 
 The integrand receives ``nvec`` samples in ``x`` and is supposed to fill the
 array ``f`` with the corresponding integrand values.  Note that ``nvec``
@@ -158,7 +193,7 @@ These are optional keywords common to all functions:
   (:math:`\varepsilon_{\text{rel}}`) and absolute
   (:math:`\varepsilon_{\text{abs}}`) accuracies.  The integrator tries to find
   an estimate :math:`\hat{I}` for the integral :math:`I` which for every
-  component :math:`c` fulfills :math:`|\hat{I}_c - I_c|\leqslant
+  component :math:`c` fulfills :math:`|\hat{I}_c - I_c|\leq
   \max(\varepsilon_{\text{abs}}, \varepsilon_{\text{rel}} |I_c|)`.
 - ``flags`` (type: ``Integer``, default: ``0``): flags governing the integration:
 
@@ -200,7 +235,37 @@ These are optional keywords common to all functions:
   the flags.
 
 - ``seed`` (type: ``Integer``, default: ``0``): the seed for the
-  pseudo-random-number generator (see Cuba documentation for details)
+  pseudo-random-number generator.  The random-number generator is chosen as
+  follows:
+
+  +----------+---------------------------+----------------------------------+
+  | ``seed`` | ``level``                 | Generator                        |
+  |          | (bits 8--31 of ``flags``) |                                  |
+  +==========+===========================+==================================+
+  | zero     | N/A                       | Sobol (quasi-random)             |
+  +----------+---------------------------+----------------------------------+
+  | non-zero | zero                      | Mersenne Twister (pseudo-random) |
+  +----------+---------------------------+----------------------------------+
+  | non-zero | non-zero                  | Ranlux (pseudo-random)           |
+  +----------+---------------------------+----------------------------------+
+
+  Ranlux implements Marsaglia and Zaman's 24-bit RCARRY algorithm with
+  generation period :math:`p`, i.e. for every 24 generated numbers used, another
+  :math:`p - 24` are skipped.  The luxury level is encoded in ``level`` as
+  follows:
+
+  - Level 1 (:math:`p = 48`): very long period, passes the gap test but fails
+    spectral test.
+  - Level 2 (:math:`p = 97`): passes all known tests, but theoretically still
+    defective.
+  - Level 3 (:math:`p = 223`): any theoretically possible correlations have very
+    small chance of being observed.
+  - Level 4 (:math:`p = 389`): highest possible luxury, all 24 bits chaotic.
+
+  Levels 5--23 default to 3, values above 24 directly specify the period
+  :math:`p`.  Note that Ranlux's original level 0, (mis)used for selecting
+  Mersenne Twister in Cuba, is equivalent to ``level`` = ``24``.
+
 - ``mineval`` (type: ``Real``, default: ``0``): the minimum number of integrand
   evaluations required
 - ``maxeval`` (type: ``Real``, default: ``1000000``): the (approximate) maximum
@@ -313,7 +378,7 @@ These optional keywords can be passed only to :func:`Divonne`:
 
     and :math:`n_2 = |\verb|key2||` determines the number of points,
 
-    - :math:`n_2\geqslant 40`, sample :math:`n_2` points,
+    - :math:`n_2\geq 40`, sample :math:`n_2` points,
     - :math:`n_2 < 40`, sample :math:`n_2\,n_{\text{need}}` points, where
       :math:`n_{\text{need}}` is the number of points needed to reach the
       prescribed accuracy, as estimated by Divonne from the results of the
@@ -430,10 +495,10 @@ Vectorization
 -------------
 
 Vectorization means evaluating the integrand function for several points at
-once.  This is also known as Single Instruction Multiple Data (SIMD) paradigm
-and is different from ordinary parallelization where independent threads are
-executed concurrently.  It is usually possible to employ vectorization on top of
-parallelization.
+once.  This is also known as `Single Instruction Multiple Data
+<https://en.wikipedia.org/wiki/SIMD>`__ (SIMD) paradigm and is different from
+ordinary parallelization where independent threads are executed concurrently.
+It is usually possible to employ vectorization on top of parallelization.
 
 ``Cuba.jl`` cannot automatically vectorize the integrand function, of course,
 but it does pass (up to) ``nvec`` points per integrand call (`Common
@@ -449,6 +514,9 @@ On the other hand, it it pointless to choose ``nvec`` > ``nbatch`` for Vegas.
 
 Examples
 --------
+
+Vector-valued integrand
+'''''''''''''''''''''''
 
 Consider the integral
 
@@ -497,12 +565,16 @@ This is the output
     Component 2: 0.41653838588663805
     Component 3: 1.2020569031595951
 
+Integral with non-constant boundaries
+'''''''''''''''''''''''''''''''''''''
+
 Now consider the integral
 
 .. math:: \int_{-y}^{y}\int_{0}^{z}\int_{0}^{\pi} \cos(x)\sin(y)\exp(z)\,\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z
 
 By applying the substitution rule repeatedly, you can scale the integrand
-function and get this equivalent integral over :math:`\Omega = [0, 1]^{3}`
+function and get this equivalent integral over the domain
+:math:`\Omega = [0, 1]^{3}`
 
 .. math:: \int\limits_{\Omega} 2\pi^{3}yz^2 \cos(\pi yz(2x - 1)) \sin(\pi yz)
 	  \exp(\pi z)\,\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z
@@ -533,6 +605,47 @@ This is the output
 
     Result of Cuba: 54.98607586826157 ± 5.460606521639899e-9
     Exact result:   54.98607586789537
+
+Complex integrand
+'''''''''''''''''
+
+As already explained, ``Cuba.jl`` operates on real quantities, so if you want to
+integrate a complex-valued function of complex arguments you have to treat
+complex quantities as 2-component arrays or real numbers.  For example, the
+integral
+
+.. math:: \int_{0}^{1} \exp(\mathrm{i} x)\,\mathrm{d}x
+
+can be computed with the following Julia script
+
+.. code-block:: julia
+
+    using Cuba
+
+    function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
+                       ff::Ptr{Cdouble}, userdata::Ptr{Void})
+        x = pointer_to_array(xx, (ndim,))
+        f = pointer_to_array(ff, (ncomp,))
+        # Complex integrand
+        tmp = exp(im*x[1])
+        # Assign to two components of "f" the real
+        # and imaginary part of the integrand.
+        f[1] = real(tmp)
+        f[2] = imag(tmp)
+        ff = pointer_from_objref(f)
+        return Cint(0)::Cint
+    end
+
+    result = Cuhre(integrand, 1, 2)
+    println("Result of Cuba: ", result[1][1] + im*result[1][2])
+    println("Exact result:   ", sin(1) + im*(1 - cos(1)))
+
+This is the output
+
+::
+
+    Result of Cuba: 0.8414709848078966 + 0.45969769413186035im
+    Exact result:   0.8414709848078965 + 0.45969769413186023im
 
 
 Performance
@@ -624,3 +737,6 @@ papers about Cuba Library:
   <http://dx.doi.org/10.1088/1742-6596/608/1/012066>`__.  arXiv:`1408.6373
   <http://arxiv.org/abs/1408.6373>`__.  Bibcode:`2015JPhCS.608a2066H
   <http://adsabs.harvard.edu/abs/2015JPhCS.608a2066H>`__.
+
+.. toctree::
+   :maxdepth: 3

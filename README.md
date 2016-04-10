@@ -76,10 +76,10 @@ or put this command into your Julia script.
 `Cuba.jl` provides 4 functions to integrate, one for each algorithm:
 
 ``` julia
-Vegas(function, ndim, ncomp[, keywords...])
-Suave(function, ndim, ncomp[, keywords...])
-Divonne(function, ndim, ncomp[, keywords...])
-Cuhre(function, ndim, ncomp[, keywords...])
+Vegas(integrand, ndim, ncomp[, keywords...])
+Suave(integrand, ndim, ncomp[, keywords...])
+Divonne(integrand, ndim, ncomp[, keywords...])
+Cuhre(integrand, ndim, ncomp[, keywords...])
 ```
 
 Mandatory arguments are:
