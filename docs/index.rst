@@ -737,6 +737,3 @@ papers about Cuba Library:
   <http://dx.doi.org/10.1088/1742-6596/608/1/012066>`__.  arXiv:`1408.6373
   <http://arxiv.org/abs/1408.6373>`__.  Bibcode:`2015JPhCS.608a2066H
   <http://adsabs.harvard.edu/abs/2015JPhCS.608a2066H>`__.
-
-.. toctree::
-   :maxdepth: 3
