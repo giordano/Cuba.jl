@@ -208,6 +208,10 @@ function Divonne{F<:AbstractFloat}(integrand::Function, ndim::Integer,
                                    nextra::Integer, peakfinder::Ptr{Void},
                                    statefile::AbstractString, spin::Ptr{Void})
     Cuba.cores(0, 10000)
+    # Divonne requires "ndim" to be at least 2, even for an integral over a one
+    # dimensional domain.  Instead, we don't prevent users from setting wrong
+    # "ndim" values like 0 or negative ones.
+    ndim == 1 && (ndim = 2)
     nregions = Ref{Cdouble}(0.0)
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)
@@ -282,6 +286,10 @@ function Cuhre(integrand::Function, ndim::Integer, ncomp::Integer,
                flags::Integer, mineval::Integer, maxeval::Integer,
                key::Integer, statefile::AbstractString, spin::Ptr{Void})
     Cuba.cores(0, 10000)
+    # Cuhre requires "ndim" to be at least 2, even for an integral over a one
+    # dimensional domain.  Instead, we don't prevent users from setting wrong
+    # "ndim" values like 0 or negative ones.
+    ndim == 1 && (ndim = 2)
     nregions = Ref{Cdouble}(0.0)
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)
