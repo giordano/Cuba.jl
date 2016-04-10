@@ -471,7 +471,7 @@ error with ``result[2][i]``.
   of ``integrand`` over the unit hypercube
 - ``error`` (type: ``Cdouble`` array with ``ncomp`` components): the presumed
   absolute error for each component of ``integral``
-- ``prob`` (type: ``Cdouble`` array with ``ncomp`` components): the
+- ``probability`` (type: ``Cdouble`` array with ``ncomp`` components): the
   :math:`\chi^2` -probability (not the :math:`\chi^2` -value itself!) that
   ``error`` is not a reliable estimate of the true integration error.  To judge
   the reliability of the result expressed through ``prob``, remember that it is
@@ -678,7 +678,7 @@ and FORTRAN 77 benchmark codes have been built with GCC 5.3.1.
       0.364000 seconds (Divonne)
       0.292000 seconds (Cuhre)
 
-Of course, a native C code making use of Cuba Library outperforms
+Of course, native C and Fortran codes making use of Cuba Library outperform
 ``Cuba.jl`` when higher values of ``CUBACORES`` are used, for example:
 
 ::
