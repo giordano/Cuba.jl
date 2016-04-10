@@ -53,7 +53,7 @@ ncomp = 3
 for alg in (:Vegas, :Suave, :Divonne, :Cuhre)
     info("Testing $(string(alg)) algorithm")
     result = @eval $alg($func, 3, $ncomp, epsabs=$epsabs[$alg],
-                        epsrel=1e-8)
+                        epsrel=1e-8, flags=0)
     for i = 1:ncomp
         println("Component $i: ", result[1][i], " ± ", result[2][i],
                 isfinite(result[1][i]) ? "" : " (skipping test)")
@@ -63,6 +63,24 @@ for alg in (:Vegas, :Suave, :Divonne, :Cuhre)
         end
     end
 end
+
+function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
+                   ff::Ptr{Cdouble}, userdata::Ptr{Void})
+    x = pointer_to_array(xx, (ndim,))
+    f = pointer_to_array(ff, (ncomp,))
+    tmp = exp(im*x[1])
+    f[1] = real(tmp)
+    f[2] = imag(tmp)
+    ff = pointer_from_objref(f)
+    return Cint(0)::Cint
+end
+
+# Test Cuhre and Divonne with ndim = 1.
+answer = sin(1) + im*(1 - cos(1))
+result = Cuhre(integrand, 1, 2)
+@test_approx_eq     result[1][1] + im*result[1][2]     answer
+result = Divonne(integrand, 1, 2, epsrel=1e-8, epsabs=1e-8)
+@test_approx_eq_eps result[1][1] + im*result[1][2]     answer     1e-8
 
 # Make sure these functions don't crash.
 Cuba.init(C_NULL, C_NULL)
