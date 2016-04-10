@@ -143,9 +143,7 @@ Function ``integrand`` must be of this type:
         f = pointer_to_array(ff, (ncomp,))
         # Do calculations on "f" here
         #   ...
-        # Store back the results to "ff"
-        ff = pointer_from_objref(f)
-    return Cint(0)::Cint
+    return Cint(0)
     end
 
 Note that ``xx`` and ``ff`` arguments are passed as pointers, so you have to
@@ -540,8 +538,7 @@ This is the Julia script you can use to compute the above integral
         f[1] = sin(x[1])*cos(x[2])*exp(x[3])
         f[2] = exp(-(x[1]^2 + x[2]^2 + x[3]^2))
         f[3] = 1/(1 - x[1]*x[2]*x[3])
-        ff = pointer_from_objref(f)
-        return Cint(0)::Cint
+        return Cint(0)
     end
 
     result = Cuhre(integrand, 3, 3, epsabs=1e-12, epsrel=1e-10)
@@ -591,8 +588,7 @@ that can be computed with ``Cuba.jl`` using the following Julia script
         f = pointer_to_array(ff, (ncomp,))
         f[1] = 2pi^3*x[2]*x[3]^2*cos(pi*x[2]*x[3]*(2*x[1] - 1.0))*
                sin(pi*x[2]*x[3])*exp(pi*x[3])
-        ff = pointer_from_objref(f)
-        return Cint(0)::Cint
+        return Cint(0)
     end
 
     result = Cuhre(integrand, 3, 1, epsabs=1e-12, epsrel=1e-10)
@@ -632,8 +628,7 @@ can be computed with the following Julia script
         # and imaginary part of the integrand.
         f[1] = real(tmp)
         f[2] = imag(tmp)
-        ff = pointer_from_objref(f)
-        return Cint(0)::Cint
+        return Cint(0)
     end
 
     result = Cuhre(integrand, 1, 2)

@@ -37,9 +37,7 @@ function func(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint, ff::Ptr{Cdouble},
     f[1] = f1(x[1], x[2], x[3])
     f[2] = f2(x[1], x[2], x[3])
     f[3] = f3(x[1], x[2], x[3])
-    # Store back the results to "ff"
-    ff = pointer_from_objref(f)
-    return Cint(0)::Cint
+    return Cint(0)
 end
 
 # Make sure using "addprocs" doesn't make the program segfault.
@@ -71,8 +69,7 @@ function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
     tmp = exp(im*x[1])
     f[1] = real(tmp)
     f[2] = imag(tmp)
-    ff = pointer_from_objref(f)
-    return Cint(0)::Cint
+    return Cint(0)
 end
 
 # Test Cuhre and Divonne with ndim = 1.

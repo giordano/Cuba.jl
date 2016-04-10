@@ -60,8 +60,7 @@ function test(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
     f[9]  = t9( x[1], x[2], x[3])
     f[10] = t10(x[1], x[2], x[3])
     f[11] = t11(x[1], x[2], x[3])
-    ff = pointer_from_objref(f)
-    return Cint(0)::Cint
+    return Cint(0)
 end
 
 info("Performance of Cuba.jl:")

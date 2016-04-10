@@ -98,9 +98,7 @@ function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint, ff::Ptr{Cdouble},
     f = pointer_to_array(ff, (ncomp,))
 	# Do calculations on "f" here
 	#   ...
-    # Store back the results to "ff"
-    ff = pointer_from_objref(f)
-return Cint(0)::Cint
+return Cint(0)
 end
 ```
 
