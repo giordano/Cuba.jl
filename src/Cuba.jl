@@ -260,6 +260,29 @@ function dointegrate(algorithm::Symbol,
     return integral, error, prob, neval[], fail[], nregions[]
 end
 
+"""
+    Vegas(integrand, ndim, ncomp[, keywords]) -> integral, error, probability, neval, fail, nregions
+
+Calculate integral of `integrand` over the unit hypercube in `ndim` dimensions
+using Vegas algorithm.  `integrand` is a vectorial function with `ncomp`
+components.
+
+Accepted keywords:
+
+* `nvec`
+* `esprel`
+* `epsabs`
+* `flags`
+* `seed`
+* `mineval`
+* `maxeval`
+* `nstart`
+* `nincrease`
+* `nbatch`
+* `gridno`
+* `statefile`
+* `spin`
+"""
 Vegas(integrand::Function, ndim::Integer, ncomp::Integer; nvec::Integer=NVEC,
       epsrel::Real=EPSREL, epsabs::Real=EPSABS, flags::Integer=FLAGS,
       seed::Integer=SEED, mineval::Real=MINEVAL, maxeval::Real=MAXEVAL,
@@ -274,6 +297,28 @@ Vegas(integrand::Function, ndim::Integer, ncomp::Integer; nvec::Integer=NVEC,
                       BORDER, MAXCHISQ, MINDEVIATION, NGIVEN, LDXGIVEN, XGIVEN,
                       NEXTRA, PEAKFINDER, KEY, statefile, spin)
 
+"""
+    Suave(integrand, ndim, ncomp[, keywords]) -> integral, error, probability, neval, fail, nregions
+
+Calculate integral of `integrand` over the unit hypercube in `ndim` dimensions
+using Suave algorithm.  `integrand` is a vectorial function with `ncomp`
+components.
+
+Accepted keywords:
+
+* `nvec`
+* `esprel`
+* `epsabs`
+* `flags`
+* `seed`
+* `mineval`
+* `maxeval`
+* `nnew`
+* `nmin`
+* `flatness`
+* `statefile`
+* `spin`
+"""
 Suave(integrand::Function, ndim::Integer, ncomp::Integer;
       nvec::Integer=NVEC, epsrel::Real=EPSREL,
       epsabs::Real=EPSABS, flags::Integer=FLAGS, seed::Integer=SEED,
@@ -288,6 +333,37 @@ Suave(integrand::Function, ndim::Integer, ncomp::Integer;
                       BORDER, MAXCHISQ, MINDEVIATION, NGIVEN, LDXGIVEN, XGIVEN,
                       NEXTRA, PEAKFINDER, KEY, statefile, spin)
 
+"""
+    Divonne(integrand, ndim, ncomp[, keywords]) -> integral, error, probability, neval, fail, nregions
+
+Calculate integral of `integrand` over the unit hypercube in `ndim` dimensions
+using Divonne algorithm.  `integrand` is a vectorial function with `ncomp`
+components.
+
+Accepted keywords:
+
+* `nvec`
+* `esprel`
+* `epsabs`
+* `flags`
+* `seed`
+* `mineval`
+* `maxeval`
+* `key1`
+* `key2`
+* `key3`
+* `maxpass`
+* `border`
+* `maxchisq`
+* `mindeviation`
+* `ngiven`
+* `ldxgiven`
+* `xgiven`
+* `nextra`
+* `peakfinder`
+* `statefile`
+* `spin`
+"""
 function Divonne{R<:Real}(integrand::Function, ndim::Integer, ncomp::Integer;
                           nvec::Integer=NVEC, epsrel::Real=EPSREL,
                           epsabs::Real=EPSABS, flags::Integer=FLAGS,
@@ -318,6 +394,25 @@ function Divonne{R<:Real}(integrand::Function, ndim::Integer, ncomp::Integer;
                        statefile, spin)
 end
 
+"""
+    Cuhre(integrand, ndim, ncomp[, keywords]) -> integral, error, probability, neval, fail, nregions
+
+Calculate integral of `integrand` over the unit hypercube in `ndim` dimensions
+using Cuhre algorithm.  `integrand` is a vectorial function with `ncomp`
+components.
+
+Accepted keywords:
+
+* `nvec`
+* `esprel`
+* `epsabs`
+* `flags`
+* `mineval`
+* `maxeval`
+* `key`
+* `statefile`
+* `spin`
+"""
 function Cuhre(integrand::Function, ndim::Integer, ncomp::Integer;
                nvec::Integer=NVEC, epsrel::Real=EPSREL, epsabs::Real=EPSABS,
                flags::Integer=FLAGS, mineval::Real=MINEVAL,

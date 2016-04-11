@@ -232,8 +232,8 @@ These are optional keywords common to all functions:
   the flags.
 
 - ``seed`` (type: ``Integer``, default: ``0``): the seed for the
-  pseudo-random-number generator.  The random-number generator is chosen as
-  follows:
+  pseudo-random-number generator.  This keyword is not available for ``Cuhre``.
+  The random-number generator is chosen as follows:
 
   +----------+---------------------------+----------------------------------+
   | ``seed`` | ``level``                 | Generator                        |
