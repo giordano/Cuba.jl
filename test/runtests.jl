@@ -27,17 +27,16 @@ f1(x,y,z) = sin(x)*cos(y)*exp(z)
 f2(x,y,z) = exp(-(x*x + y*y + z*z))
 f3(x,y,z) = 1/(1 - x*y*z)
 
-# This is the integrand function.  This is just like one would do in C.
-function func(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint, ff::Ptr{Cdouble},
-              userdata::Ptr{Void})
-    # Take arrays from "xx" and "ff" pointers.
-    x = pointer_to_array(xx, (ndim,))
-    f = pointer_to_array(ff, (ncomp,))
-    # Define components of the integrand function.
+function integrand1(x, f)
     f[1] = f1(x[1], x[2], x[3])
     f[2] = f2(x[1], x[2], x[3])
     f[3] = f3(x[1], x[2], x[3])
-    return Cint(0)
+end
+
+function integrand2(x, f)
+    tmp = exp(im*x[1])
+    f[1] = real(tmp)
+    f[2] = imag(tmp)
 end
 
 # Make sure using "addprocs" doesn't make the program segfault.
@@ -50,7 +49,7 @@ answer = [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
 ncomp = 3
 for alg in (:Vegas, :Suave, :Divonne, :Cuhre)
     info("Testing $(string(alg)) algorithm")
-    result = @eval $alg($func, 3, $ncomp, epsabs=$epsabs[$alg],
+    result = @eval $alg($integrand1, 3, $ncomp, epsabs=$epsabs[$alg],
                         epsrel=1e-8, flags=0)
     for i = 1:ncomp
         println("Component $i: ", result[1][i], " ± ", result[2][i],
@@ -62,19 +61,9 @@ for alg in (:Vegas, :Suave, :Divonne, :Cuhre)
     end
 end
 
-function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
-                   ff::Ptr{Cdouble}, userdata::Ptr{Void})
-    x = pointer_to_array(xx, (ndim,))
-    f = pointer_to_array(ff, (ncomp,))
-    tmp = exp(im*x[1])
-    f[1] = real(tmp)
-    f[2] = imag(tmp)
-    return Cint(0)
-end
-
 # Test Cuhre and Divonne with ndim = 1.
 answer = sin(1) + im*(1 - cos(1))
-result = Cuhre(integrand, 1, 2)
+result = Cuhre(integrand2, 1, 2)
 @test_approx_eq     result[1][1] + im*result[1][2]     answer
 result = Divonne(integrand, 1, 2, epsrel=1e-8, epsabs=1e-8)
 @test_approx_eq_eps result[1][1] + im*result[1][2]     answer     1e-8

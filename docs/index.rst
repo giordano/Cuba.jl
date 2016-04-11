@@ -11,8 +11,9 @@ of real-valued functions of real arguments, using different algorithms.
 This is just a Julia wrapper around the C `Cuba library
 <http://www.feynarts.de/cuba/>`__, version 4.2, by **Thomas Hahn**. All the
 credits goes to him for the underlying functions, blame me for any problem with
-the Julia interface. Feel free to report bugs and make suggestions at
-https://github.com/giordano/Cuba.jl/issues.
+the Julia interface.  ``Cuba.jl`` is developed on GitHub:
+https://github.com/giordano/Cuba.jl.  Feel free to report bugs and make
+suggestions at https://github.com/giordano/Cuba.jl/issues.
 
 All algorithms provided by Cuba library are supported in ``Cuba.jl``:
 
@@ -81,8 +82,9 @@ section you can find the computation of a 3-dimensional integral with
 non-constant boundaries using ``Cuba.jl``.
 
 **Note:** This package has been tested only on GNU/Linux and OS X systems.
-Trying to install on Windows will likely fail, please report if you manage to
-install ``Cuba.jl`` on this system.
+Trying to install on Windows will likely fail, please report at
+https://github.com/giordano/Cuba.jl/issues/2 if you manage to install
+``Cuba.jl`` on this system.
 
 Installation
 ------------
@@ -128,42 +130,41 @@ Mandatory Arguments
 
 Mandatory arguments of integrator functions are:
 
-- ``integrand`` (type: ``Function``): the name of the function to be integrated
+- ``integrand`` (type: ``Function``): the function to be integrated
 - ``ndim`` (type: ``Integer``): the number of dimensions of the integral
 - ``ncomp`` (type: ``Integer``): the number of components of the integrand
 
-Function ``integrand`` must be of this type:
+``integrand`` should be a function ``integrand(x, f)`` taking two arguments:
+
+- the input vector ``x`` of length ``ndim``
+- the output vector ``f`` of length ``ncomp``, used to set the value of each
+  component of the integrand at point ``x``
+
+Also `anonymous functions
+<http://docs.julialang.org/en/stable/manual/functions/#anonymous-functions>`__
+are allowed as ``integrand``.  For those familiar with ``Cubature.jl`` package,
+this is the same syntax used for integrating vector-valued functions.
+
+For example, the integral
+
+.. math:: \int_{0}^{1} \cos (x) \,\mathrm{d}x
+
+can be computed with one of the following lines
 
 .. code-block:: julia
 
-    function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
-                       ff::Ptr{Cdouble}, userdata::Ptr{Void})
-        # Take arrays from "xx" and "ff" pointers.
-        x = pointer_to_array(xx, (ndim,))
-        f = pointer_to_array(ff, (ncomp,))
-        # Do calculations on "f" here
-        #   ...
-    return Cint(0)
-    end
+    Vegas((x,f)->f[1]=cos(x[1]), 1, 1)
+    Suave((x,f)->f[1]=cos(x[1]), 1, 1)
+    Divonne((x,f)->f[1]=cos(x[1]), 1, 1)
+    Cuhre((x,f)->f[1]=cos(x[1]), 1, 1)
 
-Note that ``xx`` and ``ff`` arguments are passed as pointers, so you have to
-translate them to Julia objects before actually performing calculations, and
-finally convert back ``f`` into the pointer ``ff``.  In section `Examples`_ you
-can find concrete example of ``Cuba.jl`` use.
+In section `Examples`_ you can find more complete examples.  Note that ``x`` and
+``f`` are both arrays with type ``Float64``, so ``Cuba.jl`` can be used to
+integrate real-valued functions of real arguments.  See how to work with complex
+quantitites in the example `Complex integrand`_.
 
-Note that ``x`` and ``f`` are both arrays of ``Cdouble`` type (alias for
-``Float64``), so ``Cuba.jl`` can be used to integrate real-valued functions of
-real arguments.  See how to work with complex quantitites in the example
-`Complex integrand`_.
-
-The integrand receives ``nvec`` samples in ``x`` and is supposed to fill the
-array ``f`` with the corresponding integrand values.  Note that ``nvec``
-indicates the actual number of points passed to the integrand here and may be
-smaller than the ``nvec`` given to the integrator (see `Common Keywords`_
-below).
-
-**Note:** admittedly, this user interface is not REPL-friendly, help on
-improving it is welcome.
+**Note:** if you used ``Cuba.jl`` until version 0.4, be aware that the user
+interface has been reworked in version 0.5 in a backward incompatible way.
 
 Optional Keywords
 '''''''''''''''''
@@ -180,8 +181,6 @@ Common Keywords
 
 These are optional keywords common to all functions:
 
-- ``userdata`` (type: ``Ptr{Void}``, default: ``C_NULL``): user data passed to
-  the integrand
 - ``nvec`` (type: ``Integer``, default: ``1``): the maximum number of points to
   be given to the integrand routine in each invocation.  Usually this is 1 but
   if the integrand can profit from e.g. Single Instruction Multiple Data (SIMD)
@@ -531,14 +530,10 @@ This is the Julia script you can use to compute the above integral
 
     using Cuba
 
-    function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
-                       ff::Ptr{Cdouble}, userdata::Ptr{Void})
-        x = pointer_to_array(xx, (ndim,))
-        f = pointer_to_array(ff, (ncomp,))
+    function integrand(x, f)
         f[1] = sin(x[1])*cos(x[2])*exp(x[3])
         f[2] = exp(-(x[1]^2 + x[2]^2 + x[3]^2))
         f[3] = 1/(1 - x[1]*x[2]*x[3])
-        return Cint(0)
     end
 
     result = Cuhre(integrand, 3, 3, epsabs=1e-12, epsrel=1e-10)
@@ -565,13 +560,13 @@ This is the output
 Integral with non-constant boundaries
 '''''''''''''''''''''''''''''''''''''
 
-Now consider the integral
+The integral
 
 .. math:: \int_{-y}^{y}\int_{0}^{z}\int_{0}^{\pi} \cos(x)\sin(y)\exp(z)\,\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z
 
-By applying the substitution rule repeatedly, you can scale the integrand
-function and get this equivalent integral over the domain
-:math:`\Omega = [0, 1]^{3}`
+has non-constant boundaries.  By applying the substitution rule repeatedly, you
+can scale the integrand function and get this equivalent integral over the fixed
+domain :math:`\Omega = [0, 1]^{3}`
 
 .. math:: \int\limits_{\Omega} 2\pi^{3}yz^2 \cos(\pi yz(2x - 1)) \sin(\pi yz)
 	  \exp(\pi z)\,\mathrm{d}x\,\mathrm{d}y\,\mathrm{d}z
@@ -582,13 +577,9 @@ that can be computed with ``Cuba.jl`` using the following Julia script
 
     using Cuba
 
-    function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
-                       ff::Ptr{Cdouble}, userdata::Ptr{Void})
-        x = pointer_to_array(xx, (ndim,))
-        f = pointer_to_array(ff, (ncomp,))
+    function integrand(x, f)
         f[1] = 2pi^3*x[2]*x[3]^2*cos(pi*x[2]*x[3]*(2*x[1] - 1.0))*
                sin(pi*x[2]*x[3])*exp(pi*x[3])
-        return Cint(0)
     end
 
     result = Cuhre(integrand, 3, 1, epsabs=1e-12, epsrel=1e-10)
@@ -618,17 +609,13 @@ can be computed with the following Julia script
 
     using Cuba
 
-    function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
-                       ff::Ptr{Cdouble}, userdata::Ptr{Void})
-        x = pointer_to_array(xx, (ndim,))
-        f = pointer_to_array(ff, (ncomp,))
+    function integrand(x, f)
         # Complex integrand
         tmp = exp(im*x[1])
         # Assign to two components of "f" the real
         # and imaginary part of the integrand.
         f[1] = real(tmp)
         f[2] = imag(tmp)
-        return Cint(0)
     end
 
     result = Cuhre(integrand, 1, 2)
@@ -647,31 +634,31 @@ Performance
 -----------
 
 ``Cuba.jl`` cannot (yet?) take advantage of parallelization capabilities of Cuba
-Library. Nonetheless, it has performances comparable with (if not slightly
-better than) equivalent native C or Fortran codes based on Cuba library when
-``CUBACORES`` environment variable is set to ``0`` (i.e., multithreading is
-disabled). The following is the result of running the benchmark present in
-``test`` directory on a 64-bit GNU/Linux system running Julia 0.4.  The C
-and FORTRAN 77 benchmark codes have been built with GCC 5.3.1.
+Library. Nonetheless, it has performances comparable with equivalent native C or
+Fortran codes based on Cuba library when ``CUBACORES`` environment variable is
+set to ``0`` (i.e., multithreading is disabled). The following is the result of
+running the benchmark present in ``test`` directory on a 64-bit GNU/Linux system
+running Julia 0.4.3.  The C and FORTRAN 77 benchmark codes have been compiled
+with GCC 5.3.1.
 
 ::
 
     $ CUBACORES=0 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
     INFO: Performance of Cuba.jl:
-      0.332981 seconds (Vegas)
-      0.656121 seconds (Suave)
-      0.385009 seconds (Divonne)
-      0.299737 seconds (Cuhre)
+      0.340635 seconds (Vegas)
+      0.660305 seconds (Suave)
+      0.391721 seconds (Divonne)
+      0.305756 seconds (Cuhre)
     INFO: Performance of Cuba Library in C:
-      0.348074 seconds (Vegas)
-      0.662016 seconds (Suave)
-      0.378092 seconds (Divonne)
-      0.303750 seconds (Cuhre)
+      0.352429 seconds (Vegas)
+      0.668258 seconds (Suave)
+      0.380006 seconds (Divonne)
+      0.305772 seconds (Cuhre)
     INFO: Performance of Cuba Library in Fortran:
       0.328000 seconds (Vegas)
       0.660000 seconds (Suave)
       0.364000 seconds (Divonne)
-      0.292000 seconds (Cuhre)
+      0.296000 seconds (Cuhre)
 
 Of course, native C and Fortran codes making use of Cuba Library outperform
 ``Cuba.jl`` when higher values of ``CUBACORES`` are used, for example:
@@ -680,20 +667,20 @@ Of course, native C and Fortran codes making use of Cuba Library outperform
 
     $ CUBACORES=1 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
     INFO: Performance of Cuba.jl:
-      0.336093 seconds (Vegas)
-      0.663560 seconds (Suave)
-      0.391726 seconds (Divonne)
-      0.301402 seconds (Cuhre)
+      0.342575 seconds (Vegas)
+      0.660071 seconds (Suave)
+      0.393213 seconds (Divonne)
+      0.304569 seconds (Cuhre)
     INFO: Performance of Cuba Library in C:
-      0.122129 seconds (Vegas)
-      0.609809 seconds (Suave)
-      0.151087 seconds (Divonne)
-      0.085541 seconds (Cuhre)
+      0.118911 seconds (Vegas)
+      0.614480 seconds (Suave)
+      0.153015 seconds (Divonne)
+      0.086997 seconds (Cuhre)
     INFO: Performance of Cuba Library in Fortran:
-      0.072000 seconds (Vegas)
+      0.108000 seconds (Vegas)
       0.628000 seconds (Suave)
-      0.164000 seconds (Divonne)
-      0.096000 seconds (Cuhre)
+      0.144000 seconds (Divonne)
+      0.084000 seconds (Cuhre)
 
 ``Cuba.jl`` internally fixes ``CUBACORES`` to 0 in order to prevent from
 forking ``julia`` processes that would only slow down calculations

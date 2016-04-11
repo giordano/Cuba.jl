@@ -30,7 +30,6 @@ const libcuba = joinpath(dirname(@__FILE__), "..", "deps", "libcuba")
 
 ### Default values of parameters
 # Common arguments.
-const USERDATA  = C_NULL
 const NVEC      = 1
 const EPSREL    = 1e-4
 const EPSABS    = 1e-12
@@ -70,10 +69,10 @@ const KEY = 0
 
 ### Functions
 
-# Return pointer for "func", to be passed as "integrand" argument to Cuba
+# Return pointer for "integrand", to be passed as "integrand" argument to Cuba
 # functions.
-function func_ptr(func::Function)
-    return cfunction(func, Cint,
+function integrand_ptr(integrand::Function)
+    return cfunction(integrand, Cint,
                      (Ref{Cint}, # ndim
                       Ptr{Cdouble}, # x
                       Ref{Cint}, # ncomp
@@ -81,8 +80,31 @@ function func_ptr(func::Function)
                       Ptr{Void})) # userdata
 end
 
+# Note on implementation: instead of passing the function that performs
+# calculations as "integrand" argument to integrator routines, we pass the
+# pointer to this function and use "func_" to actually perform calculations.
+# Without doing so and trying to "cfunction" a function not yet defined we would
+# run into a
+#
+#   cfunction: no method exactly matched the required type signature (function not yet c-callable)
+#
+# error.  See http://julialang.org/blog/2013/05/callback for more information on
+# this, in particular the section about "qsort_r" ("Passing closures via
+# pass-through pointers").  Thanks to Steven G. Johnson for pointing to this.
+function generic_integrand!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
+                            f_::Ptr{Cdouble}, func_::Ptr{Void})
+    # Get arrays from "x_" and "f_" pointers.
+    x = pointer_to_array(x_, (ndim,))
+    f = pointer_to_array(f_, (ncomp,))
+    # Get the function from "func_" pointer.
+    func! = unsafe_pointer_to_objref(func_)::Function
+    func!(x, f)
+    return Cint(0)
+end
+const c_generic_integrand! = integrand_ptr(generic_integrand!)
+
 ### Vegas
-function Vegas(integrand::Function, ndim::Integer, ncomp::Integer,
+function Vegas(integrand::Ptr{Void}, ndim::Integer, ncomp::Integer,
                userdata::Ptr{Void}, nvec::Integer, epsrel::Real,
                epsabs::Real, flags::Integer, seed::Integer,
                mineval::Integer, maxeval::Integer, nstart::Integer,
@@ -118,7 +140,7 @@ function Vegas(integrand::Function, ndim::Integer, ncomp::Integer,
            Ptr{Cdouble}, # error
            Ptr{Cdouble}),# prob
           # Input
-          ndim, ncomp, func_ptr(integrand), userdata, nvec,
+          ndim, ncomp, integrand, userdata, nvec,
           epsrel, epsabs, flags, seed, mineval, maxeval,
           nstart, nincrease, nbatch, gridno, statefile, spin,
           # Output
@@ -126,20 +148,20 @@ function Vegas(integrand::Function, ndim::Integer, ncomp::Integer,
     return integral, error, prob, neval[], fail[], 0
 end
 
-Vegas(integrand::Function, ndim::Integer, ncomp::Integer;
-      userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC, epsrel::Real=EPSREL,
-      epsabs::Real=EPSABS, flags::Integer=FLAGS, seed::Integer=SEED,
-      mineval::Real=MINEVAL, maxeval::Real=MAXEVAL, nstart::Integer=NSTART,
-      nincrease::Integer=NINCREASE, nbatch::Integer=NBATCH,
-      gridno::Integer=GRIDNO, statefile::AbstractString=STATEFILE,
-      spin::Ptr{Void}=SPIN) =
-          Vegas(integrand, ndim, ncomp, userdata, nvec, float(epsrel),
+Vegas(integrand::Function, ndim::Integer, ncomp::Integer; nvec::Integer=NVEC,
+      epsrel::Real=EPSREL, epsabs::Real=EPSABS, flags::Integer=FLAGS,
+      seed::Integer=SEED, mineval::Real=MINEVAL, maxeval::Real=MAXEVAL,
+      nstart::Integer=NSTART, nincrease::Integer=NINCREASE,
+      nbatch::Integer=NBATCH, gridno::Integer=GRIDNO,
+      statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
+          Vegas(c_generic_integrand!, ndim, ncomp,
+                pointer_from_objref(integrand), nvec, float(epsrel),
                 float(epsabs), flags, seed, trunc(Integer, mineval),
-                trunc(Integer, maxeval), nstart, nincrease, nbatch,
-                gridno, statefile, spin)
+                trunc(Integer, maxeval), nstart, nincrease, nbatch, gridno,
+                statefile, spin)
 
 ### Suave
-function Suave(integrand::Function, ndim::Integer, ncomp::Integer,
+function Suave(integrand::Ptr{Void}, ndim::Integer, ncomp::Integer,
                userdata::Ptr{Void}, nvec::Integer, epsrel::Real,
                epsabs::Real, flags::Integer, seed::Integer,
                mineval::Integer, maxeval::Integer, nnew::Integer,
@@ -176,7 +198,7 @@ function Suave(integrand::Function, ndim::Integer, ncomp::Integer,
            Ptr{Cdouble}, # error
            Ptr{Cdouble}),# prob
           # Input
-          ndim, ncomp, func_ptr(integrand), userdata, nvec,
+          ndim, ncomp, integrand, userdata, nvec,
           epsrel, epsabs, flags, seed, mineval, maxeval,
           nnew, nmin, flatness, statefile, spin,
           # Output
@@ -185,18 +207,19 @@ function Suave(integrand::Function, ndim::Integer, ncomp::Integer,
 end
 
 Suave(integrand::Function, ndim::Integer, ncomp::Integer;
-      userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC, epsrel::Real=EPSREL,
+      nvec::Integer=NVEC, epsrel::Real=EPSREL,
       epsabs::Real=EPSABS, flags::Integer=FLAGS, seed::Integer=SEED,
       mineval::Real=MINEVAL, maxeval::Real=MAXEVAL, nnew::Integer=NNEW,
       nmin::Integer=NMIN, flatness::Real=FLATNESS,
       statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
-          Suave(integrand, ndim, ncomp, userdata, nvec, float(epsrel),
+          Suave(c_generic_integrand!, ndim, ncomp,
+                pointer_from_objref(integrand), nvec, float(epsrel),
                 float(epsabs), flags, seed, trunc(Integer, mineval),
                 trunc(Integer, maxeval), nnew, nmin, float(flatness),
                 statefile, spin)
 
 ### Divonne
-function Divonne{F<:AbstractFloat}(integrand::Function, ndim::Integer,
+function Divonne{F<:AbstractFloat}(integrand::Ptr{Void}, ndim::Integer,
                                    ncomp::Integer, userdata::Ptr{Void},
                                    nvec::Integer, epsrel::Real, epsabs::Real,
                                    flags::Integer, seed::Integer,
@@ -251,7 +274,7 @@ function Divonne{F<:AbstractFloat}(integrand::Function, ndim::Integer,
            Ptr{Cdouble}, # error
            Ptr{Cdouble}),# prob
           # Input
-          ndim, ncomp, func_ptr(integrand), userdata, nvec, epsrel,
+          ndim, ncomp, integrand, userdata, nvec, epsrel,
           epsabs, flags, seed, mineval, maxeval, key1, key2, key3,
           maxpass, border, maxchisq, mindeviation, ngiven, ldxgiven,
           xgiven, nextra, peakfinder, statefile, spin,
@@ -261,7 +284,7 @@ function Divonne{F<:AbstractFloat}(integrand::Function, ndim::Integer,
 end
 
 Divonne{R<:Real}(integrand::Function, ndim::Integer, ncomp::Integer;
-                 userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC,
+                 nvec::Integer=NVEC,
                  epsrel::Real=EPSREL, epsabs::Real=EPSABS,
                  flags::Integer=FLAGS, seed::Integer=SEED,
                  mineval::Real=MINEVAL, maxeval::Real=MAXEVAL,
@@ -272,7 +295,8 @@ Divonne{R<:Real}(integrand::Function, ndim::Integer, ncomp::Integer;
                  xgiven::AbstractArray{R}=zeros(typeof(0.0), ldxgiven, ngiven),
                  nextra::Integer=NEXTRA, peakfinder::Ptr{Void}=PEAKFINDER,
                  statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
-                     Divonne(integrand, ndim, ncomp, userdata, nvec,
+                     Divonne(c_generic_integrand!, ndim, ncomp,
+                             pointer_from_objref(integrand), nvec,
                              float(epsrel), float(epsabs), flags, seed,
                              trunc(Integer, mineval), trunc(Integer, maxeval),
                              key1, key2, key3, maxpass, float(border),
@@ -281,7 +305,7 @@ Divonne{R<:Real}(integrand::Function, ndim::Integer, ncomp::Integer;
                              spin)
 
 ### Cuhre
-function Cuhre(integrand::Function, ndim::Integer, ncomp::Integer,
+function Cuhre(integrand::Ptr{Void}, ndim::Integer, ncomp::Integer,
                userdata::Ptr{Void}, nvec::Integer, epsrel::Real, epsabs::Real,
                flags::Integer, mineval::Integer, maxeval::Integer,
                key::Integer, statefile::AbstractString, spin::Ptr{Void})
@@ -317,7 +341,7 @@ function Cuhre(integrand::Function, ndim::Integer, ncomp::Integer,
            Ptr{Cdouble}, # error
            Ptr{Cdouble}),# prob
           # Input
-          ndim, ncomp, func_ptr(integrand), userdata, nvec, epsrel,
+          ndim, ncomp, integrand, userdata, nvec, epsrel,
           epsabs, flags, mineval, maxeval, key, statefile, spin,
           # Output
           nregions, neval, fail, integral, error, prob)
@@ -325,11 +349,12 @@ function Cuhre(integrand::Function, ndim::Integer, ncomp::Integer,
 end
 
 Cuhre(integrand::Function, ndim::Integer, ncomp::Integer;
-      userdata::Ptr{Void}=USERDATA, nvec::Integer=NVEC, epsrel::Real=EPSREL,
+      nvec::Integer=NVEC, epsrel::Real=EPSREL,
       epsabs::Real=EPSABS, flags::Integer=FLAGS, mineval::Real=MINEVAL,
       maxeval::Real=MAXEVAL, key::Integer=KEY,
       statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
-          Cuhre(integrand, ndim, ncomp, userdata, nvec, float(epsrel),
+          Cuhre(c_generic_integrand!, ndim, ncomp,
+                pointer_from_objref(integrand), nvec, float(epsrel),
                 float(epsabs), flags, trunc(Integer, mineval),
                 trunc(Integer, maxeval), key, statefile, spin)
 

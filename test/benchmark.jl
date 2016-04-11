@@ -45,10 +45,7 @@ t8(x,y,z)  = exp(-x*y*z)
 t9(x,y,z)  = Sq(x)/(cos(x + y + z + 1) + 5)
 t10(x,y,z) = (x > .5) ? 1/sqrt(x*y*z + 1e-5) : sqrt(x*y*z)
 t11(x,y,z) = (rsq(x,y,z) < 1) ? 1 : 0
-function test(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
-              ff::Ptr{Cdouble}, u::Ptr{Void}=C_NULL)
-    x = pointer_to_array(xx, (ndim,))
-    f = pointer_to_array(ff, (ncomp,))
+function test{X<:Float64, F<:Float64}(x::AbstractArray{X}, f::AbstractArray{F})
     f[1]  = t1( x[1], x[2], x[3])
     f[2]  = t2( x[1], x[2], x[3])
     f[3]  = t3( x[1], x[2], x[3])
@@ -60,7 +57,6 @@ function test(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint,
     f[9]  = t9( x[1], x[2], x[3])
     f[10] = t10(x[1], x[2], x[3])
     f[11] = t11(x[1], x[2], x[3])
-    return Cint(0)
 end
 
 info("Performance of Cuba.jl:")

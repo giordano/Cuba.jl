@@ -41,8 +41,9 @@ where the final `(b - a)` is the one-dimensional version of the Jacobian.  This
 generalizes straightforwardly to more than one dimension.
 
 **Note:** This package has been tested only on GNU/Linux and OS X systems.
-Trying to install on Windows will likely fail, please report if you manage to
-install on this system.
+Trying to install on Windows will likely fail, please report at
+https://github.com/giordano/Cuba.jl/issues/2 if you manage to install on this
+system.
 
 Installation
 ------------
@@ -88,26 +89,32 @@ Mandatory arguments are:
 * `ndim`: the number of dimensions of the integral
 * `ncomp`: the number of components of the integrand
 
-The `function` must be of this type:
+`integrand` should be a function `integrand(x, f)` taking two arguments:
 
-``` julia
-function integrand(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint, ff::Ptr{Cdouble},
-                   userdata::Ptr{Void})
-    # Take arrays from "xx" and "ff" pointers.
-    x = pointer_to_array(xx, (ndim,))
-    f = pointer_to_array(ff, (ncomp,))
-	# Do calculations on "f" here
-	#   ...
-return Cint(0)
-end
+- the input vector `x` of length `ndim`
+- the output vector `f` of length `ncomp`, used to set the value of each
+  component of the integrand at point `x`
+
+Also
+[anonymous functions](http://docs.julialang.org/en/stable/manual/functions/#anonymous-functions)
+are allowed as `integrand`.  For those familiar with
+[`Cubature.jl`](https://github.com/stevengj/Cubature.jl) package, this is the
+same syntax used for integrating vector-valued functions.
+
+For example, the integral
+
+```
+∫_0^1 cos(x) dx
 ```
 
-Note that `xx` and `ff` arguments are passed as pointers, so you have to
-translate them to Julia objects before actually performing calculations, and
-finally store the results into `ff`.
+can be computed with one of the following lines
 
-All other arguments listed in Cuba documentation can be passed as optional
-keywords.
+``` julia
+Vegas((x,f)->f[1]=cos(x[1]), 1, 1)
+Suave((x,f)->f[1]=cos(x[1]), 1, 1)
+Divonne((x,f)->f[1]=cos(x[1]), 1, 1)
+Cuhre((x,f)->f[1]=cos(x[1]), 1, 1)
+```
 
 The integrating functions `Vegas`, `Suave`, `Divonne`, and `Cuhre` return the
 6-tuple
@@ -122,12 +129,13 @@ functions to the variable named `result`, you can access the value of the `i`-th
 component of the integral with `result[1][i]` and the associated error with
 `result[2][i]`.  The details of other quantities can be found in Cuba manual.
 
-More extended documentation of `Cuba.jl` is available at
+All other arguments listed in Cuba documentation can be passed as optional
+keywords.  More extended documentation of `Cuba.jl` is available at
 http://cubajl.readthedocs.org/.  You can also download the PDF version of the
 manual from https://media.readthedocs.org/pdf/cubajl/latest/cubajl.pdf.
 
-**Note:** admittedly, this user interface is not REPL-friendly, help on
-improving it is welcome.
+**Note:** if you used `Cuba.jl` until version 0.4, be aware that the user
+interface has been reworked in version 0.5 in a backward incompatible way.
 
 Example
 -------
@@ -138,15 +146,10 @@ Here is an example of a 3-component integral in 3D space (so `ndim=3` and
 ``` julia
 using Cuba
 
-function func(ndim::Cint, xx::Ptr{Cdouble}, ncomp::Cint, ff::Ptr{Cdouble},
-              userdata::Ptr{Void})
-    x = pointer_to_array(xx, (ndim,))
-    f = pointer_to_array(ff, (ncomp,))
+function func(x, f)
     f[1] = sin(x[1])*cos(x[2])*exp(x[3])
     f[2] = exp(-(x[1]^2 + x[2]^2 + x[3]^2))
     f[3] = 1/(1 - x[1]*x[2]*x[3])
-    ff = pointer_from_objref(f)
-    return Cint(0)::Cint
 end
 
 result = Cuhre(func, 3, 3, epsabs=1e-12, epsrel=1e-10)
@@ -175,52 +178,53 @@ Performance
 -----------
 
 `Cuba.jl` cannot (yet?) take advantage of parallelization capabilities of Cuba
-Library.  Nonetheless, it has performances comparable with (if not slightly
-better than) equivalent native C or Fortran codes based on Cuba library when
-`CUBACORES` environment variable is set to `0` (i.e., multithreading is
-disabled).  The following is the result of running the benchmark present in
-`test` directory on a 64-bit GNU/Linux system running Julia 0.4.  The C and
-FORTRAN 77 codes have been built with GCC 5.3.1.
+Library.  Nonetheless, it has performances comparable with equivalent native C
+or Fortran codes based on Cuba library when `CUBACORES` environment variable is
+set to `0` (i.e., multithreading is disabled).  The following is the result of
+running the benchmark present in `test` directory on a 64-bit GNU/Linux system
+running Julia 0.4.3.  The C and FORTRAN 77 benchmark codes have been compiled
+with GCC 5.3.1.
 
 ```
 $ CUBACORES=0 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
 INFO: Performance of Cuba.jl:
-  0.332981 seconds (Vegas)
-  0.656121 seconds (Suave)
-  0.385009 seconds (Divonne)
-  0.299737 seconds (Cuhre)
+  0.340635 seconds (Vegas)
+  0.660305 seconds (Suave)
+  0.391721 seconds (Divonne)
+  0.305756 seconds (Cuhre)
 INFO: Performance of Cuba Library in C:
-  0.348074 seconds (Vegas)
-  0.662016 seconds (Suave)
-  0.378092 seconds (Divonne)
-  0.303750 seconds (Cuhre)
+  0.352429 seconds (Vegas)
+  0.668258 seconds (Suave)
+  0.380006 seconds (Divonne)
+  0.305772 seconds (Cuhre)
 INFO: Performance of Cuba Library in Fortran:
   0.328000 seconds (Vegas)
   0.660000 seconds (Suave)
   0.364000 seconds (Divonne)
-  0.292000 seconds (Cuhre)
+  0.296000 seconds (Cuhre)
+
 ```
 
-Of course, a native C code making use of Cuba Library outperforms `Cuba.jl` when
-higher values of `CUBACORES` are used, for example:
+Of course, native C and Fortran codes making use of Cuba Library outperform
+`Cuba.jl` when higher values of `CUBACORES` are used, for example:
 
 ```
 $ CUBACORES=1 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
 INFO: Performance of Cuba.jl:
-  0.336093 seconds (Vegas)
-  0.663560 seconds (Suave)
-  0.391726 seconds (Divonne)
-  0.301402 seconds (Cuhre)
+  0.342575 seconds (Vegas)
+  0.660071 seconds (Suave)
+  0.393213 seconds (Divonne)
+  0.304569 seconds (Cuhre)
 INFO: Performance of Cuba Library in C:
-  0.122129 seconds (Vegas)
-  0.609809 seconds (Suave)
-  0.151087 seconds (Divonne)
-  0.085541 seconds (Cuhre)
+  0.118911 seconds (Vegas)
+  0.614480 seconds (Suave)
+  0.153015 seconds (Divonne)
+  0.086997 seconds (Cuhre)
 INFO: Performance of Cuba Library in Fortran:
-  0.072000 seconds (Vegas)
+  0.108000 seconds (Vegas)
   0.628000 seconds (Suave)
-  0.164000 seconds (Divonne)
-  0.096000 seconds (Cuhre)
+  0.144000 seconds (Divonne)
+  0.084000 seconds (Cuhre)
 ```
 
 `Cuba.jl` internally fixes `CUBACORES` to 0 in order to prevent from forking
