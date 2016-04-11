@@ -65,7 +65,7 @@ end
 answer = sin(1) + im*(1 - cos(1))
 result = Cuhre(integrand2, 1, 2)
 @test_approx_eq     result[1][1] + im*result[1][2]     answer
-result = Divonne(integrand, 1, 2, epsrel=1e-8, epsabs=1e-8)
+result = Divonne(integrand2, 1, 2, epsrel=1e-8, epsabs=1e-8)
 @test_approx_eq_eps result[1][1] + im*result[1][2]     answer     1e-8
 
 # Make sure these functions don't crash.
