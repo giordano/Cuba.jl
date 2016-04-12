@@ -147,16 +147,20 @@ this is the same syntax used for integrating vector-valued functions.
 
 For example, the integral
 
-.. math:: \int_{0}^{1} \cos (x) \,\mathrm{d}x
+.. math:: \int_{0}^{1} \cos (x) \,\mathrm{d}x = \sin(1) = 0.8414709848078965
 
 can be computed with one of the following lines
 
 .. code-block:: julia
 
     Vegas((x,f)->f[1]=cos(x[1]), 1, 1)
+    #  => 0.8414910005259609 ± 5.2708169787733e-5
     Suave((x,f)->f[1]=cos(x[1]), 1, 1)
+    #  => 0.8411523690658836 ± 8.357995611133613e-5
     Divonne((x,f)->f[1]=cos(x[1]), 1, 1)
+    #  => 0.841468071955942  ± 5.3955070531551656e-5
     Cuhre((x,f)->f[1]=cos(x[1]), 1, 1)
+    #  => 0.8414709848078966 ± 2.2204460420128823e-16
 
 In section `Examples`_ you can find more complete examples.  Note that ``x`` and
 ``f`` are both arrays with type ``Float64``, so ``Cuba.jl`` can be used to
@@ -289,7 +293,6 @@ These are optional keywords common to all functions:
   for the "spinning cores" pointer.  ``Cuba.jl`` does not support
   parallelization, so this keyword should not have a value different from
   ``C_NULL``.
-
 
 Vegas-Specific Keywords
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -458,7 +461,7 @@ The integrating functions :func:`Vegas`, :func:`Suave`, :func:`Divonne`, and
 
     (integral, error, probability, neval, fail, nregions)
 
-The first three terms of the tuple are arrays with length ``ncomp``, the last
+The first three elements of the tuple are arrays with length ``ncomp``, the last
 three ones are scalars. In particular, if you assign the output of integrator
 functions to the variable named ``result``, you can access the value of the
 ``i``-th component of the integral with ``result[1][i]`` and the associated
@@ -512,6 +515,29 @@ On the other hand, it it pointless to choose ``nvec`` > ``nbatch`` for Vegas.
 Examples
 --------
 
+One dimensional integral
+''''''''''''''''''''''''
+
+The integrand of
+
+.. math:: \int_{0}^{1} \frac{\log(x)}{\sqrt{x}} \,\mathrm{d}x
+
+has an algebraic-logarithmic divergence for :math:`x = 0`, but the integral is
+convergent and its value is :math:`-4`.  ``Cuba.jl`` integrator routines can
+handle this class of functions and you can easily compute the numerical
+approximation of this integral using one of the following commands:
+
+.. code-block:: julia
+
+    Vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    #  => -3.9981623937128483 ± 0.0004406643716840934
+    Suave( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    #  => -3.999976286717149  ± 0.0003950486666134314
+    Divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    #  => -3.9997602130594374 ± 0.00035678748149012664
+    Cuhre( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    #  => -4.00000035506719   ± 0.0003395484028625721
+
 Vector-valued integrand
 '''''''''''''''''''''''
 
@@ -524,7 +550,8 @@ where :math:`\Omega = [0, 1]^{3}` and
 .. math:: \boldsymbol{f}(x,y,z) = \left(\sin(x)\cos(y)\exp(z), \,\exp(-(x^2 + y^2 +
 	  z^2)), \,\frac{1}{1 - xyz}\right)
 
-This is the Julia script you can use to compute the above integral
+In this case it is more convenient to write a simple Julia script to compute the
+above integral
 
 .. code-block:: julia
 
@@ -537,25 +564,30 @@ This is the Julia script you can use to compute the above integral
     end
 
     result = Cuhre(integrand, 3, 3, epsabs=1e-12, epsrel=1e-10)
-    println("Results of Cuba:")
-    for i=1:3; println("Component $i: ", result[1][i], " ± ", result[2][i]); end
-    println("Exact results:")
-    println("Component 1: ", (e-1)*(1-cos(1))*sin(1))
-    println("Component 2: ", (sqrt(pi)*erf(1)/2)^3)
-    println("Component 3: ", zeta(3))
+    answer = [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
+    for i = 1:3
+        println("Component $i")
+        println(" Result of Cuba: ", result[1][i], " ± ", result[2][i])
+        println(" Exact result:   ", answer[i])
+        println(" Actual error:   ", abs(result[1][i] - answer[i]))
+    end
 
 This is the output
 
 ::
 
-    Results of Cuba:
-    Component 1: 0.6646696797813739 ± 1.0050367631018485e-13
-    Component 2: 0.4165383858806454 ± 2.932866749838454e-11
-    Component 3: 1.2020569031649702 ± 1.1958522385908214e-10
-    Exact results:
-    Component 1: 0.6646696797813771
-    Component 2: 0.41653838588663805
-    Component 3: 1.2020569031595951
+    Component 1
+     Result of Cuba: 0.6646696797813739 ± 1.0050367631018485e-13
+     Exact result:   0.6646696797813771
+     Actual error:   3.219646771412954e-15
+    Component 2
+     Result of Cuba: 0.4165383858806454 ± 2.932866749838454e-11
+     Exact result:   0.41653838588663805
+     Actual error:   5.9926508200192075e-12
+    Component 3
+     Result of Cuba: 1.2020569031649702 ± 1.1958522385908214e-10
+     Exact result:   1.2020569031595951
+     Actual error:   5.375033751420233e-12
 
 Integral with non-constant boundaries
 '''''''''''''''''''''''''''''''''''''
@@ -583,8 +615,10 @@ that can be computed with ``Cuba.jl`` using the following Julia script
     end
 
     result = Cuhre(integrand, 3, 1, epsabs=1e-12, epsrel=1e-10)
+    answer = pi*e^pi - (4e^pi - 4)/5
     println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
-    println("Exact result:   ", pi*e^pi - (4e^pi - 4)/5)
+    println("Exact result:   ", answer)
+    println("Actual error:   ", abs(result[1][1] - answer))
 
 This is the output
 
@@ -592,26 +626,29 @@ This is the output
 
     Result of Cuba: 54.98607586826157 ± 5.460606521639899e-9
     Exact result:   54.98607586789537
+    Actual error:   3.6619951515604043e-10
 
 Complex integrand
 '''''''''''''''''
 
 As already explained, ``Cuba.jl`` operates on real quantities, so if you want to
 integrate a complex-valued function of complex arguments you have to treat
-complex quantities as 2-component arrays or real numbers.  For example, the
-integral
+complex quantities as 2-component arrays or real numbers.  For example, if you
+do not remember `Euler's formula
+<https://en.wikipedia.org/wiki/Euler%27s_formula>`__, you can compute this
+simple integral
 
-.. math:: \int_{0}^{1} \exp(\mathrm{i} x)\,\mathrm{d}x
+.. math:: \int_{0}^{\pi/2} \exp(\mathrm{i} x)\,\mathrm{d}x
 
-can be computed with the following Julia script
+with the following Julia script
 
 .. code-block:: julia
 
     using Cuba
 
     function integrand(x, f)
-        # Complex integrand
-        tmp = exp(im*x[1])
+        # Complex integrand, scaled to integrate in [0, 1].
+        tmp = exp(im*x[1]*pi/2)*pi/2
         # Assign to two components of "f" the real
         # and imaginary part of the integrand.
         f[1] = real(tmp)
@@ -620,26 +657,26 @@ can be computed with the following Julia script
 
     result = Cuhre(integrand, 1, 2)
     println("Result of Cuba: ", result[1][1] + im*result[1][2])
-    println("Exact result:   ", sin(1) + im*(1 - cos(1)))
+    println("Exact result:   ", complex(1.0, 1.0))
 
 This is the output
 
 ::
 
-    Result of Cuba: 0.8414709848078966 + 0.45969769413186035im
-    Exact result:   0.8414709848078965 + 0.45969769413186023im
-
+    Result of Cuba: 1.0 + 1.0im
+    Exact result:   1.0 + 1.0im
 
 Performance
 -----------
 
-``Cuba.jl`` cannot (yet?) take advantage of parallelization capabilities of Cuba
-Library. Nonetheless, it has performances comparable with equivalent native C or
-Fortran codes based on Cuba library when ``CUBACORES`` environment variable is
-set to ``0`` (i.e., multithreading is disabled). The following is the result of
-running the benchmark present in ``test`` directory on a 64-bit GNU/Linux system
-running Julia 0.4.3.  The C and FORTRAN 77 benchmark codes have been compiled
-with GCC 5.3.1.
+``Cuba.jl`` cannot (`yet? <https://github.com/giordano/Cuba.jl/issues/1>`__)
+take advantage of parallelization capabilities of Cuba Library. Nonetheless, it
+has performances comparable with equivalent native C or Fortran codes based on
+Cuba library when ``CUBACORES`` environment variable is set to ``0`` (i.e.,
+multithreading is disabled). The following is the result of running the
+benchmark present in ``test`` directory on a 64-bit GNU/Linux system running
+Julia 0.4.3.  The C and FORTRAN 77 benchmark codes have been compiled with GCC
+5.3.1.
 
 ::
 

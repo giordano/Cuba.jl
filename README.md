@@ -104,16 +104,20 @@ same syntax used for integrating vector-valued functions.
 For example, the integral
 
 ```
-∫_0^1 cos(x) dx
+∫_0^1 cos(x) dx = sin(1) = 0.8414709848078965
 ```
 
 can be computed with one of the following lines
 
 ``` julia
 Vegas((x,f)->f[1]=cos(x[1]), 1, 1)
+#  => 0.8414910005259609 ± 5.2708169787733e-5
 Suave((x,f)->f[1]=cos(x[1]), 1, 1)
+#  => 0.8411523690658836 ± 8.357995611133613e-5
 Divonne((x,f)->f[1]=cos(x[1]), 1, 1)
+#  => 0.841468071955942  ± 5.3955070531551656e-5
 Cuhre((x,f)->f[1]=cos(x[1]), 1, 1)
+#  => 0.8414709848078966 ± 2.2204460420128823e-16
 ```
 
 The integrating functions `Vegas`, `Suave`, `Divonne`, and `Cuhre` return the
@@ -123,7 +127,7 @@ The integrating functions `Vegas`, `Suave`, `Divonne`, and `Cuhre` return the
 (integral, error, probability, neval, fail, nregions)
 ```
 
-The first three terms of the tuple are arrays with length `ncomp`, the last
+The first three elements of the tuple are arrays with length `ncomp`, the last
 three ones are scalars.  In particular, if you assign the output of integration
 functions to the variable named `result`, you can access the value of the `i`-th
 component of the integral with `result[1][i]` and the associated error with
@@ -177,13 +181,13 @@ Component 3: 1.2020569031595951
 Performance
 -----------
 
-`Cuba.jl` cannot (yet?) take advantage of parallelization capabilities of Cuba
-Library.  Nonetheless, it has performances comparable with equivalent native C
-or Fortran codes based on Cuba library when `CUBACORES` environment variable is
-set to `0` (i.e., multithreading is disabled).  The following is the result of
-running the benchmark present in `test` directory on a 64-bit GNU/Linux system
-running Julia 0.4.3.  The C and FORTRAN 77 benchmark codes have been compiled
-with GCC 5.3.1.
+`Cuba.jl` cannot ([yet?](https://github.com/giordano/Cuba.jl/issues/1)) take
+advantage of parallelization capabilities of Cuba Library.  Nonetheless, it has
+performances comparable with equivalent native C or Fortran codes based on Cuba
+library when `CUBACORES` environment variable is set to `0` (i.e.,
+multithreading is disabled).  The following is the result of running the
+benchmark present in `test` directory on a 64-bit GNU/Linux system running Julia
+0.4.3.  The C and FORTRAN 77 benchmark codes have been compiled with GCC 5.3.1.
 
 ```
 $ CUBACORES=0 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
