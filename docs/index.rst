@@ -666,6 +666,65 @@ This is the output
     Result of Cuba: 1.0 + 1.0im
     Exact result:   1.0 + 1.0im
 
+Passing data to the integrand function
+''''''''''''''''''''''''''''''''''''''
+
+Cuba Library allows program written in C and Fortran to pass extra data to the
+integrand function with ``userdata`` argument.  This is useful, for example,
+when the integrand function depends on changing parameters.  In ``Cuba.jl`` the
+``userdata`` argument is not available, but you do not normally need it.
+
+For example, the `cumulative distribution function
+<https://en.wikipedia.org/wiki/Cumulative_distribution_function>`__
+:math:`F(x;k)` of `chi-squared distribution
+<https://en.wikipedia.org/wiki/Chi-squared_distribution>`__ is defined by
+
+.. math:: F(x; k) = \int_{0}^{x} \frac{t^{k/2 - 1}\exp(-t/2)}{2^{k/2}\Gamma(k/2)} \,\mathrm{d}t
+
+The cumulative distribution function depends on parameter :math:`k`, but the
+function passed as integrand to ``Cuba.jl`` integrator routines accepts as
+arguments only the input and output vectors.  However you can easily define a
+function to calculate a numerical approximation of :math:`F(x; k)` based on the
+above integral expression because the integrand can access any variable visible
+in its `scope
+<http://docs.julialang.org/en/stable/manual/variables-and-scoping/>`__.  The
+following Julia script computes :math:`F(x = \pi; k)` for different :math:`k`
+and compares the result with more precise values, based on the analytic
+expression of the cumulative distribution function, provided by `GSL.jl
+<https://github.com/jiahao/GSL.jl>`__ package.
+
+.. code-block:: julia
+
+    using Cuba, GSL
+
+    function chi2cdf(x::Real, k::Real)
+        k2 = k/2
+        # Chi-squared probability density function, without constant denominator.
+        # The result of integration will be divided by that factor.
+        function chi2pdf(t::Float64)
+            # "k2" is taken from the outside.
+            return t^(k2 - 1.0)*exp(-t/2)
+        end
+        # Neither "x" is passed directly to the integrand function,
+        # but is visible to it.  "x" is used to scale the function
+        # in order to actually integrate in [0, 1].
+        x*Cuhre((t,f) -> f[1] = chi2pdf(t[1]*x), 1, 1)[1][1]/(2^k2*gamma(k2))
+    end
+
+    x = pi
+    @printf("Result of Cuba: %.6f %.6f %.6f %.6f %.6f\n",
+            map((k) -> chi2cdf(x, k), collect(1:5))...)
+    @printf("Exact result:   %.6f %.6f %.6f %.6f %.6f\n",
+            map((k) -> cdf_chisq_P(x, k), collect(1:5))...)
+
+
+This is the output
+
+::
+
+    Result of Cuba: 0.923681 0.792120 0.629694 0.465584 0.321833
+    Exact result:   0.923681 0.792120 0.629695 0.465584 0.321833
+
 Performance
 -----------
 
