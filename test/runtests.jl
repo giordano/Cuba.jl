@@ -40,6 +40,7 @@ end
 
 # Make sure using "addprocs" doesn't make the program segfault.
 addprocs(1)
+Cuba.cores(0, 10000)
 Cuba.accel(0,1000)
 
 # Test results and make sure the estimation of error is exact.
