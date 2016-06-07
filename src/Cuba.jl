@@ -20,6 +20,8 @@
 
 ### Code:
 
+__precompile__()
+
 module Cuba
 
 export Vegas, Suave, Divonne, Cuhre
@@ -100,7 +102,12 @@ function generic_integrand!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
     func!(x, f)
     return Cint(0)
 end
-const c_generic_integrand! = integrand_ptr(generic_integrand!)
+
+function __init__()
+    # This pointer needs to be available at runtime.  See "Module initialization
+    # and precompilation" section of Julia manual.
+    global const c_generic_integrand! = integrand_ptr(generic_integrand!)
+end
 
 # One function to rule them all.
 function dointegrate(algorithm::Symbol,
@@ -289,7 +296,7 @@ Vegas(integrand::Function, ndim::Integer, ncomp::Integer; nvec::Integer=NVEC,
       nstart::Integer=NSTART, nincrease::Integer=NINCREASE,
       nbatch::Integer=NBATCH, gridno::Integer=GRIDNO,
       statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
-          dointegrate(:Vegas, c_generic_integrand!, ndim, ncomp,
+          dointegrate(:Vegas, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
                       pointer_from_objref(integrand), nvec, float(epsrel),
                       float(epsabs), flags, seed, trunc(Integer, mineval),
                       trunc(Integer, maxeval), nstart, nincrease, nbatch,
@@ -325,7 +332,7 @@ Suave(integrand::Function, ndim::Integer, ncomp::Integer;
       mineval::Real=MINEVAL, maxeval::Real=MAXEVAL, nnew::Integer=NNEW,
       nmin::Integer=NMIN, flatness::Real=FLATNESS,
       statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
-          dointegrate(:Suave, c_generic_integrand!, ndim, ncomp,
+          dointegrate(:Suave, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
                       pointer_from_objref(integrand), nvec, float(epsrel),
                       float(epsabs), flags, seed, trunc(Integer, mineval),
                       trunc(Integer, maxeval), NSTART, NINCREASE, NBATCH,
@@ -384,7 +391,7 @@ function Divonne{R<:Real}(integrand::Function, ndim::Integer, ncomp::Integer;
     # dimensional domain.  Instead, we don't prevent users from setting wrong
     # "ndim" values like 0 or negative ones.
     ndim == 1 && (ndim = 2)
-    return dointegrate(:Divonne, c_generic_integrand!, ndim, ncomp,
+    return dointegrate(:Divonne, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
                        pointer_from_objref(integrand), nvec, float(epsrel),
                        float(epsabs), flags, seed, trunc(Integer, mineval),
                        trunc(Integer, maxeval), NSTART, NINCREASE, NBATCH,
@@ -422,7 +429,7 @@ function Cuhre(integrand::Function, ndim::Integer, ncomp::Integer;
     # dimensional domain.  Instead, we don't prevent users from setting wrong
     # "ndim" values like 0 or negative ones.
     ndim == 1 && (ndim = 2)
-    return dointegrate(:Cuhre, c_generic_integrand!, ndim, ncomp,
+    return dointegrate(:Cuhre, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
                        pointer_from_objref(integrand), nvec, float(epsrel),
                        float(epsabs), flags, SEED, trunc(Integer, mineval),
                        trunc(Integer, maxeval), NSTART, NINCREASE, NBATCH,
