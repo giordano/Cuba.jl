@@ -107,6 +107,7 @@ function __init__()
     # This pointer needs to be available at runtime.  See "Module initialization
     # and precompilation" section of Julia manual.
     global const c_generic_integrand! = integrand_ptr(generic_integrand!)
+    Cuba.cores(0, 10000)
 end
 
 # One function to rule them all.
@@ -130,7 +131,6 @@ function dointegrate(algorithm::Symbol,
                      key::Integer,
                      # Final common arguments.
                      statefile::AbstractString, spin::Ptr{Void})
-    Cuba.cores(0, 10000)
     nregions = Ref{Cint}(0)
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)
