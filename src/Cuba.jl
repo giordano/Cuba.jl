@@ -124,7 +124,7 @@ function dointegrate(algorithm::Symbol,
                      # Final common arguments.
                      statefile::AbstractString, spin::Ptr{Void})
     Cuba.cores(0, 10000)
-    nregions = Ref{Cint}(0.0)
+    nregions = Ref{Cint}(0)
     neval    = Ref{Cint}(0)
     fail     = Ref{Cint}(0)
     integral = zeros(Cdouble, ncomp)

@@ -633,7 +633,7 @@ Complex integrand
 
 As already explained, ``Cuba.jl`` operates on real quantities, so if you want to
 integrate a complex-valued function of complex arguments you have to treat
-complex quantities as 2-component arrays or real numbers.  For example, if you
+complex quantities as 2-component arrays of real numbers.  For example, if you
 do not remember `Euler's formula
 <https://en.wikipedia.org/wiki/Euler%27s_formula>`__, you can compute this
 simple integral
