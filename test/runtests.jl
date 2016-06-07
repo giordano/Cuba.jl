@@ -70,3 +70,6 @@ result = Divonne(integrand2, 1, 2, epsrel=1e-8, epsabs=1e-8)
 # Make sure these functions don't crash.
 Cuba.init(C_NULL, C_NULL)
 Cuba.exit(C_NULL, C_NULL)
+
+# Dummy call just to increase code coverage
+Cuba.integrand_ptr(Cuba.generic_integrand!)
