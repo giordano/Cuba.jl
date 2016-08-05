@@ -24,6 +24,8 @@ __precompile__()
 
 module Cuba
 
+using Compat
+
 export Vegas, Suave, Divonne, Cuhre
 
 # Note: don't use Pkg.dir("PkgName") here because the package may be installed
@@ -95,8 +97,8 @@ integrand_ptr(integrand::Function) = cfunction(integrand, Cint,
 function generic_integrand!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
                             f_::Ptr{Cdouble}, func_::Ptr{Void})
     # Get arrays from "x_" and "f_" pointers.
-    x = pointer_to_array(x_, (ndim,))
-    f = pointer_to_array(f_, (ncomp,))
+    x = unsafe_wrap(Array, x_, (ndim,))
+    f = unsafe_wrap(Array, f_, (ncomp,))
     # Get the function from "func_" pointer.
     func! = unsafe_pointer_to_objref(func_)::Function
     func!(x, f)
