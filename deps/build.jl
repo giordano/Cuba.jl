@@ -19,6 +19,8 @@
 
 ### Code:
 
+using Compat
+
 local_dir  = "cuba-julia"
 local_file = local_dir*".tar.gz"
 libcuba = joinpath(dirname(@__FILE__), "libcuba")
