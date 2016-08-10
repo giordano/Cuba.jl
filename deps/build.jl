@@ -22,22 +22,28 @@
 local_dir  = "cuba-julia"
 local_file = local_dir*".tar.gz"
 libcuba = joinpath(dirname(@__FILE__), "libcuba")
-@linux? (object="libcuba.so") : (@osx? (object="libcuba.dylib") : (object=""))
+@windows? (object="libcuba.dll") : @linux? (object="libcuba.so") : (@osx? (object="libcuba.dylib") : (object=""))
 
-# Clean already existing shared object, archive and buil directory in order to
-# perform a new clean build.
-run(`rm -rf $local_file $local_dir libcuba.so`)
+if is_windows()
+    info("Downloading Cuba shared library...")
+    download("https://bintray.com/giordano/Cuba-Shared-Library/download_file?file_path=libcuba-$(Sys.ARCH).dll",
+             object)
+else # Linux and Mac OS
+    # Clean already existing shared object, archive and buil directory in order to
+    # perform a new clean build.
+    run(`rm -rf $local_file $local_dir libcuba.so`)
 
-# Download Cuba and build the shared object.
-info("Downloading Cuba source...")
-download("https://github.com/giordano/cuba/archive/julia.tar.gz",
-         local_file)
-run(`tar xzf $local_file`)
-info("Building libcuba...")
-cd(local_dir) do
-    run(`./configure`)
-    run(`make shared`)
-    run(`mv $object ..`)
+    # Download Cuba and build the shared object.
+    info("Downloading Cuba source...")
+    download("https://github.com/giordano/cuba/archive/julia.tar.gz",
+             local_file)
+    run(`tar xzf $local_file`)
+    info("Building libcuba...")
+    cd(local_dir) do
+        run(`./configure`)
+        run(`make shared`)
+        run(`mv $object ..`)
+    end
 end
 
 # Make sure Julia is able to see the library.
