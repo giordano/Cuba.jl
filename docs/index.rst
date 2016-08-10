@@ -81,10 +81,8 @@ This generalizes straightforwardly to more than one dimension.  In `Examples`_
 section you can find the computation of a 3-dimensional integral with
 non-constant boundaries using ``Cuba.jl``.
 
-**Note:** This package has been tested only on GNU/Linux and OS X systems.
-Trying to install on Windows will likely fail, please report at
-https://github.com/giordano/Cuba.jl/issues/2 if you manage to install
-``Cuba.jl`` on this system.
+``Cuba.jl`` is available for GNU/Linux, Mac OS, and Windows (``i686`` and
+``x86_64`` architectures).
 
 Installation
 ------------
@@ -787,10 +785,8 @@ Furthemore, without this measure, adding more Julia processes with
 Related projects
 ----------------
 
-Another Julia package for multidimenensional numerical integration is
-available: `Cubature.jl <https://github.com/stevengj/Cubature.jl>`__, by
-Steven G. Johnson. Differently from ``Cuba.jl``, this works on
-GNU/Linux, OS X and Windows as well.
+Another Julia package for multidimenensional numerical integration is available:
+`Cubature.jl <https://github.com/stevengj/Cubature.jl>`__, by Steven G. Johnson.
 
 License
 -------

@@ -40,10 +40,8 @@ example, recall that in one dimension
 where the final `(b - a)` is the one-dimensional version of the Jacobian.  This
 generalizes straightforwardly to more than one dimension.
 
-**Note:** This package has been tested only on GNU/Linux and OS X systems.
-Trying to install on Windows will likely fail, please report at
-https://github.com/giordano/Cuba.jl/issues/2 if you manage to install on this
-system.
+`Cuba.jl` is available for GNU/Linux, Mac OS, and Windows (`i686` and `x86_64`
+architectures).
 
 Installation
 ------------
@@ -242,7 +240,6 @@ Related projects
 
 Another Julia package for multidimenensional numerical integration is available:
 [Cubature.jl](https://github.com/stevengj/Cubature.jl), by Steven G. Johnson.
-Differently from `Cuba.jl`, this works on GNU/Linux, OS X and Windows as well.
 
 License
 -------
