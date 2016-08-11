@@ -26,13 +26,12 @@ tagfile = "installed_version"
 
 if is_windows()
     version="v4.2-20150925" # Version of Cuba library.
-    if !isfile(tagfile) || readchomp(tagfile) != version
+    arch=Sys.ARCH
+    if !isfile(tagfile) || readdlm(tagfile) != [version, arch]
         info("Downloading Cuba shared library...")
         download("https://bintray.com/giordano/Cuba-Shared-Library/download_file?file_path=libcuba-$(version)-$(Sys.ARCH).dll",
                  "libcuba.dll")
-        open(tagfile, "w") do file
-            println(file, version)
-        end
+        writedlm(tagfile, [version, arch])
     end
 else # GNU/Linux and Mac OS
     # SHA hash of the revision to be downloaded from

@@ -36,8 +36,9 @@ v0.0.5 (2016-04-12)
 
 ### New Features ###
 
-* User interface greatly simplified (thanks to Steven G. Johnson).  This change
-  is **backward incompatible**.  See documentation for details
+* User interface greatly simplified (thanks to Steven G. Johnson;
+  [#3](https://github.com/giordano/Cuba.jl/issues/3)).  This change is
+  **backward incompatible**.  See documentation for details
 
 v0.0.4 (2016-04-10)
 -------------------
