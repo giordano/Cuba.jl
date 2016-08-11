@@ -21,36 +21,66 @@
 
 using Compat
 
-local_dir  = "cuba-julia"
-local_file = local_dir*".tar.gz"
 libcuba = joinpath(dirname(@__FILE__), "libcuba")
-is_windows() ? (object="libcuba.dll") : is_linux() ? (object="libcuba.so") : (is_apple() ? (object="libcuba.dylib") : (object=""))
+tagfile = "installed_version"
 
 if is_windows()
-    info("Downloading Cuba shared library...")
-    download("https://bintray.com/giordano/Cuba-Shared-Library/download_file?file_path=libcuba-$(Sys.ARCH).dll",
-             object)
+    version="v4.2-20150925" # Version of Cuba library.
+    if !isfile(tagfile) || readchomp(tagfile) != version
+        info("Downloading Cuba shared library...")
+        download("https://bintray.com/giordano/Cuba-Shared-Library/download_file?file_path=libcuba-$(Sys.ARCH)-$(version).dll",
+                 "libcuba.dll")
+        open(tagfile, "w") do file
+            println(file, version)
+        end
+    end
 else # GNU/Linux and Mac OS
-    # Clean already existing shared object, archive and buil directory in order to
-    # perform a new clean build.
-    run(`rm -rf $local_file $local_dir libcuba.so`)
+    # SHA hash of the revision to be downloaded from
+    # https://github.com/giordano/cuba/tree/julia
+    sha="a7aac5a67b834fe04bb157ede77968a390d7ad7a"
+    if !isfile(tagfile) || readchomp(tagfile) != sha
+        local_dir  = "cuba-$(sha)"
+        local_file = "$(local_dir).tar.gz"
+        if is_linux()
+            object="libcuba.so"
+        elseif is_apple()
+            object="libcuba.dylib"
+        else
+            object=""
+        end
 
-    # Download Cuba and build the shared object.
-    info("Downloading Cuba source...")
-    download("https://github.com/giordano/cuba/archive/julia.tar.gz",
-             local_file)
-    run(`tar xzf $local_file`)
-    info("Building libcuba...")
-    cd(local_dir) do
-        run(`./configure`)
-        run(`make shared`)
-        run(`mv $object ..`)
+        # Clean already existing tag file, shared object, and build directory in
+        # order to perform a new clean build.  Leave the archive, to avoid
+        # downloading it again.
+        run(`rm -rf $tagfile $object $local_dir`)
+
+        if !isfile(local_file)
+            info("Downloading Cuba source...")
+            download("https://github.com/giordano/cuba/archive/$(sha).tar.gz",
+                     local_file)
+        end
+        run(`tar xzf $local_file`)
+        info("Building libcuba...")
+        cd(local_dir) do
+            run(`./configure`)
+            run(`make shared`)
+            run(`mv $object ..`)
+        end
+        open(tagfile, "w") do file
+            println(file, sha)
+        end
     end
 end
 
 # Make sure Julia is able to see the library.
-if length(Libdl.find_library([libcuba])) > 0
-    info("libcuba successfully installed!")
-else
+if isempty(Libdl.find_library([libcuba]))
+    if isfile(tagfile)
+        # Delete the tagfile in order to force building upon next
+        # Pkg.build("Cuba").  Note that Julia 0.4 doesn't have "force" keyword
+        # to `rm' function.
+        rm(tagfile)
+    end
     error("Installation of libcuba failed")
+else
+    info("libcuba successfully installed!")
 end
