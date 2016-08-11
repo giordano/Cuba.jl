@@ -24,13 +24,13 @@ using Compat
 local_dir  = "cuba-julia"
 local_file = local_dir*".tar.gz"
 libcuba = joinpath(dirname(@__FILE__), "libcuba")
-@windows? (object="libcuba.dll") : @linux? (object="libcuba.so") : (@osx? (object="libcuba.dylib") : (object=""))
+is_windows() ? (object="libcuba.dll") : is_linux() ? (object="libcuba.so") : (is_apple() ? (object="libcuba.dylib") : (object=""))
 
 if is_windows()
     info("Downloading Cuba shared library...")
     download("https://bintray.com/giordano/Cuba-Shared-Library/download_file?file_path=libcuba-$(Sys.ARCH).dll",
              object)
-else # Linux and Mac OS
+else # GNU/Linux and Mac OS
     # Clean already existing shared object, archive and buil directory in order to
     # perform a new clean build.
     run(`rm -rf $local_file $local_dir libcuba.so`)
