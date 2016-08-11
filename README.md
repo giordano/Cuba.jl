@@ -1,6 +1,6 @@
 # Cuba
 
-[![Build Status](https://travis-ci.org/giordano/Cuba.jl.svg?branch=master)](https://travis-ci.org/giordano/Cuba.jl) [![Coverage Status](https://coveralls.io/repos/github/giordano/Cuba.jl/badge.svg?branch=master)](https://coveralls.io/github/giordano/Cuba.jl?branch=master) [![codecov.io](https://codecov.io/github/giordano/Cuba.jl/coverage.svg?branch=master)](https://codecov.io/github/giordano/Cuba.jl?branch=master) [![Cuba](http://pkg.julialang.org/badges/Cuba_0.4.svg)](http://pkg.julialang.org/?pkg=Cuba) [![Cuba](http://pkg.julialang.org/badges/Cuba_0.5.svg)](http://pkg.julialang.org/?pkg=Cuba)
+[![Build Status](https://travis-ci.org/giordano/Cuba.jl.svg?branch=master)](https://travis-ci.org/giordano/Cuba.jl) [![Appveyor Build Status on Windows](https://ci.appveyor.com/api/projects/status/ivqy72upfjxplbcn/branch/master?svg=true)](https://ci.appveyor.com/project/giordano/cuba-jl/branch/master) [![Coverage Status](https://coveralls.io/repos/github/giordano/Cuba.jl/badge.svg?branch=master)](https://coveralls.io/github/giordano/Cuba.jl?branch=master) [![codecov.io](https://codecov.io/github/giordano/Cuba.jl/coverage.svg?branch=master)](https://codecov.io/github/giordano/Cuba.jl?branch=master) [![Cuba](http://pkg.julialang.org/badges/Cuba_0.4.svg)](http://pkg.julialang.org/?pkg=Cuba) [![Cuba](http://pkg.julialang.org/badges/Cuba_0.5.svg)](http://pkg.julialang.org/?pkg=Cuba)
 
 Introduction
 ------------
@@ -55,8 +55,10 @@ In a Julia session run the command
 julia> Pkg.add("Cuba")
 ```
 
-Installation script will download Cuba Library source code and build the Cuba
-shared object.  In order to accomplish this task a C compiler is needed.
+Installation script on GNU/Linux and Mac OS systems will download Cuba Library
+source code and build the Cuba shared object.  In order to accomplish this task
+a C compiler is needed.  Instead, on Windows a prebuilt version of the library
+is downloaded.
 
 You may need to update your package list with `Pkg.update()` in order to get the
 latest version of `Cuba.jl`.
@@ -185,26 +187,26 @@ performances comparable with equivalent native C or Fortran codes based on Cuba
 library when `CUBACORES` environment variable is set to `0` (i.e.,
 multithreading is disabled).  The following is the result of running the
 benchmark present in `test` directory on a 64-bit GNU/Linux system running Julia
-0.4.3.  The C and FORTRAN 77 benchmark codes have been compiled with GCC 5.3.1.
+0.6.0-dev.72.  The C and FORTRAN 77 benchmark codes have been compiled with GCC
+5.4.0.
 
 ```
 $ CUBACORES=0 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
 INFO: Performance of Cuba.jl:
-  0.340635 seconds (Vegas)
-  0.660305 seconds (Suave)
-  0.391721 seconds (Divonne)
-  0.305756 seconds (Cuhre)
+  0.318776 seconds (Vegas)
+  0.665132 seconds (Suave)
+  0.369386 seconds (Divonne)
+  0.284738 seconds (Cuhre)
 INFO: Performance of Cuba Library in C:
-  0.352429 seconds (Vegas)
-  0.668258 seconds (Suave)
-  0.380006 seconds (Divonne)
-  0.305772 seconds (Cuhre)
+  0.344432 seconds (Vegas)
+  0.666233 seconds (Suave)
+  0.374605 seconds (Divonne)
+  0.309294 seconds (Cuhre)
 INFO: Performance of Cuba Library in Fortran:
-  0.328000 seconds (Vegas)
-  0.660000 seconds (Suave)
+  0.324000 seconds (Vegas)
+  0.640000 seconds (Suave)
   0.364000 seconds (Divonne)
-  0.296000 seconds (Cuhre)
-
+  0.284000 seconds (Cuhre)
 ```
 
 Of course, native C and Fortran codes making use of Cuba Library outperform
@@ -213,20 +215,20 @@ Of course, native C and Fortran codes making use of Cuba Library outperform
 ```
 $ CUBACORES=1 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
 INFO: Performance of Cuba.jl:
-  0.342575 seconds (Vegas)
-  0.660071 seconds (Suave)
-  0.393213 seconds (Divonne)
-  0.304569 seconds (Cuhre)
+  0.322994 seconds (Vegas)
+  0.638098 seconds (Suave)
+  0.371486 seconds (Divonne)
+  0.284845 seconds (Cuhre)
 INFO: Performance of Cuba Library in C:
-  0.118911 seconds (Vegas)
-  0.614480 seconds (Suave)
-  0.153015 seconds (Divonne)
-  0.086997 seconds (Cuhre)
+  0.103477 seconds (Vegas)
+  0.647665 seconds (Suave)
+  0.159992 seconds (Divonne)
+  0.088057 seconds (Cuhre)
 INFO: Performance of Cuba Library in Fortran:
-  0.108000 seconds (Vegas)
-  0.628000 seconds (Suave)
-  0.144000 seconds (Divonne)
-  0.084000 seconds (Cuhre)
+  0.096000 seconds (Vegas)
+  0.660000 seconds (Suave)
+  0.176000 seconds (Divonne)
+  0.088000 seconds (Cuhre)
 ```
 
 `Cuba.jl` internally fixes `CUBACORES` to 0 in order to prevent from forking
