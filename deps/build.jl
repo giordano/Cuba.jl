@@ -28,7 +28,7 @@ if is_windows()
     version="v4.2-20150925" # Version of Cuba library.
     if !isfile(tagfile) || readchomp(tagfile) != version
         info("Downloading Cuba shared library...")
-        download("https://bintray.com/giordano/Cuba-Shared-Library/download_file?file_path=libcuba-$(Sys.ARCH)-$(version).dll",
+        download("https://bintray.com/giordano/Cuba-Shared-Library/download_file?file_path=libcuba-$(version)-$(Sys.ARCH).dll",
                  "libcuba.dll")
         open(tagfile, "w") do file
             println(file, version)
