@@ -1,6 +1,14 @@
 History of Cuba.jl
 ==================
 
+v0.1.3 (2016-08-11)
+-------------------
+
+### New Features ###
+
+* A tagged version of Cuba library is now downloaded when building the package.
+  This ensures reproducibility of the results of a given `Cuba.jl` release.
+
 v0.1.2 (2016-08-11)
 -------------------
 
