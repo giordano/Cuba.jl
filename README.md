@@ -1,6 +1,12 @@
-# Cuba
+# Cuba.jl
 
-[![Build Status](https://travis-ci.org/giordano/Cuba.jl.svg?branch=master)](https://travis-ci.org/giordano/Cuba.jl) [![Appveyor Build Status on Windows](https://ci.appveyor.com/api/projects/status/ivqy72upfjxplbcn/branch/master?svg=true)](https://ci.appveyor.com/project/giordano/cuba-jl/branch/master) [![Coverage Status](https://coveralls.io/repos/github/giordano/Cuba.jl/badge.svg?branch=master)](https://coveralls.io/github/giordano/Cuba.jl?branch=master) [![codecov.io](https://codecov.io/github/giordano/Cuba.jl/coverage.svg?branch=master)](https://codecov.io/github/giordano/Cuba.jl?branch=master) [![Cuba](http://pkg.julialang.org/badges/Cuba_0.4.svg)](http://pkg.julialang.org/?pkg=Cuba) [![Cuba](http://pkg.julialang.org/badges/Cuba_0.5.svg)](http://pkg.julialang.org/?pkg=Cuba)
+| **Documentation**                       | [**Package Evaluator**][pkgeval-link] | **Build Status**                          | **Code Coverage**               |
+|:---------------------------------------:|:-------------------------------------:|:-----------------------------------------:|:-------------------------------:|
+| [![][docs-stable-img]][docs-stable-url] | [![][pkg-0.4-img]][pkg-0.4-url]       | [![Build Status][travis-img]][travis-url] | [![][coveral-img]][coveral-url] |
+| [![][docs-latest-img]][docs-latest-url] | [![][pkg-0.5-img]][pkg-0.5-url]       | [![Build Status][appvey-img]][appvey-url] | [![][codecov-img]][codecov-url] |
+
+
+[![Build Status](https://travis-ci.org/giordano/Cuba.jl.svg?branch=master)](https://travis-ci.org/giordano/Cuba.jl) [![Appveyor Build Status on Windows]()](https://ci.appveyor.com/project/giordano/cuba-jl/branch/master) [![Coverage Status](https://coveralls.io/repos/github/giordano/Cuba.jl/badge.svg?branch=master)](https://coveralls.io/github/giordano/Cuba.jl?branch=master) [![codecov.io](https://codecov.io/github/giordano/Cuba.jl/coverage.svg?branch=master)](https://codecov.io/github/giordano/Cuba.jl?branch=master) [![Cuba](http://pkg.julialang.org/badges/Cuba_0.4.svg)](http://pkg.julialang.org/?pkg=Cuba) [![Cuba](http://pkg.julialang.org/badges/Cuba_0.5.svg)](http://pkg.julialang.org/?pkg=Cuba)
 
 Introduction
 ------------
@@ -252,3 +258,30 @@ Mosè Giordano.  If you use this library for your work, please credit Thomas Hah
 (citable papers about Cuba library:
 http://adsabs.harvard.edu/abs/2005CoPhC.168...78H and
 http://adsabs.harvard.edu/abs/2015JPhCS.608a2066H).
+
+
+
+[docs-latest-img]: https://img.shields.io/badge/docs-latest-blue.svg
+[docs-latest-url]: https://cubajl.readthedocs.io/en/latest/
+
+[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
+[docs-stable-url]: https://cubajl.readthedocs.io/en/stable/
+
+[pkgeval-link]: http://pkg.julialang.org/?pkg=Cuba
+
+[pkg-0.4-img]: http://pkg.julialang.org/badges/Cuba_0.4.svg
+[pkg-0.4-url]: http://pkg.julialang.org/detail/Cuba.html
+[pkg-0.5-img]: http://pkg.julialang.org/badges/Cuba_0.5.svg
+[pkg-0.5-url]: http://pkg.julialang.org/detail/Cuba.html
+
+[travis-img]: https://travis-ci.org/giordano/Cuba.jl.svg?branch=master
+[travis-url]: https://travis-ci.org/giordano/Cuba.jl
+
+[appvey-img]: https://ci.appveyor.com/api/projects/status/ivqy72upfjxplbcn/branch/master?svg=true
+[appvey-url]: https://ci.appveyor.com/project/giordano/measurements-jl
+
+[coveral-img]: https://coveralls.io/repos/github/giordano/Cuba.jl/badge.svg?branch=master
+[coveral-url]: https://coveralls.io/github/giordano/Cuba.jl?branch=master
+
+[codecov-img]: https://codecov.io/gh/giordano/Cuba.jl/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/giordano/Cuba.jl
