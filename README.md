@@ -275,7 +275,7 @@ http://adsabs.harvard.edu/abs/2015JPhCS.608a2066H).
 [travis-url]: https://travis-ci.org/giordano/Cuba.jl
 
 [appvey-img]: https://ci.appveyor.com/api/projects/status/ivqy72upfjxplbcn/branch/master?svg=true
-[appvey-url]: https://ci.appveyor.com/project/giordano/measurements-jl
+[appvey-url]: https://ci.appveyor.com/project/giordano/cuba-jl
 
 [coveral-img]: https://coveralls.io/repos/github/giordano/Cuba.jl/badge.svg?branch=master
 [coveral-url]: https://coveralls.io/github/giordano/Cuba.jl?branch=master
