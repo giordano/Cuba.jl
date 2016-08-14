@@ -36,7 +36,7 @@ if is_windows()
 else # GNU/Linux and Mac OS
     # SHA hash of the revision to be downloaded from
     # https://github.com/giordano/cuba/tree/julia
-    sha="a7aac5a67b834fe04bb157ede77968a390d7ad7a"
+    sha="44da524f3fb9e5a803614c19cbfe7027a372601e"
     if !isfile(tagfile) || readchomp(tagfile) != sha
         local_dir  = "cuba-$(sha)"
         local_file = "$(local_dir).tar.gz"
