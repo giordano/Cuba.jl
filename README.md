@@ -137,12 +137,16 @@ component of the integral with `result[1][i]` and the associated error with
 `result[2][i]`.  The details of other quantities can be found in Cuba manual.
 
 All other arguments listed in Cuba documentation can be passed as optional
-keywords.  More extended documentation of `Cuba.jl` is available at
-http://cubajl.readthedocs.io/.  You can also download the PDF version of the
-manual from https://media.readthedocs.org/pdf/cubajl/latest/cubajl.pdf.
+keywords.
 
 **Note:** if you used `Cuba.jl` until version 0.4, be aware that the user
 interface has been reworked in version 0.5 in a backward incompatible way.
+
+### Documentation ###
+
+A more detailed manual of `Cuba.jl`, with many complete examples, is available
+at http://cubajl.readthedocs.io/.  You can also download the latest PDF version
+from https://media.readthedocs.org/pdf/cubajl/latest/cubajl.pdf.
 
 Example
 -------

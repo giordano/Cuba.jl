@@ -1,6 +1,14 @@
 History of Cuba.jl
 ==================
 
+v0.1.4 (2016-08-21)
+-------------------
+
+* A new version of Cuba library is downloaded to be compiled on GNU/Linux and
+  Mac OS systems.  There have been only small changes for compatibility with
+  recent GCC versions, no actual change to the library nor to the Julia wrapper.
+  Nothing changed for Windows users.
+
 v0.1.3 (2016-08-11)
 -------------------
 
