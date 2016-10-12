@@ -44,13 +44,12 @@ Cuba.cores(0, 10000)
 Cuba.accel(0,1000)
 
 # Test results and make sure the estimation of error is exact.
-epsabs = Dict(Vegas=>1e-4, Suave=>1e-3, Divonne=>1e-4, Cuhre=>1e-8)
 answer = [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
 ncomp = 3
-for alg in (:Vegas, :Suave, :Divonne, :Cuhre)
+for (alg, epsabs) in ((Vegas, 1e-4), (Suave, 1e-3),
+                   (Divonne, 1e-4), (Cuhre, 1e-8))
     info("Testing $(string(alg)) algorithm")
-    result = @eval $alg($integrand1, 3, $ncomp, epsabs=$epsabs[$alg],
-                        epsrel=1e-8, flags=0)
+    result = alg(integrand1, 3, ncomp, epsabs=epsabs, epsrel=1e-8, flags=0)
     for i = 1:ncomp
         println("Component $i: ", result[1][i], " ± ", result[2][i],
                 isfinite(result[1][i]) ? "" : " (skipping test)")
@@ -64,9 +63,15 @@ end
 # Test Cuhre and Divonne with ndim = 1.
 answer = sin(1) + im*(1 - cos(1))
 result = Cuhre(integrand2, 1, 2)
-@test_approx_eq     result[1][1] + im*result[1][2]     answer
+@test_approx_eq     complex(result[1]...) answer
 result = Divonne(integrand2, 1, 2, epsrel=1e-8, epsabs=1e-8)
-@test_approx_eq_eps result[1][1] + im*result[1][2]     answer     1e-8
+@test_approx_eq_eps complex(result[1]...) answer 1e-8
+
+# Test taken from one of the examples of integrals over infinite domains.
+func(x) = log(1 + x^2)/(1 + x^2)
+result = Cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
+               1, 1, epsabs = 1e-12, epsrel = 1e-10)
+@test_approx_eq_eps result[1][1] pi*log(2) 3e-12
 
 # Make sure these functions don't crash.
 Cuba.init(C_NULL, C_NULL)

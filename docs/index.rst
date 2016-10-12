@@ -67,19 +67,48 @@ For more details on the algorithms see the manual included in Cuba library and
 available in ``deps/cuba-julia/cuba.pdf`` after successful installation
 of ``Cuba.jl``.
 
-Integration is performed on the :math:`n`-dimensional `unit hypercube
-<https://en.wikipedia.org/wiki/Hypercube>`__ :math:`[0, 1]^{n}`.  If you want to
-compute an integral over a different set, you have to scale the integrand
-function in order to have an equivalent integral on :math:`[0, 1]^{n}`.  For
-example, `recall <https://en.wikipedia.org/wiki/Integration_by_substitution>`__
-that in one dimension
+Integration is always performed on the :math:`n`-dimensional `unit hypercube
+<https://en.wikipedia.org/wiki/Hypercube>`__ :math:`[0, 1]^{n}`.
 
-.. math::  \int_{a}^{b} \mathrm{d}x\,f[x] = \int_{0}^{1} \mathrm{d}y\,f[a + (b - a) y] (b - a)
+.. Tip::
 
-where the final :math:`(b - a)` is the one-dimensional version of the Jacobian.
-This generalizes straightforwardly to more than one dimension.  In `Examples`_
-section you can find the computation of a 3-dimensional integral with
-non-constant boundaries using ``Cuba.jl``.
+   If you want to compute an integral over a different set, you have to scale
+   the integrand function in order to have an equivalent integral on :math:`[0,
+   1]^{n}` using `substitution rules
+   <https://en.wikipedia.org/wiki/Integration_by_substitution>`__.  For example,
+   recall that in one dimension
+
+   .. math:: \int_{a}^{b} f(x)\,\mathrm{d}x = \int_{0}^{1} f(a +
+              (b - a) y) (b - a)\,\mathrm{d}y
+
+   where the final :math:`(b - a)` is the one-dimensional version of the
+   Jacobian.
+
+   Integration over a semi-infinite or an inifite domain is a bit trickier, but
+   you can follow `this advice
+   <http://ab-initio.mit.edu/wiki/index.php/Cubature#Infinite_intervals>`__ from
+   Steven G. Johnson: to compute an integral over a semi-infinite interval, you
+   can perform the change of variables :math:`x=a+y/(1-y)`:
+
+   .. math:: \int_{a}^{\infty} f(x)\,\mathrm{d}x = \int_{0}^{1}
+	     f\left(a + \frac{y}{1 - y}\right)\frac{1}{(1 - y)^2}\,\mathrm{d}y
+
+   For an infinite interval, you can perform the change of variables
+   :math:`x=(2y - 1)/((1 - y)y)`:
+
+   .. math:: \int_{-\infty}^{\infty} f(x)\,\mathrm{d}x = \int_{0}^{1}
+	     f\left(\frac{2y - 1}{(1 - y)y}\right)\frac{2y^2 - 2y + 1}{(1 -
+	     y)^2y^2}\,\mathrm{d}y
+
+   In addition, recall that for an even function :math:`\int_{-\infty}^{\infty}
+   f(x)\,\mathrm{d}x = 2\int_{0}^{\infty}f(x)\,\mathrm{d}x`, while the integral
+   of an odd function over the infinite interval :math:`(-\infty, \infty)` is
+   zero.
+
+   All this generalizes straightforwardly to more than one dimension.  In
+   `Examples`_ section you can find the computation of a 3-dimensional `integral
+   with non-constant boundaries`_ using ``Cuba.jl`` and two `integrals over
+   infinite domains`_.
 
 ``Cuba.jl`` is available for GNU/Linux, Mac OS, and Windows (``i686`` and
 ``x86_64`` architectures).
@@ -164,8 +193,8 @@ can be computed with one of the following lines
 
 In section `Examples`_ you can find more complete examples.  Note that ``x`` and
 ``f`` are both arrays with type ``Float64``, so ``Cuba.jl`` can be used to
-integrate real-valued functions of real arguments.  See how to work with complex
-quantitites in the example `Complex integrand`_.
+integrate real-valued functions of real arguments.  See how to work with a
+`complex integrand`_.
 
 **Note:** if you used ``Cuba.jl`` until version 0.4, be aware that the user
 interface has been reworked in version 0.5 in a backward incompatible way.
@@ -566,7 +595,7 @@ above integral
     result = Cuhre(integrand, 3, 3, epsabs=1e-12, epsrel=1e-10)
     answer = [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
     for i = 1:3
-        println("Component $i")
+        println("Component ", i)
         println(" Result of Cuba: ", result[1][i], " ± ", result[2][i])
         println(" Exact result:   ", answer[i])
         println(" Actual error:   ", abs(result[1][i] - answer[i]))
@@ -628,6 +657,83 @@ This is the output
     Exact result:   54.98607586789537
     Actual error:   3.6619951515604043e-10
 
+Integrals over Infinite Domains
+'''''''''''''''''''''''''''''''
+
+``Cuba.jl`` assumes always as integration domain the hypercube :math:`[0, 1]^n`,
+but we have seen that using integration by substitution we can calculate
+integrals over different domains as well.  In the `Introduction`_ we also
+proposed two useful substitutions that can be employed to change an infinite or
+semi-infinite domain into a finite one.
+
+As a first example, consider the following integral with a semi-infinite domain:
+
+.. math:: \int_{0}^{\infty}\frac{\log(1 + x^2)}{1 + x^2}\,\mathrm{d}x
+
+whose exact result is :math:`\pi\log 2`.  This can be computed with the
+following Julia script:
+
+.. code-block:: julia
+
+   using Cuba
+
+   # The function we want to integrate over [0, ∞).
+   func(x) = log(1 + x^2)/(1 + x^2)
+
+   # Scale the function in order to integrate over [0, 1].
+   function integrand(x, f)
+       f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2
+   end
+
+   result = Cuhre(integrand, 1, 1, epsabs = 1e-12, epsrel = 1e-10)
+   answer = pi*log(2)
+   println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
+   println("Exact result:   ", answer)
+   println("Actual error:   ", abs(result[1][1] - answer))
+
+This is the output:
+
+::
+
+   Result of Cuba: 2.177586090305688 ± 2.1503995410096295e-10
+   Exact result:   2.177586090303602
+   Actual error:   2.085887018665744e-12
+
+Now we want to calculate this integral, over an infinite domain
+
+.. math:: \int_{-\infty}^{\infty} \frac{1 - \cos x}{x^2}\,\mathrm{d}x
+
+which gives :math:`\pi`.  You can calculate the result with the code below.
+Note that integrand function has value :math:`1/2` for :math:`x=0`, but you have
+to inform Julia about this.
+
+.. code-block:: julia
+
+   using Cuba
+
+   # The function we want to integrate over (-∞, ∞).
+   func(x) = x==0 ? 0.5*one(x) : (1 - cos(x))/x^2
+
+   # Scale the function in order to integrate over [0, 1].
+   function integrand(x, f)
+       f[1] = func((2*x[1] - 1)/x[1]/(1 - x[1])) *
+           (2*x[1]^2 - 2*x[1] + 1)/x[1]^2/(1 - x[1])^2
+   end
+
+   result = Cuhre(integrand, 1, 1, epsabs = 1e-7, epsrel = 1e-7)
+   answer = float(pi)
+   println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
+   println("Exact result:   ", answer)
+   println("Actual error:   ", abs(result[1][1] - answer))
+
+The output of this script is
+
+::
+
+   Result of Cuba: 3.1415928900555046 ± 2.050669142074607e-6
+   Exact result:   3.141592653589793
+   Actual error:   2.3646571145619077e-7
+
 Complex integrand
 '''''''''''''''''
 
@@ -656,7 +762,7 @@ with the following Julia script
     end
 
     result = Cuhre(integrand, 1, 2)
-    println("Result of Cuba: ", result[1][1] + im*result[1][2])
+    println("Result of Cuba: ", complex(result[1]...))
     println("Exact result:   ", complex(1.0, 1.0))
 
 This is the output
