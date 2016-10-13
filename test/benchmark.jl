@@ -29,8 +29,8 @@ using Cuba
 
 ndim=3
 ncomp=11
-epsabs=1e-8
-epsrel=1e-8
+abstol=1e-8
+reltol=1e-8
 
 Sq(x)      = x*x
 rsq(x,y,z) = Sq(x) + Sq(y) + Sq(z)
@@ -60,15 +60,14 @@ function test{X<:Float64, F<:Float64}(x::AbstractArray{X}, f::AbstractArray{F})
 end
 
 info("Performance of Cuba.jl:")
-for alg in (:Vegas, :Suave, :Divonne, :Cuhre)
-    @eval (# Run the integrator a first time to compile the function.
-           $alg($test, $ndim, $ncomp, epsabs=$epsabs,
-                epsrel=$epsrel);
-           tic();
-           $alg($test, $ndim, $ncomp, epsabs=$epsabs,
-                epsrel=$epsrel);
-           println(@sprintf("%10.6f%s%s%s", toq(), " seconds (",
-                            string($alg)[6:end], ")")))
+for alg in (vegas, suave, divonne, cuhre)
+    # Run the integrator a first time to compile the function.
+    alg(test, ndim, ncomp, abstol=abstol,
+         reltol=reltol);
+    tic();
+    alg(test, ndim, ncomp, abstol=abstol,
+        reltol=reltol);
+    println(@sprintf("%10.6f seconds (%s)", toq(), ucfirst(string(alg)[6:end])))
 end
 
 cd(dirname(@__FILE__))

@@ -146,10 +146,10 @@ or put this command into your Julia script.
 
 ``Cuba.jl`` provides four functions to integrate, one for each algorithm:
 
-.. function:: Vegas(integrand, ndim, ncomp[, keywords...])
-.. function:: Suave(integrand, ndim, ncomp[, keywords...])
-.. function:: Divonne(integrand, ndim, ncomp[, keywords...])
-.. function:: Cuhre(integrand, ndim, ncomp[, keywords...])
+.. function:: vegas(integrand, ndim, ncomp[, keywords...])
+.. function:: suave(integrand, ndim, ncomp[, keywords...])
+.. function:: divonne(integrand, ndim, ncomp[, keywords...])
+.. function:: cuhre(integrand, ndim, ncomp[, keywords...])
 
 Large parts of the following sections are borrowed from Cuba manual.  Refer to
 it for more information on the details.
@@ -182,13 +182,13 @@ can be computed with one of the following lines
 
 .. code-block:: julia
 
-    Vegas((x,f)->f[1]=cos(x[1]), 1, 1)
+    vegas((x,f)->f[1]=cos(x[1]), 1, 1)
     #  => 0.8414910005259609 ± 5.2708169787733e-5
-    Suave((x,f)->f[1]=cos(x[1]), 1, 1)
+    suave((x,f)->f[1]=cos(x[1]), 1, 1)
     #  => 0.8411523690658836 ± 8.357995611133613e-5
-    Divonne((x,f)->f[1]=cos(x[1]), 1, 1)
+    divonne((x,f)->f[1]=cos(x[1]), 1, 1)
     #  => 0.841468071955942  ± 5.3955070531551656e-5
-    Cuhre((x,f)->f[1]=cos(x[1]), 1, 1)
+    cuhre((x,f)->f[1]=cos(x[1]), 1, 1)
     #  => 0.8414709848078966 ± 2.2204460420128823e-16
 
 In section `Examples`_ you can find more complete examples.  Note that ``x`` and
@@ -218,7 +218,7 @@ These are optional keywords common to all functions:
   be given to the integrand routine in each invocation.  Usually this is 1 but
   if the integrand can profit from e.g. Single Instruction Multiple Data (SIMD)
   vectorization, a larger value can be chosen.  See `Vectorization`_ section.
-- ``epsrel`` (type: ``Real``, default: ``1e-4``), and ``epsabs`` (type:
+- ``reltol`` (type: ``Real``, default: ``1e-4``), and ``abstol`` (type:
   ``Real``, default: ``1e-12``): the requested relative
   (:math:`\varepsilon_{\text{rel}}`) and absolute
   (:math:`\varepsilon_{\text{abs}}`) accuracies.  The integrator tries to find
@@ -265,8 +265,8 @@ These are optional keywords common to all functions:
   the flags.
 
 - ``seed`` (type: ``Integer``, default: ``0``): the seed for the
-  pseudo-random-number generator.  This keyword is not available for ``Cuhre``.
-  The random-number generator is chosen as follows:
+  pseudo-random-number generator.  This keyword is not available for
+  :func:`cuhre`.  The random-number generator is chosen as follows:
 
   +----------+---------------------------+----------------------------------+
   | ``seed`` | ``level``                 | Generator                        |
@@ -296,9 +296,9 @@ These are optional keywords common to all functions:
   :math:`p`.  Note that Ranlux's original level 0, (mis)used for selecting
   Mersenne Twister in Cuba, is equivalent to ``level`` = ``24``.
 
-- ``mineval`` (type: ``Real``, default: ``0``): the minimum number of integrand
+- ``minevals`` (type: ``Real``, default: ``0``): the minimum number of integrand
   evaluations required
-- ``maxeval`` (type: ``Real``, default: ``1000000``): the (approximate) maximum
+- ``maxevals`` (type: ``Real``, default: ``1000000``): the (approximate) maximum
   number of integrand evaluations allowed
 - ``statefile`` (type: ``AbstractString``, default: ``""``): a filename for
   storing the internal state.  To not store the internal state, put ``""``
@@ -326,7 +326,7 @@ These are optional keywords common to all functions:
 Vegas-Specific Keywords
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-These optional keywords can be passed only to :func:`Vegas`:
+These optional keywords can be passed only to :func:`vegas`:
 
 - ``nstart`` (type: ``Integer``, default: ``1000``): the number of integrand
   evaluations per iteration to start with
@@ -355,7 +355,7 @@ These optional keywords can be passed only to :func:`Vegas`:
 Suave-Specific Keywords
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-These optional keywords can be passed only to :func:`Suave`:
+These optional keywords can be passed only to :func:`suave`:
 
 - ``nnew`` (type: ``Integer``, default: ``1000``): the number of new integrand
   evaluations in each subdivision
@@ -376,7 +376,7 @@ These optional keywords can be passed only to :func:`Suave`:
 Divonne-Specific Keywords
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-These optional keywords can be passed only to :func:`Divonne`:
+These optional keywords can be passed only to :func:`divonne`:
 
 - ``key1`` (type: ``Integer``, default: ``47``): determines sampling in the
   partitioning phase: ``key1`` :math:`= 7, 9, 11, 13` selects the cubature rule
@@ -468,7 +468,7 @@ These optional keywords can be passed only to :func:`Divonne`:
 Cuhre-Specific Keyword
 ~~~~~~~~~~~~~~~~~~~~~~
 
-This optional keyword can be passed only to :func:`Cuhre`:
+This optional keyword can be passed only to :func:`cuhre`:
 
 - ``key`` (type: ``Integer``, default: ``0``): chooses the basic integration rule:
 
@@ -483,8 +483,8 @@ This optional keyword can be passed only to :func:`Cuhre`:
 Output
 ''''''
 
-The integrating functions :func:`Vegas`, :func:`Suave`, :func:`Divonne`, and
-:func:`Cuhre` return the 6-tuple
+The integrating functions :func:`vegas`, :func:`suave`, :func:`divonne`, and
+:func:`cuhre` return the 6-tuple
 
 .. code-block:: julia
 
@@ -514,11 +514,12 @@ error with ``result[2][i]``.
   - ``fail`` = ``-1``, dimension out of range
   - ``fail`` > ``0``, the accuracy goal was not met within the allowed maximum
     number of integrand evaluations.  While Vegas, Suave, and Cuhre simply
-    return ``1``, Divonne can estimate the number of points by which ``maxeval``
-    needs to be increased to reach the desired accuracy and returns this value.
+    return ``1``, Divonne can estimate the number of points by which
+    ``maxevals`` needs to be increased to reach the desired accuracy and returns
+    this value.
 
 - ``nregions`` (type: ``Cint``): the actual number of subregions needed (always
-  ``0`` in ``Vegas``)
+  ``0`` in :func:`vegas`)
 
 Vectorization
 -------------
@@ -558,13 +559,13 @@ approximation of this integral using one of the following commands:
 
 .. code-block:: julia
 
-    Vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
     #  => -3.9981623937128483 ± 0.0004406643716840934
-    Suave( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    suave( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
     #  => -3.999976286717149  ± 0.0003950486666134314
-    Divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
     #  => -3.9997602130594374 ± 0.00035678748149012664
-    Cuhre( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    cuhre( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
     #  => -4.00000035506719   ± 0.0003395484028625721
 
 Vector-valued integrand
@@ -592,7 +593,7 @@ above integral
         f[3] = 1/(1 - x[1]*x[2]*x[3])
     end
 
-    result = Cuhre(integrand, 3, 3, epsabs=1e-12, epsrel=1e-10)
+    result = cuhre(integrand, 3, 3, abstol=1e-12, reltol=1e-10)
     answer = [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
     for i = 1:3
         println("Component ", i)
@@ -643,7 +644,7 @@ that can be computed with ``Cuba.jl`` using the following Julia script
                sin(pi*x[2]*x[3])*exp(pi*x[3])
     end
 
-    result = Cuhre(integrand, 3, 1, epsabs=1e-12, epsrel=1e-10)
+    result = cuhre(integrand, 3, 1, abstol=1e-12, reltol=1e-10)
     answer = pi*e^pi - (4e^pi - 4)/5
     println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
     println("Exact result:   ", answer)
@@ -685,7 +686,7 @@ following Julia script:
        f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2
    end
 
-   result = Cuhre(integrand, 1, 1, epsabs = 1e-12, epsrel = 1e-10)
+   result = cuhre(integrand, 1, 1, abstol = 1e-12, reltol = 1e-10)
    answer = pi*log(2)
    println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
    println("Exact result:   ", answer)
@@ -720,7 +721,7 @@ to inform Julia about this.
            (2*x[1]^2 - 2*x[1] + 1)/x[1]^2/(1 - x[1])^2
    end
 
-   result = Cuhre(integrand, 1, 1, epsabs = 1e-7, epsrel = 1e-7)
+   result = cuhre(integrand, 1, 1, abstol = 1e-7, reltol = 1e-7)
    answer = float(pi)
    println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
    println("Exact result:   ", answer)
@@ -761,7 +762,7 @@ with the following Julia script
         f[2] = imag(tmp)
     end
 
-    result = Cuhre(integrand, 1, 2)
+    result = cuhre(integrand, 1, 2)
     println("Result of Cuba: ", complex(result[1]...))
     println("Exact result:   ", complex(1.0, 1.0))
 
@@ -814,7 +815,7 @@ expression of the cumulative distribution function, provided by `GSL.jl
         # Neither "x" is passed directly to the integrand function,
         # but is visible to it.  "x" is used to scale the function
         # in order to actually integrate in [0, 1].
-        x*Cuhre((t,f) -> f[1] = chi2pdf(t[1]*x), 1, 1)[1][1]/(2^k2*gamma(k2))
+        x*cuhre((t,f) -> f[1] = chi2pdf(t[1]*x), 1, 1)[1][1]/(2^k2*gamma(k2))
     end
 
     x = pi

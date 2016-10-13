@@ -20,12 +20,12 @@ at https://github.com/giordano/Cuba.jl/issues.
 
 All algorithms provided by Cuba library are supported in `Cuba.jl`:
 
-* `Vegas` (type: Monte Carlo; variance reduction with importance sampling)
-* `Suave` (type: Monte Carlo; variance reduction with globally adaptive
+* `vegas` (type: Monte Carlo; variance reduction with importance sampling)
+* `suave` (type: Monte Carlo; variance reduction with globally adaptive
   subdivision + importance sampling)
-* `Divonne` (type: Monte Carlo or deterministic; variance reduction with
+* `divonne` (type: Monte Carlo or deterministic; variance reduction with
   stratified sampling, aided by methods from numerical optimization)
-* `Cuhre` (type: deterministic; variance reduction with globally adaptive
+* `cuhre` (type: deterministic; variance reduction with globally adaptive
   subdivision)
 
 For more details on the algorithms see the manual included in Cuba library and
@@ -81,10 +81,10 @@ or put this command into your Julia script.
 `Cuba.jl` provides 4 functions to integrate, one for each algorithm:
 
 ``` julia
-Vegas(integrand, ndim, ncomp[, keywords...])
-Suave(integrand, ndim, ncomp[, keywords...])
-Divonne(integrand, ndim, ncomp[, keywords...])
-Cuhre(integrand, ndim, ncomp[, keywords...])
+vegas(integrand, ndim, ncomp[, keywords...])
+suave(integrand, ndim, ncomp[, keywords...])
+divonne(integrand, ndim, ncomp[, keywords...])
+cuhre(integrand, ndim, ncomp[, keywords...])
 ```
 
 Mandatory arguments are:
@@ -114,17 +114,17 @@ For example, the integral
 can be computed with one of the following lines
 
 ``` julia
-Vegas((x,f)->f[1]=cos(x[1]), 1, 1)
+vegas((x,f)->f[1]=cos(x[1]), 1, 1)
 #  => 0.8414910005259609 ± 5.2708169787733e-5
-Suave((x,f)->f[1]=cos(x[1]), 1, 1)
+suave((x,f)->f[1]=cos(x[1]), 1, 1)
 #  => 0.8411523690658836 ± 8.357995611133613e-5
-Divonne((x,f)->f[1]=cos(x[1]), 1, 1)
+divonne((x,f)->f[1]=cos(x[1]), 1, 1)
 #  => 0.841468071955942  ± 5.3955070531551656e-5
-Cuhre((x,f)->f[1]=cos(x[1]), 1, 1)
+cuhre((x,f)->f[1]=cos(x[1]), 1, 1)
 #  => 0.8414709848078966 ± 2.2204460420128823e-16
 ```
 
-The integrating functions `Vegas`, `Suave`, `Divonne`, and `Cuhre` return the
+The integrating functions `vegas`, `suave`, `divonne`, and `cuhre` return the
 6-tuple
 
 ``` julia
@@ -164,7 +164,7 @@ function func(x, f)
     f[3] = 1/(1 - x[1]*x[2]*x[3])
 end
 
-result = Cuhre(func, 3, 3, epsabs=1e-12, epsrel=1e-10)
+result = cuhre(func, 3, 3, abstol=1e-12, reltol=1e-10)
 println("Results of Cuba:")
 for i=1:3; println("Component $i: ", result[1][i], " ± ", result[2][i]); end
 println("Exact results:")

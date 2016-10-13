@@ -1,6 +1,21 @@
 History of Cuba.jl
 ==================
 
+v0.2.0 (201?-??-??)
+-------------------
+
+### Breaking Changes ###
+
+All integrator functions and some optional keywords have been renamed for more
+consistency with the Julia environment.  Here is the detailed list:
+
+* Integrators functions have been renamed to lowercase name: `Vegas` to `vegas`,
+  `Suave` to `suave`, `Divonne` to `divonne`, `Cuhre` to `cuhre`.  The uppercase
+  variants are still available but deprecated, they will be removed at some
+  point in the future.
+* Optional keywords changes: `epsabs` to `abstol`, `epsrel` to `reltol`,
+  `maxeval` to `maxevals`, `mineval` to `minevals`.
+
 v0.1.4 (2016-08-21)
 -------------------
 
