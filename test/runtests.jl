@@ -70,7 +70,7 @@ result = divonne(integrand2, 1, 2, reltol=1e-8, abstol=1e-8)
 # Test taken from one of the examples of integrals over infinite domains.
 func(x) = log(1 + x^2)/(1 + x^2)
 result = cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
-               1, 1, abstol = 1e-12, reltol = 1e-10)
+               abstol = 1e-12, reltol = 1e-10)
 @test_approx_eq_eps result[1][1] pi*log(2) 3e-12
 
 # Make sure these functions don't crash.

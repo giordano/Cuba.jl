@@ -270,16 +270,16 @@ function dointegrate(algorithm::Symbol,
 end
 
 """
-    vegas(integrand, ndim, ncomp[, keywords]) -> integral, error, probability, neval, fail, nregions
+    vegas(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
 
 Calculate integral of `integrand` over the unit hypercube in `ndim` dimensions
 using Vegas algorithm.  `integrand` is a vectorial function with `ncomp`
-components.
+components.  `ndim` and `ncomp` default to 1.
 
 Accepted keywords:
 
 * `nvec`
-* `esprel`
+* `reltol`
 * `abstol`
 * `flags`
 * `seed`
@@ -292,7 +292,8 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-vegas(integrand::Function, ndim::Integer, ncomp::Integer; nvec::Integer=NVEC,
+vegas(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
+      nvec::Integer=NVEC,
       reltol::Real=RELTOL, abstol::Real=ABSTOL, flags::Integer=FLAGS,
       seed::Integer=SEED, minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
       nstart::Integer=NSTART, nincrease::Integer=NINCREASE,
@@ -307,16 +308,16 @@ vegas(integrand::Function, ndim::Integer, ncomp::Integer; nvec::Integer=NVEC,
                       NEXTRA, PEAKFINDER, KEY, statefile, spin)
 
 """
-    suave(integrand, ndim, ncomp[, keywords]) -> integral, error, probability, neval, fail, nregions
+    suave(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
 
 Calculate integral of `integrand` over the unit hypercube in `ndim` dimensions
 using Suave algorithm.  `integrand` is a vectorial function with `ncomp`
-components.
+components. `ndim` and `ncomp` default to 1.
 
 Accepted keywords:
 
 * `nvec`
-* `esprel`
+* `reltol`
 * `abstol`
 * `flags`
 * `seed`
@@ -328,7 +329,7 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-suave(integrand::Function, ndim::Integer, ncomp::Integer;
+suave(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
       nvec::Integer=NVEC, reltol::Real=RELTOL,
       abstol::Real=ABSTOL, flags::Integer=FLAGS, seed::Integer=SEED,
       minevals::Real=MINEVALS, maxevals::Real=MAXEVALS, nnew::Integer=NNEW,
@@ -343,16 +344,16 @@ suave(integrand::Function, ndim::Integer, ncomp::Integer;
                       NEXTRA, PEAKFINDER, KEY, statefile, spin)
 
 """
-    divonne(integrand, ndim, ncomp[, keywords]) -> integral, error, probability, neval, fail, nregions
+    divonne(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
 
 Calculate integral of `integrand` over the unit hypercube in `ndim` dimensions
 using Divonne algorithm.  `integrand` is a vectorial function with `ncomp`
-components.
+components. `ndim` and `ncomp` default to 1.
 
 Accepted keywords:
 
 * `nvec`
-* `esprel`
+* `reltol`
 * `abstol`
 * `flags`
 * `seed`
@@ -373,7 +374,7 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-function divonne{R<:Real}(integrand::Function, ndim::Integer, ncomp::Integer;
+function divonne{R<:Real}(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
                           nvec::Integer=NVEC, reltol::Real=RELTOL,
                           abstol::Real=ABSTOL, flags::Integer=FLAGS,
                           seed::Integer=SEED, minevals::Real=MINEVALS,
@@ -404,16 +405,16 @@ function divonne{R<:Real}(integrand::Function, ndim::Integer, ncomp::Integer;
 end
 
 """
-    cuhre(integrand, ndim, ncomp[, keywords]) -> integral, error, probability, neval, fail, nregions
+    cuhre(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
 
 Calculate integral of `integrand` over the unit hypercube in `ndim` dimensions
 using Cuhre algorithm.  `integrand` is a vectorial function with `ncomp`
-components.
+components. `ndim` and `ncomp` default to 1.
 
 Accepted keywords:
 
 * `nvec`
-* `esprel`
+* `reltol`
 * `abstol`
 * `flags`
 * `minevals`
@@ -422,7 +423,7 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-function cuhre(integrand::Function, ndim::Integer, ncomp::Integer;
+function cuhre(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
                nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
                flags::Integer=FLAGS, minevals::Real=MINEVALS,
                maxevals::Real=MAXEVALS, key::Integer=KEY,

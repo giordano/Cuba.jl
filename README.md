@@ -81,17 +81,17 @@ or put this command into your Julia script.
 `Cuba.jl` provides 4 functions to integrate, one for each algorithm:
 
 ``` julia
-vegas(integrand, ndim, ncomp[, keywords...])
-suave(integrand, ndim, ncomp[, keywords...])
-divonne(integrand, ndim, ncomp[, keywords...])
-cuhre(integrand, ndim, ncomp[, keywords...])
+vegas(integrand, ndim, ncomp[; keywords...])
+suave(integrand, ndim, ncomp[; keywords...])
+divonne(integrand, ndim, ncomp[; keywords...])
+cuhre(integrand, ndim, ncomp[; keywords...])
 ```
 
 Mandatory arguments are:
 
 * `function`: the name of the function to be integrated
-* `ndim`: the number of dimensions of the integral
-* `ncomp`: the number of components of the integrand
+* `ndim`: the number of dimensions of the integration domain.  Defaults to 1
+* `ncomp`: the number of components of the integrand.  Defaults to 1
 
 `integrand` should be a function `integrand(x, f)` taking two arguments:
 
@@ -114,13 +114,13 @@ For example, the integral
 can be computed with one of the following lines
 
 ``` julia
-vegas((x,f)->f[1]=cos(x[1]), 1, 1)
+vegas((x,f)->f[1]=cos(x[1]))
 #  => 0.8414910005259609 ± 5.2708169787733e-5
-suave((x,f)->f[1]=cos(x[1]), 1, 1)
+suave((x,f)->f[1]=cos(x[1]))
 #  => 0.8411523690658836 ± 8.357995611133613e-5
-divonne((x,f)->f[1]=cos(x[1]), 1, 1)
+divonne((x,f)->f[1]=cos(x[1]))
 #  => 0.841468071955942  ± 5.3955070531551656e-5
-cuhre((x,f)->f[1]=cos(x[1]), 1, 1)
+cuhre((x,f)->f[1]=cos(x[1]))
 #  => 0.8414709848078966 ± 2.2204460420128823e-16
 ```
 

@@ -4,6 +4,14 @@ History of Cuba.jl
 v0.2.0 (201?-??-??)
 -------------------
 
+This release faces some changes to the user interface.  Be aware of them when
+upgrading.
+
+### New Features ###
+
+* `ndim` and `ncomp` arguments can be omitted.  In that case they default to 1.
+  This change is not breaking, old syntax will continue to work.
+
 ### Breaking Changes ###
 
 All integrator functions and some optional keywords have been renamed for more

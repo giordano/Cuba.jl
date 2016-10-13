@@ -146,10 +146,10 @@ or put this command into your Julia script.
 
 ``Cuba.jl`` provides four functions to integrate, one for each algorithm:
 
-.. function:: vegas(integrand, ndim, ncomp[, keywords...])
-.. function:: suave(integrand, ndim, ncomp[, keywords...])
-.. function:: divonne(integrand, ndim, ncomp[, keywords...])
-.. function:: cuhre(integrand, ndim, ncomp[, keywords...])
+.. function:: vegas(integrand, ndim=1, ncomp=1[; keywords...])
+.. function:: suave(integrand, ndim=1, ncomp=1[; keywords...])
+.. function:: divonne(integrand, ndim=1, ncomp=1[; keywords...])
+.. function:: cuhre(integrand, ndim=1, ncomp=1[; keywords...])
 
 Large parts of the following sections are borrowed from Cuba manual.  Refer to
 it for more information on the details.
@@ -160,8 +160,10 @@ Mandatory Arguments
 Mandatory arguments of integrator functions are:
 
 - ``integrand`` (type: ``Function``): the function to be integrated
-- ``ndim`` (type: ``Integer``): the number of dimensions of the integral
-- ``ncomp`` (type: ``Integer``): the number of components of the integrand
+- ``ndim`` (type: ``Integer``): the number of dimensions of the integratation
+  domain.  Defaults to 1 if omitted
+- ``ncomp`` (type: ``Integer``): the number of components of the integrand.
+  Default to 1 if omitted
 
 ``integrand`` should be a function ``integrand(x, f)`` taking two arguments:
 
@@ -182,13 +184,13 @@ can be computed with one of the following lines
 
 .. code-block:: julia
 
-    vegas((x,f)->f[1]=cos(x[1]), 1, 1)
+    vegas((x,f)->f[1]=cos(x[1]))
     #  => 0.8414910005259609 ± 5.2708169787733e-5
-    suave((x,f)->f[1]=cos(x[1]), 1, 1)
+    suave((x,f)->f[1]=cos(x[1]))
     #  => 0.8411523690658836 ± 8.357995611133613e-5
-    divonne((x,f)->f[1]=cos(x[1]), 1, 1)
+    divonne((x,f)->f[1]=cos(x[1]))
     #  => 0.841468071955942  ± 5.3955070531551656e-5
-    cuhre((x,f)->f[1]=cos(x[1]), 1, 1)
+    cuhre((x,f)->f[1]=cos(x[1]))
     #  => 0.8414709848078966 ± 2.2204460420128823e-16
 
 In section `Examples`_ you can find more complete examples.  Note that ``x`` and
@@ -541,7 +543,6 @@ purpose but not identical to ``nvec``.  It internally partitions the sampling
 done by Vegas but has no bearing on the number of points given to the integrand.
 On the other hand, it it pointless to choose ``nvec`` > ``nbatch`` for Vegas.
 
-
 Examples
 --------
 
@@ -559,13 +560,13 @@ approximation of this integral using one of the following commands:
 
 .. code-block:: julia
 
-    vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
     #  => -3.9981623937128483 ± 0.0004406643716840934
-    suave( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    suave( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
     #  => -3.999976286717149  ± 0.0003950486666134314
-    divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
     #  => -3.9997602130594374 ± 0.00035678748149012664
-    cuhre( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), 1, 1)
+    cuhre( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
     #  => -4.00000035506719   ± 0.0003395484028625721
 
 Vector-valued integrand
@@ -686,7 +687,7 @@ following Julia script:
        f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2
    end
 
-   result = cuhre(integrand, 1, 1, abstol = 1e-12, reltol = 1e-10)
+   result = cuhre(integrand, abstol = 1e-12, reltol = 1e-10)
    answer = pi*log(2)
    println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
    println("Exact result:   ", answer)
@@ -721,7 +722,7 @@ to inform Julia about this.
            (2*x[1]^2 - 2*x[1] + 1)/x[1]^2/(1 - x[1])^2
    end
 
-   result = cuhre(integrand, 1, 1, abstol = 1e-7, reltol = 1e-7)
+   result = cuhre(integrand, abstol = 1e-7, reltol = 1e-7)
    answer = float(pi)
    println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
    println("Exact result:   ", answer)
@@ -815,7 +816,7 @@ expression of the cumulative distribution function, provided by `GSL.jl
         # Neither "x" is passed directly to the integrand function,
         # but is visible to it.  "x" is used to scale the function
         # in order to actually integrate in [0, 1].
-        x*cuhre((t,f) -> f[1] = chi2pdf(t[1]*x), 1, 1)[1][1]/(2^k2*gamma(k2))
+        x*cuhre((t,f) -> f[1] = chi2pdf(t[1]*x))[1][1]/(2^k2*gamma(k2))
     end
 
     x = pi
