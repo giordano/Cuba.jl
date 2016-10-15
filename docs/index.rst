@@ -11,43 +11,41 @@ of real-valued functions of real arguments, using different algorithms.
 This is just a Julia wrapper around the C `Cuba library
 <http://www.feynarts.de/cuba/>`__, version 4.2, by **Thomas Hahn**. All the
 credits goes to him for the underlying functions, blame me for any problem with
-the Julia interface.  ``Cuba.jl`` is developed on GitHub:
-https://github.com/giordano/Cuba.jl.  Feel free to report bugs and make
-suggestions at https://github.com/giordano/Cuba.jl/issues.
+the Julia interface.
 
 All algorithms provided by Cuba library are supported in ``Cuba.jl``:
 
-+-----------+-----------------------------------------------+-----------------+----------------------------------+
-| Algorithm | Basic integration method                      | Type            | `Variance reduction`_            |
-+===========+===============================================+=================+==================================+
-| Vegas_    | `Sobol quasi-random sample`_                  | `Monte Carlo`_  | `importance sampling`_           |
-|           +-----------------------------------------------+-----------------+                                  |
-|           | `or` `Mersenne Twister pseudo-random sample`_ | Monte Carlo     |                                  |
-|           +-----------------------------------------------+-----------------+                                  |
-|           | `or` `Ranlux pseudo-random sample`_           | Monte Carlo     |                                  |
-+-----------+-----------------------------------------------+-----------------+----------------------------------+
-| Suave     | Sobol quasi-random sample                     | Monte Carlo     | globally `adaptive subdivision`_ |
-|           +-----------------------------------------------+-----------------+                                  |
-|           | `or` Mersenne Twister pseudo-random sample    | Monte Carlo     | and importance sampling          |
-|           +-----------------------------------------------+-----------------+                                  |
-|           | `or` Ranlux pseudo-random sample              | Monte Carlo     |                                  |
-+-----------+-----------------------------------------------+-----------------+----------------------------------+
-| Divonne   | Korobov quasi-random sample                   | Monte Carlo     | `stratified sampling`_           |
-|           +-----------------------------------------------+-----------------+                                  |
-|           | `or` Sobol quasi-random sample                | Monte Carlo     | aided by methods from            |
-|           +-----------------------------------------------+-----------------+                                  |
-|           | `or` Mersenne Twister pseudo-random sample    | Monte Carlo     | numerical optimization           |
-|           +-----------------------------------------------+-----------------+                                  |
-|           | `or` Ranlux pseudo-random sample              | Monte Carlo     |                                  |
-|           +-----------------------------------------------+-----------------+                                  |
-|           | `or` cubature rules                           | deterministic   |                                  |
-+-----------+-----------------------------------------------+-----------------+----------------------------------+
-| Cuhre     | cubature rules                                | deterministic   | globally adaptive subdivision    |
-+-----------+-----------------------------------------------+-----------------+----------------------------------+
++---------------+-----------------------------------------------+-----------------+----------------------------------+
+| Algorithm     | Basic integration method                      | Type            | `Variance reduction`_            |
++===============+===============================================+=================+==================================+
+| `Vegas <s_>`_ | `Sobol quasi-random sample`_                  | `Monte Carlo`_  | `importance sampling`_           |
+|               +-----------------------------------------------+-----------------+                                  |
+|               | `or` `Mersenne Twister pseudo-random sample`_ | Monte Carlo     |                                  |
+|               +-----------------------------------------------+-----------------+                                  |
+|               | `or` `Ranlux pseudo-random sample`_           | Monte Carlo     |                                  |
++---------------+-----------------------------------------------+-----------------+----------------------------------+
+| Suave         | Sobol quasi-random sample                     | Monte Carlo     | globally `adaptive subdivision`_ |
+|               +-----------------------------------------------+-----------------+                                  |
+|               | `or` Mersenne Twister pseudo-random sample    | Monte Carlo     | and importance sampling          |
+|               +-----------------------------------------------+-----------------+                                  |
+|               | `or` Ranlux pseudo-random sample              | Monte Carlo     |                                  |
++---------------+-----------------------------------------------+-----------------+----------------------------------+
+| Divonne       | Korobov quasi-random sample                   | Monte Carlo     | `stratified sampling`_           |
+|               +-----------------------------------------------+-----------------+                                  |
+|               | `or` Sobol quasi-random sample                | Monte Carlo     | aided by methods from            |
+|               +-----------------------------------------------+-----------------+                                  |
+|               | `or` Mersenne Twister pseudo-random sample    | Monte Carlo     | numerical optimization           |
+|               +-----------------------------------------------+-----------------+                                  |
+|               | `or` Ranlux pseudo-random sample              | Monte Carlo     |                                  |
+|               +-----------------------------------------------+-----------------+                                  |
+|               | `or` cubature rules                           | deterministic   |                                  |
++---------------+-----------------------------------------------+-----------------+----------------------------------+
+| Cuhre         | cubature rules                                | deterministic   | globally adaptive subdivision    |
++---------------+-----------------------------------------------+-----------------+----------------------------------+
 
 .. _`Variance reduction`: https://en.wikipedia.org/wiki/Variance_reduction
 
-.. _Vegas: https://en.wikipedia.org/wiki/VEGAS_algorithm
+.. _s: https://en.wikipedia.org/wiki/VEGAS_algorithm
 
 .. _`Sobol quasi-random sample`: https://en.wikipedia.org/wiki/Sobol_sequence
 
@@ -100,10 +98,12 @@ Integration is always performed on the :math:`n`-dimensional `unit hypercube
 	     f\left(\frac{2y - 1}{(1 - y)y}\right)\frac{2y^2 - 2y + 1}{(1 -
 	     y)^2y^2}\,\mathrm{d}y
 
-   In addition, recall that for an even function :math:`\int_{-\infty}^{\infty}
-   f(x)\,\mathrm{d}x = 2\int_{0}^{\infty}f(x)\,\mathrm{d}x`, while the integral
-   of an odd function over the infinite interval :math:`(-\infty, \infty)` is
-   zero.
+   In addition, recall that for an `even function
+   <https://en.wikipedia.org/wiki/Even_and_odd_functions#Even_functions>`__
+   :math:`\int_{-\infty}^{\infty} f(x)\,\mathrm{d}x =
+   2\int_{0}^{\infty}f(x)\,\mathrm{d}x`, while the integral of an `odd function
+   <https://en.wikipedia.org/wiki/Even_and_odd_functions#Odd_functions>`__ over
+   the infinite interval :math:`(-\infty, \infty)` is zero.
 
    All this generalizes straightforwardly to more than one dimension.  In
    `Examples`_ section you can find the computation of a 3-dimensional `integral
@@ -119,19 +119,17 @@ Installation
 ``Cuba.jl`` is available for Julia 0.4 and later versions, and can be
 installed with `Julia built-in package
 manager <http://docs.julialang.org/en/stable/manual/packages/>`__. In a
-Julia session run the command
+Julia session run the commands
 
 .. code-block:: julia
 
+    julia> Pkg.update()
     julia> Pkg.add("Cuba")
 
 Installation script on GNU/Linux and Mac OS systems will download Cuba Library
 source code and build the Cuba shared object.  In order to accomplish this task
 a C compiler is needed.  Instead, on Windows a prebuilt version of the library
 is downloaded.
-
-You may need to update your package list with ``Pkg.update()`` in order to get
-the latest version of ``Cuba.jl``.
 
 Usage
 -----
@@ -154,18 +152,23 @@ or put this command into your Julia script.
 Large parts of the following sections are borrowed from Cuba manual.  Refer to
 it for more information on the details.
 
-Mandatory Arguments
-'''''''''''''''''''
+Arguments
+'''''''''
 
-Mandatory arguments of integrator functions are:
+The only mandatory argument of integrator functions is:
 
 - ``integrand`` (type: ``Function``): the function to be integrated
+
+Optional positional arguments are:
+
 - ``ndim`` (type: ``Integer``): the number of dimensions of the integratation
   domain.  Defaults to 1 if omitted
 - ``ncomp`` (type: ``Integer``): the number of components of the integrand.
   Default to 1 if omitted
 
-``integrand`` should be a function ``integrand(x, f)`` taking two arguments:
+``ndim`` and ``ncomp`` arguments must appear in this order, so you cannot omit
+``ndim`` but not ``ncomp``.  ``integrand`` should be a function ``integrand(x,
+f)`` taking two arguments:
 
 - the input vector ``x`` of length ``ndim``
 - the output vector ``f`` of length ``ncomp``, used to set the value of each
@@ -897,6 +900,21 @@ Related projects
 
 Another Julia package for multidimenensional numerical integration is available:
 `Cubature.jl <https://github.com/stevengj/Cubature.jl>`__, by Steven G. Johnson.
+
+Development
+-----------
+
+``Cuba.jl`` is developed on GitHub: https://github.com/giordano/Cuba.jl.  Feel
+free to report bugs and make suggestions at
+https://github.com/giordano/Cuba.jl/issues.
+
+History
+'''''''
+
+The ChangeLog of the package is available in `NEWS.md
+<https://github.com/giordano/Cuba.jl/blob/master/NEWS.md>`__ file in top
+directory.  There have been some breaking changes from time to time, beware of
+them when upgrading the package.
 
 License
 -------

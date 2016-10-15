@@ -53,9 +53,10 @@ Installation
 `Cuba.jl` is available for Julia 0.4 and later versions, and can be installed
 with
 [Julia built-in package manager](http://docs.julialang.org/en/stable/manual/packages/).
-In a Julia session run the command
+In a Julia session run the commands
 
 ```julia
+julia> Pkg.update()
 julia> Pkg.add("Cuba")
 ```
 
@@ -63,9 +64,6 @@ Installation script on GNU/Linux and Mac OS systems will download Cuba Library
 source code and build the Cuba shared object.  In order to accomplish this task
 a C compiler is needed.  Instead, on Windows a prebuilt version of the library
 is downloaded.
-
-You may need to update your package list with `Pkg.update()` in order to get the
-latest version of `Cuba.jl`.
 
 Usage
 -----
@@ -87,13 +85,18 @@ divonne(integrand, ndim, ncomp[; keywords...])
 cuhre(integrand, ndim, ncomp[; keywords...])
 ```
 
-Mandatory arguments are:
+The only mandatory argument is:
 
 * `function`: the name of the function to be integrated
+
+Optional positional arguments are:
+
 * `ndim`: the number of dimensions of the integration domain.  Defaults to 1
 * `ncomp`: the number of components of the integrand.  Defaults to 1
 
-`integrand` should be a function `integrand(x, f)` taking two arguments:
+`ndim` and `ncomp` arguments must appear in this order, so you cannot omit
+`ndim` but not `ncomp`.  `integrand` should be a function `integrand(x, f)`
+taking two arguments:
 
 - the input vector `x` of length `ndim`
 - the output vector `f` of length `ncomp`, used to set the value of each
