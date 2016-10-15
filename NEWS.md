@@ -1,7 +1,7 @@
 History of Cuba.jl
 ==================
 
-v0.2.0 (201?-??-??)
+v0.2.0 (2016-10-15)
 -------------------
 
 This release faces some changes to the user interface.  Be aware of them when
