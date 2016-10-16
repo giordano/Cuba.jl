@@ -762,8 +762,7 @@ with the following Julia script
         tmp = cis(x[1]*pi/2)*pi/2
         # Assign to two components of "f" the real
         # and imaginary part of the integrand.
-        f[1] = real(tmp)
-        f[2] = imag(tmp)
+        f[1], f[2] = reim(tmp)
     end
 
     result = cuhre(integrand, 1, 2)

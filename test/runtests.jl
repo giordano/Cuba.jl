@@ -30,12 +30,7 @@ function integrand1(x, f)
     f[1] = f1(x[1], x[2], x[3])
     f[2] = f2(x[1], x[2], x[3])
     f[3] = f3(x[1], x[2], x[3])
-end
-
-function integrand2(x, f)
-    tmp = exp(im*x[1])
-    f[1] = real(tmp)
-    f[2] = imag(tmp)
+    isinf(f[3]) && println(x)
 end
 
 # Make sure using "addprocs" doesn't make the program segfault.
@@ -49,16 +44,20 @@ ncomp = 3
 for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
                       (divonne, 1e-4), (cuhre, 1e-8))
     info("Testing ", ucfirst(string(alg)[6:end]), " algorithm")
-    result = alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8, flags=0)
+    if alg == divonne
+        result = alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8, flags=0,
+                     border = 1e-5)
+    else
+        result = alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8, flags=0)
+    end
     for i = 1:ncomp
-        println("Component $i: ", result[1][i], " ± ", result[2][i],
-                isfinite(result[1][i]) ? "" : " (skipping test)")
+        println("Component $i: ", result[1][i], " ± ", result[2][i])
         println("Should be:   ", answer[i])
-        if isfinite(result[1][i])
-            @test_approx_eq_eps result[1][i] answer[i] result[2][i]
-        end
+        @test_approx_eq_eps result[1][i] answer[i] result[2][i]
     end
 end
+
+integrand2(x, f) = f[1], f[2] = reim(exp(im*x[1]))
 
 # Test Cuhre and Divonne with ndim = 1.
 answer = sin(1) + im*(1 - cos(1))
