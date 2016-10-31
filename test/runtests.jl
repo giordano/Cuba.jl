@@ -30,7 +30,6 @@ function integrand1(x, f)
     f[1] = f1(x[1], x[2], x[3])
     f[2] = f2(x[1], x[2], x[3])
     f[3] = f3(x[1], x[2], x[3])
-    isinf(f[3]) && println(x)
 end
 
 # Make sure using "addprocs" doesn't make the program segfault.
