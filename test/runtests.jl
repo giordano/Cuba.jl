@@ -56,7 +56,7 @@ for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
     end
 end
 
-integrand2(x, f) = f[1], f[2] = reim(exp(im*x[1]))
+integrand2(x, f) = f[1], f[2] = reim(cis(x[1]))
 
 # Test Cuhre and Divonne with ndim = 1.
 answer = sin(1) + im*(1 - cos(1))

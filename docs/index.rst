@@ -116,7 +116,7 @@ Integration is always performed on the :math:`n`-dimensional `unit hypercube
 Installation
 ------------
 
-``Cuba.jl`` is available for Julia 0.4 and later versions, and can be
+``Cuba.jl`` is available for Julia 0.5 and later versions, and can be
 installed with `Julia built-in package
 manager <http://docs.julialang.org/en/stable/manual/packages/>`__. In a
 Julia session run the commands
@@ -130,6 +130,8 @@ Installation script on GNU/Linux and Mac OS systems will download Cuba Library
 source code and build the Cuba shared object.  In order to accomplish this task
 a C compiler is needed.  Instead, on Windows a prebuilt version of the library
 is downloaded.
+
+Older versions are also available for Julia 0.4.
 
 Usage
 -----

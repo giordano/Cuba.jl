@@ -2,9 +2,8 @@
 
 | **Documentation**                       | [**Package Evaluator**][pkgeval-link] | **Build Status**                          | **Code Coverage**               |
 |:---------------------------------------:|:-------------------------------------:|:-----------------------------------------:|:-------------------------------:|
-| [![][docs-stable-img]][docs-stable-url] | [![][pkg-0.4-img]][pkg-0.4-url]       | [![Build Status][travis-img]][travis-url] | [![][coveral-img]][coveral-url] |
-| [![][docs-latest-img]][docs-latest-url] | [![][pkg-0.5-img]][pkg-0.5-url]       | [![Build Status][appvey-img]][appvey-url] | [![][codecov-img]][codecov-url] |
-|                                         | [![][pkg-0.6-img]][pkg-0.6-url]       |                                           |                                 |
+| [![][docs-stable-img]][docs-stable-url] | [![][pkg-0.5-img]][pkg-0.5-url]       | [![Build Status][travis-img]][travis-url] | [![][coveral-img]][coveral-url] |
+| [![][docs-latest-img]][docs-latest-url] | [![][pkg-0.6-img]][pkg-0.6-url]       | [![Build Status][appvey-img]][appvey-url] | [![][codecov-img]][codecov-url] |
 
 Introduction
 ------------
@@ -50,7 +49,7 @@ architectures).
 Installation
 ------------
 
-`Cuba.jl` is available for Julia 0.4 and later versions, and can be installed
+`Cuba.jl` is available for Julia 0.5 and later versions, and can be installed
 with
 [Julia built-in package manager](http://docs.julialang.org/en/stable/manual/packages/).
 In a Julia session run the commands
@@ -64,6 +63,8 @@ Installation script on GNU/Linux and Mac OS systems will download Cuba Library
 source code and build the Cuba shared object.  In order to accomplish this task
 a C compiler is needed.  Instead, on Windows a prebuilt version of the library
 is downloaded.
+
+Older versions are also available for Julia 0.4.
 
 Usage
 -----
@@ -274,8 +275,6 @@ http://adsabs.harvard.edu/abs/2015JPhCS.608a2066H).
 
 [pkgeval-link]: http://pkg.julialang.org/?pkg=Cuba
 
-[pkg-0.4-img]: http://pkg.julialang.org/badges/Cuba_0.4.svg
-[pkg-0.4-url]: http://pkg.julialang.org/detail/Cuba.html
 [pkg-0.5-img]: http://pkg.julialang.org/badges/Cuba_0.5.svg
 [pkg-0.5-url]: http://pkg.julialang.org/detail/Cuba.html
 [pkg-0.6-img]: http://pkg.julialang.org/badges/Cuba_0.6.svg

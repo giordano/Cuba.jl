@@ -24,8 +24,6 @@ __precompile__()
 
 module Cuba
 
-using Compat
-
 export vegas, suave, divonne, cuhre
 
 # Note: don't use Pkg.dir("PkgName") here because the package may be installed
@@ -53,16 +51,16 @@ const GRIDNO    = 0
 # Suave-specific arguments.
 const NNEW     = 1000
 const NMIN     = 2
-const FLATNESS = 25.
+const FLATNESS = 25.0
 
 # Divonne-specific arguments.
 const KEY1         = 47
 const KEY2         = 1
 const KEY3         = 1
 const MAXPASS      = 5
-const BORDER       = 0.
-const MAXCHISQ     = 10.
-const MINDEVIATION = .25
+const BORDER       = 0.0
+const MAXCHISQ     = 10.0
+const MINDEVIATION = 0.25
 const NGIVEN       = 0
 const LDXGIVEN     = 0
 const XGIVEN       = 0
@@ -461,10 +459,5 @@ function exit(f::Ptr{Void}, arg::Ptr{Void})
     ccall((:cubaexit, libcuba), Ptr{Void}, (Ptr{Void}, Ptr{Void}), f, arg)
     return 0
 end
-
-@deprecate Vegas(args...; kwargs...)   vegas(args...; kwargs...)
-@deprecate Suave(args...; kwargs...)   suave(args...; kwargs...)
-@deprecate Divonne(args...; kwargs...) divonne(args...; kwargs...)
-@deprecate Cuhre(args...; kwargs...)   cuhre(args...; kwargs...)
 
 end # module

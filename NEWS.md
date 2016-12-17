@@ -1,6 +1,15 @@
 History of Cuba.jl
 ==================
 
+v0.3.0 (201?-??-??)
+-------------------
+
+### Breaking Changes
+
+* Support for Julia 0.4 was dropped
+* Integrators functions with uppercase names were removed.  They were deprecated
+  in v0.2.0.
+
 v0.2.0 (2016-10-15)
 -------------------
 
