@@ -19,8 +19,6 @@
 
 ### Code:
 
-using Compat
-
 libcuba = joinpath(dirname(@__FILE__), "libcuba")
 tagfile = "installed_version"
 
