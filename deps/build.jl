@@ -71,12 +71,7 @@ end
 
 # Make sure Julia is able to see the library.
 if isempty(Libdl.find_library([libcuba]))
-    if isfile(tagfile)
-        # Delete the tagfile in order to force building upon next
-        # Pkg.build("Cuba").  Note that Julia 0.4 doesn't have "force" keyword
-        # to `rm' function.
-        rm(tagfile)
-    end
+    rm(tagfile, force = true)
     error("Installation of libcuba failed")
 else
     info("libcuba successfully installed!")
