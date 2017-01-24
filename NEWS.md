@@ -1,21 +1,21 @@
 History of Cuba.jl
 ==================
 
-v0.3.0 (201?-??-??)
+v0.3.0 (2017-01-24)
 -------------------
 
 ### Breaking Changes
 
 * Support for Julia 0.4 was dropped
 * Integrators functions with uppercase names were removed.  They were deprecated
-  in v0.2.0.
+  in v0.2.0
 
 ### New Features ###
 
 * New 64-bit integers functions `llvegas`, `llsuave`, `lldivonne`, `llcuhre` are
   provided.  They should be used in cases where convergence is not reached
   within the ordinary 32-bit integer
-  range. ([#4](https://github.com/giordano/Cuba.jl/issues/4))
+  range ([#4](https://github.com/giordano/Cuba.jl/issues/4))
 
 v0.2.0 (2016-10-15)
 -------------------
