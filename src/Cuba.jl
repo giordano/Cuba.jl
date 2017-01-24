@@ -24,7 +24,7 @@ __precompile__()
 
 module Cuba
 
-export vegas, suave, divonne, cuhre
+export vegas, llvegas, suave, llsuave, divonne, lldivonne, cuhre, llcuhre
 
 # Note: don't use Pkg.dir("PkgName") here because the package may be installed
 # elsewhere.
@@ -111,160 +111,164 @@ function __init__()
 end
 
 # One function to rule them all.
-function dointegrate(algorithm::Symbol,
-                     # First common arguments.
-                     integrand::Ptr{Void}, ndim::Integer, ncomp::Integer,
-                     userdata::Ptr{Void}, nvec::Integer, reltol::Real,
-                     abstol::Real, flags::Integer, seed::Integer,
-                     minevals::Integer, maxevals::Integer,
-                     # Vegas-specific arguments.
-                     nstart::Integer, nincrease::Integer,
-                     nbatch::Integer, gridno::Integer,
-                     # Suave-specific arguments.
-                     nnew::Integer, nmin::Integer, flatness::Real,
-                     # Divonne-specific arguments.
-                     key1::Integer, key2::Integer, key3::Integer,
-                     maxpass::Integer, border::Real, maxchisq::Real,
-                     mindeviation::Real, ngiven::Integer, ldxgiven::Integer,
-                     xgiven::Any, nextra::Integer, peakfinder::Ptr{Void},
-                     # Cuhre-specific argument.
-                     key::Integer,
-                     # Final common arguments.
-                     statefile::AbstractString, spin::Ptr{Void})
-    nregions = Ref{Cint}(0)
-    neval    = Ref{Cint}(0)
-    fail     = Ref{Cint}(0)
-    integral = zeros(Cdouble, ncomp)
-    error    = zeros(Cdouble, ncomp)
-    prob     = zeros(Cdouble, ncomp)
-    if algorithm == :Cuhre
-        ccall((:Cuhre, libcuba), Cdouble,
-              (Cint, # ndim
-               Cint, # ncomp
-               Ptr{Void}, # integrand
-               Ptr{Void}, # userdata
-               Cint, # nvec
-               Cdouble, # reltol
-               Cdouble, # abstol
-               Cint, # flags
-               Cint, # minevals
-               Cint, # maxevals
-               Cint, # key
-               Ptr{Cchar}, # statefile
-               Ptr{Void}, # spin
-               Ptr{Cint}, # nregions
-               Ptr{Cint}, # neval
-               Ptr{Cint}, # fail
-               Ptr{Cdouble}, # integral
-               Ptr{Cdouble}, # error
-               Ptr{Cdouble}),# prob
-              # Input
-              ndim, ncomp, integrand, userdata, nvec, reltol,
-              abstol, flags, minevals, maxevals, key, statefile, spin,
-              # Output
-              nregions, neval, fail, integral, error, prob)
-    elseif algorithm == :Vegas
-        ccall((:Vegas, libcuba), Cdouble,
-              (Cint, # ndim
-               Cint, # ncomp
-               Ptr{Void}, # integrand
-               Ptr{Void}, # userdata
-               Cint, # nvec
-               Cdouble, # reltol
-               Cdouble, # abstol
-               Cint, # flags
-               Cint, # seed
-               Cint, # minevals
-               Cint, # maxevals
-               Cint, # nstart
-               Cint, # nincrease
-               Cint, # nbatch
-               Cint, # gridno
-               Ptr{Cchar}, # statefile
-               Ptr{Void}, # spin
-               Ptr{Cint}, # neval
-               Ptr{Cint}, # fail
-               Ptr{Cdouble}, # integral
-               Ptr{Cdouble}, # error
-               Ptr{Cdouble}),# prob
-              # Input
-              ndim, ncomp, integrand, userdata, nvec,
-              reltol, abstol, flags, seed, minevals, maxevals,
-              nstart, nincrease, nbatch, gridno, statefile, spin,
-              # Output
-              neval, fail, integral, error, prob)
-    elseif algorithm == :Suave
-        ccall((:Suave, libcuba), Cdouble,
-              (Cint, # ndim
-               Cint, # ncomp
-               Ptr{Void}, # integrand
-               Ptr{Void}, # userdata
-               Cint, # nvec
-               Cdouble, # reltol
-               Cdouble, # abstol
-               Cint, # flags
-               Cint, # seed
-               Cint, # minevals
-               Cint, # maxevals
-               Cint, # nnew
-               Cint, # nmin
-               Cdouble, # flatness
-               Ptr{Cchar}, # statefile
-               Ptr{Void}, # spin
-               Ptr{Cint}, # nregions
-               Ptr{Cint}, # neval
-               Ptr{Cint}, # fail
-               Ptr{Cdouble}, # integral
-               Ptr{Cdouble}, # error
-               Ptr{Cdouble}),# prob
-              # Input
-              ndim, ncomp, integrand, userdata, nvec,
-              reltol, abstol, flags, seed, minevals, maxevals,
-              nnew, nmin, flatness, statefile, spin,
-              # Output
-              nregions, neval, fail, integral, error, prob)
-    elseif algorithm == :Divonne
-        ccall((:Divonne, libcuba), Cdouble,
-              (Cint, # ndim
-               Cint, # ncomp
-               Ptr{Void}, # integrand
-               Ptr{Void}, # userdata
-               Cint, # nvec
-               Cdouble, # reltol
-               Cdouble, # abstol
-               Cint, # flags
-               Cint, # seed
-               Cint, # minevals
-               Cint, # maxevals
-               Cint, # key1
-               Cint, # key2
-               Cint, # key3
-               Cint, # maxpass
-               Cdouble, # border
-               Cdouble, # maxchisq
-               Cdouble, # mindeviation
-               Cint, # ngiven
-               Cint, # ldxgiven
-               Ptr{Cdouble}, # xgiven
-               Cint, # nextra
-               Ptr{Void}, # peakfinder
-               Ptr{Cchar}, # statefile
-               Ptr{Void}, # spin
-               Ptr{Cint}, # nregions
-               Ptr{Cint}, # neval
-               Ptr{Cint}, # fail
-               Ptr{Cdouble}, # integral
-               Ptr{Cdouble}, # error
-               Ptr{Cdouble}),# prob
-              # Input
-              ndim, ncomp, integrand, userdata, nvec, reltol,
-              abstol, flags, seed, minevals, maxevals, key1, key2, key3,
-              maxpass, border, maxchisq, mindeviation, ngiven, ldxgiven,
-              xgiven, nextra, peakfinder, statefile, spin,
-              # Output
-              nregions, neval, fail, integral, error, prob)
+for (CubaInt, prefix) in ((Int32, ""), (Int64, "ll"))
+    @eval begin
+        function dointegrate(algorithm::Symbol,
+                             # First common arguments.
+                             integrand::Ptr{Void}, ndim::Integer, ncomp::Integer,
+                             userdata::Ptr{Void}, nvec::$CubaInt, reltol::Real,
+                             abstol::Real, flags::Integer, seed::Integer,
+                             minevals::$CubaInt, maxevals::$CubaInt,
+                             # Vegas-specific arguments.
+                             nstart::$CubaInt, nincrease::$CubaInt,
+                             nbatch::$CubaInt, gridno::Integer,
+                             # Suave-specific arguments.
+                             nnew::$CubaInt, nmin::$CubaInt, flatness::Real,
+                             # Divonne-specific arguments.
+                             key1::Integer, key2::Integer, key3::Integer,
+                             maxpass::Integer, border::Real, maxchisq::Real,
+                             mindeviation::Real, ngiven::$CubaInt, ldxgiven::Integer,
+                             xgiven::Any, nextra::$CubaInt, peakfinder::Ptr{Void},
+                             # Cuhre-specific argument.
+                             key::Integer,
+                             # Final common arguments.
+                             statefile::AbstractString, spin::Ptr{Void})
+            nregions = Ref{Cint}(0)
+            neval    = Ref{$CubaInt}(0)
+            fail     = Ref{Cint}(0)
+            integral = zeros(Cdouble, ncomp)
+            error    = zeros(Cdouble, ncomp)
+            prob     = zeros(Cdouble, ncomp)
+            if algorithm == :Cuhre
+                ccall(($(prefix * "Cuhre"), libcuba), Cdouble,
+                      (Cint, # ndim
+                       Cint, # ncomp
+                       Ptr{Void}, # integrand
+                       Ptr{Void}, # userdata
+                       $CubaInt, # nvec
+                       Cdouble, # reltol
+                       Cdouble, # abstol
+                       Cint, # flags
+                       $CubaInt, # minevals
+                       $CubaInt, # maxevals
+                       Cint, # key
+                       Ptr{Cchar}, # statefile
+                       Ptr{Void}, # spin
+                       Ptr{Cint}, # nregions
+                       Ptr{$CubaInt}, # neval
+                       Ptr{Cint}, # fail
+                       Ptr{Cdouble}, # integral
+                       Ptr{Cdouble}, # error
+                       Ptr{Cdouble}),# prob
+                      # Input
+                      ndim, ncomp, integrand, userdata, nvec, reltol,
+                      abstol, flags, minevals, maxevals, key, statefile, spin,
+                      # Output
+                      nregions, neval, fail, integral, error, prob)
+            elseif algorithm == :Vegas
+                ccall(($(prefix * "Vegas"), libcuba), Cdouble,
+                      (Cint, # ndim
+                       Cint, # ncomp
+                       Ptr{Void}, # integrand
+                       Ptr{Void}, # userdata
+                       $CubaInt, # nvec
+                       Cdouble, # reltol
+                       Cdouble, # abstol
+                       Cint, # flags
+                       Cint, # seed
+                       $CubaInt, # minevals
+                       $CubaInt, # maxevals
+                       $CubaInt, # nstart
+                       $CubaInt, # nincrease
+                       $CubaInt, # nbatch
+                       Cint, # gridno
+                       Ptr{Cchar}, # statefile
+                       Ptr{Void}, # spin
+                       Ptr{$CubaInt}, # neval
+                       Ptr{Cint}, # fail
+                       Ptr{Cdouble}, # integral
+                       Ptr{Cdouble}, # error
+                       Ptr{Cdouble}),# prob
+                      # Input
+                      ndim, ncomp, integrand, userdata, nvec,
+                      reltol, abstol, flags, seed, minevals, maxevals,
+                      nstart, nincrease, nbatch, gridno, statefile, spin,
+                      # Output
+                      neval, fail, integral, error, prob)
+            elseif algorithm == :Suave
+                ccall(($(prefix * "Suave"), libcuba), Cdouble,
+                      (Cint, # ndim
+                       Cint, # ncomp
+                       Ptr{Void}, # integrand
+                       Ptr{Void}, # userdata
+                       $CubaInt, # nvec
+                       Cdouble, # reltol
+                       Cdouble, # abstol
+                       Cint, # flags
+                       Cint, # seed
+                       $CubaInt, # minevals
+                       $CubaInt, # maxevals
+                       $CubaInt, # nnew
+                       $CubaInt, # nmin
+                       Cdouble, # flatness
+                       Ptr{Cchar}, # statefile
+                       Ptr{Void}, # spin
+                       Ptr{Cint}, # nregions
+                       Ptr{$CubaInt}, # neval
+                       Ptr{Cint}, # fail
+                       Ptr{Cdouble}, # integral
+                       Ptr{Cdouble}, # error
+                       Ptr{Cdouble}),# prob
+                      # Input
+                      ndim, ncomp, integrand, userdata, nvec,
+                      reltol, abstol, flags, seed, minevals, maxevals,
+                      nnew, nmin, flatness, statefile, spin,
+                      # Output
+                      nregions, neval, fail, integral, error, prob)
+            elseif algorithm == :Divonne
+                ccall(($(prefix * "Divonne"), libcuba), Cdouble,
+                      (Cint, # ndim
+                       Cint, # ncomp
+                       Ptr{Void}, # integrand
+                       Ptr{Void}, # userdata
+                       $CubaInt, # nvec
+                       Cdouble, # reltol
+                       Cdouble, # abstol
+                       Cint, # flags
+                       Cint, # seed
+                       $CubaInt, # minevals
+                       $CubaInt, # maxevals
+                       Cint, # key1
+                       Cint, # key2
+                       Cint, # key3
+                       Cint, # maxpass
+                       Cdouble, # border
+                       Cdouble, # maxchisq
+                       Cdouble, # mindeviation
+                       $CubaInt, # ngiven
+                       Cint, # ldxgiven
+                       Ptr{Cdouble}, # xgiven
+                       $CubaInt, # nextra
+                       Ptr{Void}, # peakfinder
+                       Ptr{Cchar}, # statefile
+                       Ptr{Void}, # spin
+                       Ptr{Cint}, # nregions
+                       Ptr{$CubaInt}, # neval
+                       Ptr{Cint}, # fail
+                       Ptr{Cdouble}, # integral
+                       Ptr{Cdouble}, # error
+                       Ptr{Cdouble}),# prob
+                      # Input
+                      ndim, ncomp, integrand, userdata, nvec, reltol,
+                      abstol, flags, seed, minevals, maxevals, key1, key2, key3,
+                      maxpass, border, maxchisq, mindeviation, ngiven, ldxgiven,
+                      xgiven, nextra, peakfinder, statefile, spin,
+                      # Output
+                      nregions, neval, fail, integral, error, prob)
+            end
+        return integral, error, prob, neval[], fail[], nregions[]
+        end
     end
-    return integral, error, prob, neval[], fail[], nregions[]
 end
 
 """
@@ -290,20 +294,29 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-vegas(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
-      nvec::Integer=NVEC,
-      reltol::Real=RELTOL, abstol::Real=ABSTOL, flags::Integer=FLAGS,
-      seed::Integer=SEED, minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
-      nstart::Integer=NSTART, nincrease::Integer=NINCREASE,
-      nbatch::Integer=NBATCH, gridno::Integer=GRIDNO,
-      statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
-          dointegrate(:Vegas, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
-                      pointer_from_objref(integrand), nvec, float(reltol),
-                      float(abstol), flags, seed, trunc(Integer, minevals),
-                      trunc(Integer, maxevals), nstart, nincrease, nbatch,
-                      gridno, NNEW, NMIN, FLATNESS, KEY1, KEY2, KEY3, MAXPASS,
-                      BORDER, MAXCHISQ, MINDEVIATION, NGIVEN, LDXGIVEN, XGIVEN,
-                      NEXTRA, PEAKFINDER, KEY, statefile, spin)
+vegas, llvegas
+
+for (CubaInt, prefix) in ((Int32, ""), (Int64, "ll"))
+    func = Symbol(prefix, "vegas")
+    @eval begin
+        $func(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
+              nvec::Integer=NVEC,
+              reltol::Real=RELTOL, abstol::Real=ABSTOL, flags::Integer=FLAGS,
+              seed::Integer=SEED, minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
+              nstart::Integer=NSTART, nincrease::Integer=NINCREASE,
+              nbatch::Integer=NBATCH, gridno::Integer=GRIDNO,
+              statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
+                  dointegrate(:Vegas, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
+                              pointer_from_objref(integrand), $CubaInt(nvec), float(reltol),
+                              float(abstol), flags, seed, trunc($CubaInt, minevals),
+                              trunc($CubaInt, maxevals), $CubaInt(nstart),
+                              $CubaInt(nincrease), $CubaInt(nbatch),
+                              gridno, $CubaInt(NNEW), $CubaInt(NMIN), FLATNESS, KEY1, KEY2,
+                              KEY3, MAXPASS, BORDER, MAXCHISQ, MINDEVIATION,
+                              $CubaInt(NGIVEN), LDXGIVEN, XGIVEN,
+                              $CubaInt(NEXTRA), PEAKFINDER, KEY, statefile, spin)
+    end
+end
 
 """
     suave(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
@@ -327,19 +340,27 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-suave(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
-      nvec::Integer=NVEC, reltol::Real=RELTOL,
-      abstol::Real=ABSTOL, flags::Integer=FLAGS, seed::Integer=SEED,
-      minevals::Real=MINEVALS, maxevals::Real=MAXEVALS, nnew::Integer=NNEW,
-      nmin::Integer=NMIN, flatness::Real=FLATNESS,
-      statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
-          dointegrate(:Suave, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
-                      pointer_from_objref(integrand), nvec, float(reltol),
-                      float(abstol), flags, seed, trunc(Integer, minevals),
-                      trunc(Integer, maxevals), NSTART, NINCREASE, NBATCH,
-                      GRIDNO, nnew, nmin, flatness, KEY1, KEY2, KEY3, MAXPASS,
-                      BORDER, MAXCHISQ, MINDEVIATION, NGIVEN, LDXGIVEN, XGIVEN,
-                      NEXTRA, PEAKFINDER, KEY, statefile, spin)
+suave, llsuave
+
+for (CubaInt, prefix) in ((Int32, ""), (Int64, "ll"))
+    func = Symbol(prefix, "suave")
+    @eval begin
+        $func(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
+              nvec::Integer=NVEC, reltol::Real=RELTOL,
+              abstol::Real=ABSTOL, flags::Integer=FLAGS, seed::Integer=SEED,
+              minevals::Real=MINEVALS, maxevals::Real=MAXEVALS, nnew::Integer=NNEW,
+              nmin::Integer=NMIN, flatness::Real=FLATNESS,
+              statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) =
+                  dointegrate(:Suave, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
+                              pointer_from_objref(integrand), $CubaInt(nvec), float(reltol),
+                              float(abstol), flags, seed, trunc($CubaInt, minevals),
+                              trunc($CubaInt, maxevals), $CubaInt(NSTART),
+                              $CubaInt(NINCREASE), $CubaInt(NBATCH), GRIDNO, $CubaInt(nnew),
+                              $CubaInt(nmin), flatness, KEY1, KEY2, KEY3, MAXPASS,
+                              BORDER, MAXCHISQ, MINDEVIATION, $CubaInt(NGIVEN), LDXGIVEN,
+                              XGIVEN, $CubaInt(NEXTRA), PEAKFINDER, KEY, statefile, spin)
+    end
+end
 
 """
     divonne(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
@@ -372,34 +393,42 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-function divonne{R<:Real}(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
-                          nvec::Integer=NVEC, reltol::Real=RELTOL,
-                          abstol::Real=ABSTOL, flags::Integer=FLAGS,
-                          seed::Integer=SEED, minevals::Real=MINEVALS,
-                          maxevals::Real=MAXEVALS, key1::Integer=KEY1,
-                          key2::Integer=KEY2, key3::Integer=KEY3,
-                          maxpass::Integer=MAXPASS, border::Real=BORDER,
-                          maxchisq::Real=MAXCHISQ,
-                          mindeviation::Real=MINDEVIATION,
-                          ngiven::Integer=NGIVEN, ldxgiven::Integer=LDXGIVEN,
-                          xgiven::AbstractArray{R}=zeros(Cdouble, ldxgiven,
-                                                         ngiven),
-                          nextra::Integer=NEXTRA,
-                          peakfinder::Ptr{Void}=PEAKFINDER,
-                          statefile::AbstractString=STATEFILE,
-                          spin::Ptr{Void}=SPIN)
-    # Divonne requires "ndim" to be at least 2, even for an integral over a one
-    # dimensional domain.  Instead, we don't prevent users from setting wrong
-    # "ndim" values like 0 or negative ones.
-    ndim == 1 && (ndim = 2)
-    return dointegrate(:Divonne, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
-                       pointer_from_objref(integrand), nvec, float(reltol),
-                       float(abstol), flags, seed, trunc(Integer, minevals),
-                       trunc(Integer, maxevals), NSTART, NINCREASE, NBATCH,
-                       GRIDNO, NNEW, NMIN, FLATNESS, key1, key2, key3, maxpass,
-                       float(border), float(maxchisq), float(mindeviation),
-                       ngiven, ldxgiven, xgiven, nextra, peakfinder, KEY,
-                       statefile, spin)
+divonne, lldivonne
+
+for (CubaInt, prefix) in ((Int32, ""), (Int64, "ll"))
+    func = Symbol(prefix, "divonne")
+    @eval begin
+        function $func{R<:Real}(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
+                                nvec::Integer=NVEC, reltol::Real=RELTOL,
+                                abstol::Real=ABSTOL, flags::Integer=FLAGS,
+                                seed::Integer=SEED, minevals::Real=MINEVALS,
+                                maxevals::Real=MAXEVALS, key1::Integer=KEY1,
+                                key2::Integer=KEY2, key3::Integer=KEY3,
+                                maxpass::Integer=MAXPASS, border::Real=BORDER,
+                                maxchisq::Real=MAXCHISQ,
+                                mindeviation::Real=MINDEVIATION,
+                                ngiven::Integer=NGIVEN, ldxgiven::Integer=LDXGIVEN,
+                                xgiven::AbstractArray{R}=zeros(Cdouble, ldxgiven,
+                                                               ngiven),
+                                nextra::Integer=NEXTRA,
+                                peakfinder::Ptr{Void}=PEAKFINDER,
+                                statefile::AbstractString=STATEFILE,
+                                spin::Ptr{Void}=SPIN)
+            # Divonne requires "ndim" to be at least 2, even for an integral over a one
+            # dimensional domain.  Instead, we don't prevent users from setting wrong
+            # "ndim" values like 0 or negative ones.
+            ndim == 1 && (ndim = 2)
+            return dointegrate(:Divonne, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
+                               pointer_from_objref(integrand), $CubaInt(nvec), float(reltol),
+                               float(abstol), flags, seed, trunc($CubaInt, minevals),
+                               trunc($CubaInt, maxevals), $CubaInt(NSTART),
+                               $CubaInt(NINCREASE), $CubaInt(NBATCH), GRIDNO,
+                               $CubaInt(NNEW), $CubaInt(NMIN), FLATNESS, key1, key2, key3,
+                               maxpass, float(border), float(maxchisq), float(mindeviation),
+                               $CubaInt(ngiven), ldxgiven, xgiven, $CubaInt(nextra),
+                               peakfinder, KEY, statefile, spin)
+        end
+    end
 end
 
 """
@@ -421,22 +450,31 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-function cuhre(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
-               nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
-               flags::Integer=FLAGS, minevals::Real=MINEVALS,
-               maxevals::Real=MAXEVALS, key::Integer=KEY,
-               statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
-    # Cuhre requires "ndim" to be at least 2, even for an integral over a one
-    # dimensional domain.  Instead, we don't prevent users from setting wrong
-    # "ndim" values like 0 or negative ones.
-    ndim == 1 && (ndim = 2)
-    return dointegrate(:Cuhre, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
-                       pointer_from_objref(integrand), nvec, float(reltol),
-                       float(abstol), flags, SEED, trunc(Integer, minevals),
-                       trunc(Integer, maxevals), NSTART, NINCREASE, NBATCH,
-                       GRIDNO, NNEW, NMIN, FLATNESS, KEY1, KEY2, KEY3, MAXPASS,
-                       BORDER, MAXCHISQ, MINDEVIATION, NGIVEN, LDXGIVEN, XGIVEN,
-                       NEXTRA, PEAKFINDER, key, statefile, spin)
+cuhre, llcuhre
+
+for (CubaInt, prefix) in ((Int32, ""), (Int64, "ll"))
+    func = Symbol(prefix, "cuhre")
+    @eval begin
+        function $func(integrand::Function, ndim::Integer=1, ncomp::Integer=1;
+                       nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
+                       flags::Integer=FLAGS, minevals::Real=MINEVALS,
+                       maxevals::Real=MAXEVALS, key::Integer=KEY,
+                       statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
+            # Cuhre requires "ndim" to be at least 2, even for an integral over a one
+            # dimensional domain.  Instead, we don't prevent users from setting wrong
+            # "ndim" values like 0 or negative ones.
+            ndim == 1 && (ndim = 2)
+            return dointegrate(:Cuhre, c_generic_integrand!::Ptr{Void}, ndim, ncomp,
+                               pointer_from_objref(integrand), $CubaInt(nvec), float(reltol),
+                               float(abstol), flags, SEED, trunc($CubaInt, minevals),
+                               trunc($CubaInt, maxevals), $CubaInt(NSTART),
+                               $CubaInt(NINCREASE), $CubaInt(NBATCH), GRIDNO,
+                               $CubaInt(NNEW), $CubaInt(NMIN), FLATNESS, KEY1, KEY2, KEY3,
+                               MAXPASS, BORDER, MAXCHISQ, MINDEVIATION, $CubaInt(NGIVEN),
+                               LDXGIVEN, XGIVEN, $CubaInt(NEXTRA), PEAKFINDER, key,
+                               statefile, spin)
+        end
+    end
 end
 
 ### Other functions, not exported

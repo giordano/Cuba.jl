@@ -77,7 +77,7 @@ using Cuba
 
 or put this command into your Julia script.
 
-`Cuba.jl` provides 4 functions to integrate, one for each algorithm:
+`Cuba.jl` provides the following functions to integrate:
 
 ``` julia
 vegas(integrand, ndim, ncomp[; keywords...])
@@ -85,6 +85,12 @@ suave(integrand, ndim, ncomp[; keywords...])
 divonne(integrand, ndim, ncomp[; keywords...])
 cuhre(integrand, ndim, ncomp[; keywords...])
 ```
+
+All 64-bit integers functions (`llvegas`, `llsuave`, `lldivonne`, `llcuhre`) are
+wrapped and exported as well.  They have the same syntax as the corresponding
+32-bit integers functions and should be used in cases where convergence is not
+reached within the ordinary 32-bit integer range.  See the manual for more
+information about these functions.
 
 The only mandatory argument is:
 

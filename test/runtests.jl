@@ -56,6 +56,14 @@ for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
     end
 end
 
+# Test 64-bit integer functions.
+for (alg, abstol) in ((llvegas, 2e-5), (llsuave, 6e-6),
+                      (lldivonne, 7e-7), (llcuhre, 1e-8))
+    # Make sure that using maxevals > typemax(Int32) doesn't result into InexactError.
+    result = alg((x,f) -> f[1] = f1(x[1], x[2], x[3]), 3, maxevals = 3e9)
+    @test_approx_eq_eps result[1][1] answer[1] abstol
+end
+
 integrand2(x, f) = f[1], f[2] = reim(cis(x[1]))
 
 # Test Cuhre and Divonne with ndim = 1.
