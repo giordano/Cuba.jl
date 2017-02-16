@@ -2,5 +2,6 @@
 *.jl.*.cov
 *.jl.mem
 /deps
-/test
 /docs/_build
+/test/benchmark-fortran
+/test/benchmark-c
