@@ -21,7 +21,6 @@
 
 using Cuba
 using Base.Test
-using SpecialFunctions: erf
 
 f1(x,y,z) = sin(x)*cos(y)*exp(z)
 f2(x,y,z) = exp(-(x*x + y*y + z*z))
@@ -39,7 +38,8 @@ Cuba.cores(0, 10000)
 Cuba.accel(0,1000)
 
 # Test results and make sure the estimation of error is exact.
-answer = [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
+# Analytic expressions: [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
+answer = [0.6646696797813771, 0.41653838588663805, 1.2020569031595951]
 ncomp = 3
 for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
                       (divonne, 1e-4), (cuhre, 1e-8))
