@@ -38,7 +38,8 @@ Cuba.cores(0, 10000)
 Cuba.accel(0,1000)
 
 # Test results and make sure the estimation of error is exact.
-answer = [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
+# Analytic expressions: [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
+answer = [0.6646696797813771, 0.41653838588663805, 1.2020569031595951]
 ncomp = 3
 for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
                       (divonne, 1e-4), (cuhre, 1e-8))
@@ -52,7 +53,7 @@ for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
     for i = 1:ncomp
         println("Component $i: ", result[1][i], " ± ", result[2][i])
         println("Should be:   ", answer[i])
-        @test_approx_eq_eps result[1][i] answer[i] result[2][i]
+        @test isapprox(result[1][i], answer[i], atol=result[2][i])
     end
 end
 
@@ -61,7 +62,7 @@ for (alg, abstol) in ((llvegas, 1e-4), (llsuave, 1e-3),
                       (lldivonne, 1e-4), (llcuhre, 1e-8))
     # Make sure that using maxevals > typemax(Int32) doesn't result into InexactError.
     result = alg((x,f) -> f[1] = f1(x[1], x[2], x[3]), 3, maxevals = 3e9)
-    @test_approx_eq_eps result[1][1] answer[1] abstol
+    @test isapprox(result[1][1], answer[1], atol=abstol)
 end
 
 integrand2(x, f) = f[1], f[2] = reim(cis(x[1]))
@@ -69,15 +70,15 @@ integrand2(x, f) = f[1], f[2] = reim(cis(x[1]))
 # Test Cuhre and Divonne with ndim = 1.
 answer = sin(1) + im*(1 - cos(1))
 result = cuhre(integrand2, 1, 2)
-@test_approx_eq     complex(result[1]...) answer
+@test complex(result[1]...) ≈ answer
 result = divonne(integrand2, 1, 2, reltol=1e-8, abstol=1e-8)
-@test_approx_eq_eps complex(result[1]...) answer 1e-8
+@test isapprox(complex(result[1]...), answer, atol=1e-8)
 
 # Test taken from one of the examples of integrals over infinite domains.
 func(x) = log(1 + x^2)/(1 + x^2)
 result = cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
                abstol = 1e-12, reltol = 1e-10)
-@test_approx_eq_eps result[1][1] pi*log(2) 3e-12
+@test isapprox(result[1][1], pi*log(2), atol=3e-12)
 
 # Make sure these functions don't crash.
 Cuba.init(C_NULL, C_NULL)
