@@ -69,15 +69,15 @@ integrand2(x, f) = f[1], f[2] = reim(cis(x[1]))
 
 # Test Cuhre and Divonne with ndim = 1.
 answer = sin(1) + im*(1 - cos(1))
-result = cuhre(integrand2, 1, 2)
+result = @inferred cuhre(integrand2, 1, 2)
 @test complex(result[1]...) ≈ answer
 result = divonne(integrand2, 1, 2, reltol=1e-8, abstol=1e-8)
 @test isapprox(complex(result[1]...), answer, atol=1e-8)
 
 # Test taken from one of the examples of integrals over infinite domains.
 func(x) = log(1 + x^2)/(1 + x^2)
-result = cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
-               abstol = 1e-12, reltol = 1e-10)
+result = @inferred cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
+                         abstol = 1e-12, reltol = 1e-10)
 @test isapprox(result[1][1], pi*log(2), atol=3e-12)
 
 # Make sure these functions don't crash.

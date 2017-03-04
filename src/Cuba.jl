@@ -98,7 +98,7 @@ function generic_integrand!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
     x = unsafe_wrap(Array, x_, (ndim,))
     f = unsafe_wrap(Array, f_, (ncomp,))
     # Get the function from "func_" pointer.
-    func! = unsafe_pointer_to_objref(func_)::Function
+    func! = unsafe_pointer_to_objref(func_)
     func!(x, f)
     return Cint(0)
 end
