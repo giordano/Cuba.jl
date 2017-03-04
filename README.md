@@ -205,26 +205,26 @@ performances comparable with equivalent native C or Fortran codes based on Cuba
 library when `CUBACORES` environment variable is set to `0` (i.e.,
 multithreading is disabled).  The following is the result of running the
 benchmark present in `test` directory on a 64-bit GNU/Linux system running Julia
-0.6.0-dev.72.  The C and FORTRAN 77 benchmark codes have been compiled with GCC
-5.4.0.
+0.6.0-pre.alpha.46 (commit bb76add105).  The C and FORTRAN 77 benchmark codes
+have been compiled with GCC 6.3.0.
 
 ```
 $ CUBACORES=0 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
 INFO: Performance of Cuba.jl:
-  0.318776 seconds (Vegas)
-  0.665132 seconds (Suave)
-  0.369386 seconds (Divonne)
-  0.284738 seconds (Cuhre)
+  0.307080 seconds (Vegas)
+  0.609476 seconds (Suave)
+  0.354592 seconds (Divonne)
+  0.267998 seconds (Cuhre)
 INFO: Performance of Cuba Library in C:
-  0.344432 seconds (Vegas)
-  0.666233 seconds (Suave)
-  0.374605 seconds (Divonne)
-  0.309294 seconds (Cuhre)
+  1.010126 seconds (Vegas)
+  0.659615 seconds (Suave)
+  0.362619 seconds (Divonne)
+  0.291206 seconds (Cuhre)
 INFO: Performance of Cuba Library in Fortran:
-  0.324000 seconds (Vegas)
-  0.640000 seconds (Suave)
-  0.364000 seconds (Divonne)
-  0.284000 seconds (Cuhre)
+  0.996000 seconds (Vegas)
+  0.620000 seconds (Suave)
+  0.348000 seconds (Divonne)
+  0.276000 seconds (Cuhre)
 ```
 
 Of course, native C and Fortran codes making use of Cuba Library outperform
@@ -233,19 +233,19 @@ Of course, native C and Fortran codes making use of Cuba Library outperform
 ```
 $ CUBACORES=1 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
 INFO: Performance of Cuba.jl:
-  0.322994 seconds (Vegas)
-  0.638098 seconds (Suave)
-  0.371486 seconds (Divonne)
-  0.284845 seconds (Cuhre)
+  0.307776 seconds (Vegas)
+  0.610480 seconds (Suave)
+  0.355804 seconds (Divonne)
+  0.264611 seconds (Cuhre)
 INFO: Performance of Cuba Library in C:
-  0.103477 seconds (Vegas)
-  0.647665 seconds (Suave)
-  0.159992 seconds (Divonne)
-  0.088057 seconds (Cuhre)
+  0.128447 seconds (Vegas)
+  0.482316 seconds (Suave)
+  0.175453 seconds (Divonne)
+  0.085852 seconds (Cuhre)
 INFO: Performance of Cuba Library in Fortran:
-  0.096000 seconds (Vegas)
-  0.660000 seconds (Suave)
-  0.176000 seconds (Divonne)
+  0.124000 seconds (Vegas)
+  0.616000 seconds (Suave)
+  0.172000 seconds (Divonne)
   0.088000 seconds (Cuhre)
 ```
 
