@@ -27,10 +27,10 @@
 
 using Cuba
 
-ndim=3
-ncomp=11
-abstol=1e-8
-reltol=1e-8
+const ndim=3
+const ncomp=11
+const abstol=1e-8
+const reltol=1e-8
 
 Sq(x)      = x*x
 rsq(x,y,z) = Sq(x) + Sq(y) + Sq(z)
@@ -70,18 +70,19 @@ for alg in (vegas, suave, divonne, cuhre)
     println(@sprintf("%10.6f seconds (%s)", toq(), ucfirst(string(alg)[6:end])))
 end
 
-cd(dirname(@__FILE__))
-sha = readchomp("../deps/installed_version")
-if mtime("benchmark.c") > mtime("benchmark-c")
-    run(`gcc -I../deps/cuba-$(sha) -o benchmark-c benchmark.c ../deps/cuba-$(sha)/libcuba.a -lm`)
-end
-info("Performance of Cuba Library in C:")
-run(`./benchmark-c`)
-
-if success(`which gfortran`)
-    if mtime("benchmark.f") > mtime("benchmark-fortran")
-        run(`gfortran -cpp -o benchmark-fortran benchmark.f ../deps/cuba-$(sha)/libcuba.a -lm`)
+cd(dirname(@__FILE__)) do
+    sha = readchomp("../deps/installed_version")
+    if mtime("benchmark.c") > mtime("benchmark-c")
+        run(`gcc -I../deps/cuba-$(sha) -o benchmark-c benchmark.c ../deps/cuba-$(sha)/libcuba.a -lm`)
     end
-    info("Performance of Cuba Library in Fortran:")
-    run(`./benchmark-fortran`)
+    info("Performance of Cuba Library in C:")
+    run(`./benchmark-c`)
+
+    if success(`which gfortran`)
+        if mtime("benchmark.f") > mtime("benchmark-fortran")
+            run(`gfortran -cpp -o benchmark-fortran benchmark.f ../deps/cuba-$(sha)/libcuba.a -lm`)
+        end
+        info("Performance of Cuba Library in Fortran:")
+        run(`./benchmark-fortran`)
+    end
 end
