@@ -216,15 +216,15 @@ INFO: Performance of Cuba.jl:
   0.334314 seconds (Divonne)
   0.242272 seconds (Cuhre)
 INFO: Performance of Cuba Library in C:
-  1.007969 seconds (Vegas)
-  0.640897 seconds (Suave)
-  0.365177 seconds (Divonne)
-  0.290420 seconds (Cuhre)
+  0.999586 seconds (Vegas)
+  0.617721 seconds (Suave)
+  0.339684 seconds (Divonne)
+  0.274668 seconds (Cuhre)
 INFO: Performance of Cuba Library in Fortran:
-  1.012000 seconds (Vegas)
-  0.624000 seconds (Suave)
-  0.352000 seconds (Divonne)
-  0.276000 seconds (Cuhre)
+  0.832000 seconds (Vegas)
+  0.600000 seconds (Suave)
+  0.308000 seconds (Divonne)
+  0.232000 seconds (Cuhre)
 ```
 
 Of course, native C and Fortran codes making use of Cuba Library outperform
@@ -238,14 +238,14 @@ INFO: Performance of Cuba.jl:
   0.329523 seconds (Divonne)
   0.245176 seconds (Cuhre)
 INFO: Performance of Cuba Library in C:
-  0.123491 seconds (Vegas)
-  0.627512 seconds (Suave)
-  0.165322 seconds (Divonne)
-  0.085055 seconds (Cuhre)
+  0.123311 seconds (Vegas)
+  0.511874 seconds (Suave)
+  0.140986 seconds (Divonne)
+  0.089292 seconds (Cuhre)
 INFO: Performance of Cuba Library in Fortran:
   0.120000 seconds (Vegas)
-  0.624000 seconds (Suave)
-  0.160000 seconds (Divonne)
+  0.620000 seconds (Suave)
+  0.136000 seconds (Divonne)
   0.092000 seconds (Cuhre)
 ```
 

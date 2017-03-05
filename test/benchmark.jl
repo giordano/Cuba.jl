@@ -32,20 +32,19 @@ const ncomp=11
 const abstol=1e-8
 const reltol=1e-8
 
-Sq(x)      = x*x
-rsq(x,y,z) = Sq(x) + Sq(y) + Sq(z)
+rsq(x,y,z) = abs2(x) + abs2(y) + abs2(z)
 t1(x,y,z)  = sin(x)*cos(y)*exp(z)
-t2(x,y,z)  = 1./((x + y)*(x + y) + .003)*cos(y)*exp(z)
-t3(x,y,z)  = 1/(3.75 - cos(pi*x) - cos(pi*y) - cos(pi*z))
-t4(x,y,z)  = abs(rsq(x,y,z) - .125)
+t2(x,y,z)  = 1.0/((x + y)*(x + y) + 0.003)*cos(y)*exp(z)
+t3(x,y,z)  = 1.0/(3.75 - cos(pi*x) - cos(pi*y) - cos(pi*z))
+t4(x,y,z)  = abs(rsq(x,y,z) - 0.125)
 t5(x,y,z)  = exp(-rsq(x,y,z))
-t6(x,y,z)  = 1./(1. - x*y*z + 1e-10)
+t6(x,y,z)  = 1.0/(1.0 - x*y*z + 1e-10)
 t7(x,y,z)  = sqrt(abs(x - y - z))
 t8(x,y,z)  = exp(-x*y*z)
-t9(x,y,z)  = Sq(x)/(cos(x + y + z + 1) + 5)
-t10(x,y,z) = (x > .5) ? 1/sqrt(x*y*z + 1e-5) : sqrt(x*y*z)
-t11(x,y,z) = (rsq(x,y,z) < 1) ? 1 : 0
-function test{X<:Float64, F<:Float64}(x::AbstractArray{X}, f::AbstractArray{F})
+t9(x,y,z)  = abs2(x)/(cos(x + y + z + 1.0) + 5.0)
+t10(x,y,z) = (x > 0.5) ? 1.0/sqrt(x*y*z + 1e-5) : sqrt(x*y*z)
+t11(x,y,z) = (rsq(x,y,z) < 1.0) ? 1.0 : 0.0
+function test(x::Vector{Float64}, f::Vector{Float64})
     f[1]  = t1( x[1], x[2], x[3])
     f[2]  = t2( x[1], x[2], x[3])
     f[3]  = t3( x[1], x[2], x[3])
@@ -73,14 +72,14 @@ end
 cd(dirname(@__FILE__)) do
     sha = readchomp("../deps/installed_version")
     if mtime("benchmark.c") > mtime("benchmark-c")
-        run(`gcc -I../deps/cuba-$(sha) -o benchmark-c benchmark.c ../deps/cuba-$(sha)/libcuba.a -lm`)
+        run(`gcc -O3 -I../deps/cuba-$(sha) -o benchmark-c benchmark.c ../deps/cuba-$(sha)/libcuba.a -lm`)
     end
     info("Performance of Cuba Library in C:")
     run(`./benchmark-c`)
 
     if success(`which gfortran`)
         if mtime("benchmark.f") > mtime("benchmark-fortran")
-            run(`gfortran -cpp -o benchmark-fortran benchmark.f ../deps/cuba-$(sha)/libcuba.a -lm`)
+            run(`gfortran -O3 -cpp -o benchmark-fortran benchmark.f ../deps/cuba-$(sha)/libcuba.a -lm`)
         end
         info("Performance of Cuba Library in Fortran:")
         run(`./benchmark-fortran`)
