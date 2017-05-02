@@ -1,6 +1,14 @@
 History of Cuba.jl
 ==================
 
+v0.3.1 (2017-05-02)
+-------------------
+
+### Improvements
+
+* Small performance improvements by avoiding dynamic dispatch in callback
+  ([#6](https://github.com/giordano/Cuba.jl/pull/6)).  No user visible changes.
+
 v0.3.0 (2017-01-24)
 -------------------
 
@@ -10,7 +18,7 @@ v0.3.0 (2017-01-24)
 * Integrators functions with uppercase names were removed.  They were deprecated
   in v0.2.0
 
-### New Features ###
+### New Features
 
 * New 64-bit integers functions `llvegas`, `llsuave`, `lldivonne`, `llcuhre` are
   provided.  They should be used in cases where convergence is not reached
@@ -23,12 +31,12 @@ v0.2.0 (2016-10-15)
 This release faces some changes to the user interface.  Be aware of them when
 upgrading.
 
-### New Features ###
+### New Features
 
 * `ndim` and `ncomp` arguments can be omitted.  In that case they default to 1.
   This change is not breaking, old syntax will continue to work.
 
-### Breaking Changes ###
+### Breaking Changes
 
 All integrator functions and some optional keywords have been renamed for more
 consistency with the Julia environment.  Here is the detailed list:
@@ -51,7 +59,7 @@ v0.1.4 (2016-08-21)
 v0.1.3 (2016-08-11)
 -------------------
 
-### New Features ###
+### New Features
 
 * A tagged version of Cuba library is now downloaded when building the package.
   This ensures reproducibility of the results of a given `Cuba.jl` release.
@@ -59,7 +67,7 @@ v0.1.3 (2016-08-11)
 v0.1.2 (2016-08-11)
 -------------------
 
-### New Features ###
+### New Features
 
 * Windows (`i686` and `x86_64` architectures) supported
   ([#2](https://github.com/giordano/Cuba.jl/issues/2))
@@ -67,21 +75,21 @@ v0.1.2 (2016-08-11)
 v0.1.1 (2016-08-05)
 -------------------
 
-### Bug Fixes ###
+### Bug Fixes
 
 * Fix warnings in Julia 0.5
 
 v0.1.0 (2016-06-08)
 -------------------
 
-### New Features ###
+### New Features
 
 * Module precompilation enabled
 
 v0.0.5 (2016-04-12)
 -------------------
 
-### New Features ###
+### New Features
 
 * User interface greatly simplified (thanks to Steven G. Johnson;
   [#3](https://github.com/giordano/Cuba.jl/issues/3)).  This change is
@@ -90,16 +98,16 @@ v0.0.5 (2016-04-12)
 v0.0.4 (2016-04-10)
 -------------------
 
-### New Features ###
+### New Features
 
 * New complete documentation, available at http://cubajl.readthedocs.org/ and
   locally in `docs/` directory
 
-### Breaking Changes ###
+### Breaking Changes
 
 * `verbose` keyword renamed to `flags`
 
-### Bug Fixes ###
+### Bug Fixes
 
 * Number of cores fixed to 0 to avoid crashes when Julia has more than 1 process
 * In `Cuhre` and `Divonne`, force `ndim` to be 2 when user sets it to 1
@@ -107,24 +115,24 @@ v0.0.4 (2016-04-10)
 v0.0.3 (2016-04-06)
 -------------------
 
-### New Features ###
+### New Features
 
 * Add `cores`, `accel`, `init`, `exit` function.  They will likely not be much
   useful for most users, so they are not exported nor documented.  See Cuba
   manual for information
 
-### Breaking Changes ###
+### Breaking Changes
 
 * Make `ndim` and `ncomp` arguments mandatory
 
-### Bug Fixes ###
+### Bug Fixes
 
 * Fix build script
 
 v0.0.2 (2016-04-04)
 -------------------
 
-### Bug Fixes ###
+### Bug Fixes
 
 * Fix path of libcuba
 
