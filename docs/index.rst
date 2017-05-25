@@ -463,7 +463,7 @@ These optional keywords can be passed only to :func:`divonne`:
   ``xgiven`` array
 - ``ldxgiven`` (type: ``Integer``, default: ``0``): the leading dimension of
   ``xgiven``, i.e. the offset between one point and the next in memory
-- ``xgiven`` (type: ``AbstractArray{Real}``, default: ``zeros(typeof(0.0),
+- ``xgiven`` (type: ``AbstractArray{Real}``, default: ``zeros(Cdouble,
   ldxgiven, ngiven)``): a list of points where the integrand might have peaks.
   Divonne will consider these points when partitioning the integration region.
   The idea here is to help the integrator find the extrema of the integrand in
