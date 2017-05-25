@@ -7,7 +7,7 @@ v0.3.1 (2017-05-02)
 ### Improvements
 
 * Small performance improvements by avoiding dynamic dispatch in callback
-  ([#6](https://github.com/giordano/Cuba.jl/pull/6)).  No user visible changes.
+  ([#6](https://github.com/giordano/Cuba.jl/pull/6)).  No user visible change.
 
 v0.3.0 (2017-01-24)
 -------------------
