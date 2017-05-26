@@ -113,13 +113,13 @@ include("vegas.jl")
 
 @inline function dointegrate{T}(x::Integral{T})
     integrand = integrand_ptr(x.func)
-    nregions  = Ref{Cint}(0)
-    neval     = Ref{Int64}(0)
-    fail      = Ref{Cint}(0)
     integral  = Vector{Cdouble}(x.ncomp)
     error     = Vector{Cdouble}(x.ncomp)
     prob      = Vector{Cdouble}(x.ncomp)
-    dointegrate!(x, integrand, nregions, neval, fail, integral, error, prob)
+    neval     = Ref{Int64}(0)
+    fail      = Ref{Cint}(0)
+    nregions  = Ref{Cint}(0)
+    dointegrate!(x, integrand, integral, error, prob, neval, fail, nregions)
     return integral, error, prob, neval[], fail[], nregions[]
 end
 

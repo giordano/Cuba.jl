@@ -39,8 +39,8 @@ immutable Vegas{T} <: Integral{T}
     spin::Ptr{Void}
 end
 
-@inline function dointegrate!{T}(x::Vegas{T}, integrand, nregions,
-                                 neval, fail, integral, error, prob)
+@inline function dointegrate!{T}(x::Vegas{T}, integrand, integral,
+                                 error, prob, neval, fail, nregions)
     ccall((:llVegas, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp

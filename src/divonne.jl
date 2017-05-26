@@ -47,8 +47,8 @@ immutable Divonne{T} <: Integral{T}
     spin::Ptr{Void}
 end
 
-@inline function dointegrate!{T}(x::Divonne{T}, integrand, nregions,
-                                 neval, fail, integral, error, prob)
+@inline function dointegrate!{T}(x::Divonne{T}, integrand, integral,
+                                 error, prob, neval, fail, nregions)
     ccall((:llDivonne, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
