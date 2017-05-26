@@ -24,7 +24,7 @@ tagfile = "installed_version"
 
 if is_windows()
     version="v4.2-20150925" # Version of Cuba library.
-    arch=Sys.ARCH
+    arch=string(Sys.ARCH)
     if !isfile(tagfile) || readdlm(tagfile) != [version, arch]
         info("Downloading Cuba shared library...")
         download("https://bintray.com/giordano/Cuba-Shared-Library/download_file?file_path=libcuba-$(version)-$(Sys.ARCH).dll",
