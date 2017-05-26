@@ -98,7 +98,7 @@ integrand_ptr{T}(integrand::T) = cfunction(generic_integrand!, Cint,
                                             Ptr{Cdouble}, # x
                                             Ref{Cint}, # ncomp
                                             Ptr{Cdouble}, # f
-                                            Ref{typeof(integrand)})) # userdata
+                                            Ref{T})) # userdata
 
 abstract Integral{T, I}
 
