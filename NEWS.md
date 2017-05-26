@@ -1,6 +1,16 @@
 History of Cuba.jl
 ==================
 
+v0.4.0 (2017-??-??)
+-------------------
+
+### Breaking Changes
+
+* Now `vegas`, `suave`, `divonne`, and `cuhre` wrap the 64-bit integers
+  functions.  The 32-bit integers functions are no more available.  `llvegas`,
+  `llsuave`, `lldivonne`, `llcuhre` are deprecated and will be removed at some
+  point in the future.  This change reduces confusion about the function to use.
+
 v0.3.1 (2017-05-02)
 -------------------
 

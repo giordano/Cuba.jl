@@ -144,4 +144,9 @@ function exit(f::Ptr{Void}, arg::Ptr{Void})
     return 0
 end
 
+for f in (:vegas, :suave, :divonne, :cuhre)
+    llf = Symbol("ll", f)
+    @eval @deprecate $llf(args...; kwargs...) $f(args...; kwargs...)
+end
+
 end # module
