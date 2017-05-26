@@ -29,7 +29,8 @@ c     Code:
       program CubaTest
       implicit none
 
-      integer ndim, ncomp, nvec, last, seed, mineval, maxeval
+      integer ndim, ncomp, last, seed
+      integer(8) nvec, mineval, maxeval
       double precision epsrel, epsabs, userdata
       parameter (ndim = 3)
       parameter (ncomp = 11)
@@ -42,7 +43,7 @@ c     Code:
       parameter (mineval = 0)
       parameter (maxeval = 1000000)
 
-      integer nstart, nincrease, nbatch, gridno
+      integer(8) nstart, nincrease, nbatch, gridno
       integer*8 spin
       character*(*) statefile
       parameter (nstart = 1000)
@@ -52,7 +53,7 @@ c     Code:
       parameter (statefile = "")
       parameter (spin = -1)
 
-      integer nnew, nmin
+      integer(8) nnew, nmin
       double precision flatness
       parameter (nnew = 1000)
       parameter (nmin = 2)
@@ -60,7 +61,8 @@ c     Code:
 
       integer key1, key2, key3, maxpass
       double precision border, maxchisq, mindeviation
-      integer ngiven, ldxgiven, nextra
+      integer ldxgiven
+      integer(8) ngiven, nextra
       parameter (key1 = 47)
       parameter (key2 = 1)
       parameter (key3 = 1)
@@ -78,7 +80,9 @@ c     Code:
       external integrand
 
       double precision integral(ncomp), error(ncomp), prob(ncomp)
-      integer verbose, nregions, neval, fail
+      integer verbose, nregions, fail
+      integer(8) neval
+
       character*16 env
       parameter (verbose = 0)
 
@@ -87,7 +91,7 @@ c     Code:
       integer c
 
       call cpu_time(start)
-      call vegas(ndim, ncomp, integrand, userdata, nvec,
+      call llvegas(ndim, ncomp, integrand, userdata, nvec,
      &    epsrel, epsabs, verbose, seed,
      &    mineval, maxeval, nstart, nincrease, nbatch,
      &    gridno, statefile, spin,
@@ -96,7 +100,7 @@ c     Code:
       print '(f10.6, a)', finish-start, " seconds (Vegas)"
 
       call cpu_time(start)
-      call suave(ndim, ncomp, integrand, userdata, nvec,
+      call llsuave(ndim, ncomp, integrand, userdata, nvec,
      &    epsrel, epsabs, verbose + last, seed,
      &    mineval, maxeval, nnew, nmin, flatness,
      &    statefile, spin,
@@ -105,7 +109,7 @@ c     Code:
       print '(f10.6, a)', finish-start, " seconds (Suave)"
 
       call cpu_time(start)
-      call divonne(ndim, ncomp, integrand, userdata, nvec,
+      call lldivonne(ndim, ncomp, integrand, userdata, nvec,
      &    epsrel, epsabs, verbose, seed,
      &    mineval, maxeval, key1, key2, key3, maxpass,
      &    border, maxchisq, mindeviation,
@@ -116,7 +120,7 @@ c     Code:
       print '(f10.6, a)', finish-start, " seconds (Divonne)"
 
       call cpu_time(start)
-      call cuhre(ndim, ncomp, integrand, userdata, nvec,
+      call llcuhre(ndim, ncomp, integrand, userdata, nvec,
      &    epsrel, epsabs, verbose + last,
      &    mineval, maxeval, key,
      &    statefile, spin,

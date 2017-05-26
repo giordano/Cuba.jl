@@ -44,25 +44,19 @@ ncomp = 3
 for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
                       (divonne, 1e-4), (cuhre, 1e-8))
     info("Testing ", ucfirst(string(alg)[6:end]), " algorithm")
+    # Make sure that using maxevals > typemax(Int32) doesn't result into InexactError.
     if alg == divonne
         result = alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8, flags=0,
-                     border = 1e-5)
+                     border = 1e-5, maxevals = 3000000000)
     else
-        result = alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8, flags=0)
+        result = alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8, flags=0,
+                     maxevals = 3e9)
     end
     for i = 1:ncomp
         println("Component $i: ", result[1][i], " ± ", result[2][i])
         println("Should be:   ", answer[i])
         @test isapprox(result[1][i], answer[i], atol=result[2][i])
     end
-end
-
-# Test 64-bit integer functions.
-for (alg, abstol) in ((llvegas, 1e-4), (llsuave, 1e-3),
-                      (lldivonne, 1e-4), (llcuhre, 1e-8))
-    # Make sure that using maxevals > typemax(Int32) doesn't result into InexactError.
-    result = alg((x,f) -> f[1] = f1(x[1], x[2], x[3]), 3, maxevals = 3e9)
-    @test isapprox(result[1][1], answer[1], atol=abstol)
 end
 
 integrand2(x, f) = f[1], f[2] = reim(cis(x[1]))

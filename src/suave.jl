@@ -20,75 +20,71 @@
 
 ### Code:
 
-immutable Suave{T, I} <: Integral{T, I}
+immutable Suave{T} <: Integral{T}
     func::T
     ndim::Int
     ncomp::Int
-    nvec::I
+    nvec::Int64
     reltol::Cdouble
     abstol::Cdouble
     flags::Int
     seed::Int
-    minevals::I
-    maxevals::I
-    nnew::I
-    nmin::I
+    minevals::Int64
+    maxevals::Int64
+    nnew::Int64
+    nmin::Int64
     flatness::Cdouble
     statefile::String
     spin::Ptr{Void}
 end
 
-for (CubaInt, prefix) in ((Int32, ""), (Int64, "ll"))
-    @eval @inline function dointegrate!{T}(x::Suave{T, $CubaInt}, integrand, nregions,
-                                           neval, fail, integral, error, prob)
-        ccall(($(prefix * "Suave"), libcuba), Cdouble,
-              (Cint, # ndim
-               Cint, # ncomp
-               Ptr{Void}, # integrand
-               Any, # userdata
-               $CubaInt, # nvec
-               Cdouble, # reltol
-               Cdouble, # abstol
-               Cint, # flags
-               Cint, # seed
-               $CubaInt, # minevals
-               $CubaInt, # maxevals
-               $CubaInt, # nnew
-               $CubaInt, # nmin
-               Cdouble, # flatness
-               Ptr{Cchar}, # statefile
-               Ptr{Void}, # spin
-               Ptr{Cint}, # nregions
-               Ptr{$CubaInt}, # neval
-               Ptr{Cint}, # fail
-               Ptr{Cdouble}, # integral
-               Ptr{Cdouble}, # error
-               Ptr{Cdouble}),# prob
-              # Input
-              x.ndim, x.ncomp, integrand, x.func, x.nvec,
-              x.reltol, x.abstol, x.flags, x.seed, x.minevals, x.maxevals,
-              x.nnew, x.nmin, x.flatness, x.statefile, x.spin,
-              # Output
-              nregions, neval, fail, integral, error, prob)
-    end
+@inline function dointegrate!{T}(x::Suave{T}, integrand, nregions,
+                                 neval, fail, integral, error, prob)
+    ccall((:llSuave, libcuba), Cdouble,
+          (Cint, # ndim
+           Cint, # ncomp
+           Ptr{Void}, # integrand
+           Any, # userdata
+           Int64, # nvec
+           Cdouble, # reltol
+           Cdouble, # abstol
+           Cint, # flags
+           Cint, # seed
+           Int64, # minevals
+           Int64, # maxevals
+           Int64, # nnew
+           Int64, # nmin
+           Cdouble, # flatness
+           Ptr{Cchar}, # statefile
+           Ptr{Void}, # spin
+           Ptr{Cint}, # nregions
+           Ptr{Int64}, # neval
+           Ptr{Cint}, # fail
+           Ptr{Cdouble}, # integral
+           Ptr{Cdouble}, # error
+           Ptr{Cdouble}),# prob
+          # Input
+          x.ndim, x.ncomp, integrand, x.func, x.nvec,
+          x.reltol, x.abstol, x.flags, x.seed, x.minevals, x.maxevals,
+          x.nnew, x.nmin, x.flatness, x.statefile, x.spin,
+          # Output
+          nregions, neval, fail, integral, error, prob)
+end
 
-    func = Symbol(prefix, "suave")
-    @eval function $func{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
-                            nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
-                            flags::Integer=FLAGS, seed::Integer=SEED,
-                            minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
-                            nnew::Integer=NNEW, nmin::Integer=NMIN, flatness::Real=FLATNESS,
-                            statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
-        return dointegrate(Suave(integrand, ndim, ncomp, $CubaInt(nvec), Cdouble(reltol),
-                                 Cdouble(abstol), flags, seed, trunc($CubaInt, minevals),
-                                 trunc($CubaInt, maxevals), $CubaInt(nnew), $CubaInt(nmin),
-                                 Cdouble(flatness), String(statefile), spin))
-    end
+function suave{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
+                  nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
+                  flags::Integer=FLAGS, seed::Integer=SEED,
+                  minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
+                  nnew::Integer=NNEW, nmin::Integer=NMIN, flatness::Real=FLATNESS,
+                  statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
+    return dointegrate(Suave(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
+                             Cdouble(abstol), flags, seed, trunc(Int64, minevals),
+                             trunc(Int64, maxevals), Int64(nnew), Int64(nmin),
+                             Cdouble(flatness), String(statefile), spin))
 end
 
 """
     suave(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
-    llsuave(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
 
 Calculate integral of `integrand` over the unit hypercube in `ndim` dimensions
 using Suave algorithm.  `integrand` is a vectorial function with `ncomp`
@@ -109,4 +105,4 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-suave, llsuave
+suave

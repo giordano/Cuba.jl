@@ -20,17 +20,17 @@
 
 ### Code:
 
-immutable Divonne{T, I} <: Integral{T, I}
+immutable Divonne{T} <: Integral{T}
     func::T
     ndim::Int
     ncomp::Int
-    nvec::I
+    nvec::Int64
     reltol::Cdouble
     abstol::Cdouble
     flags::Int
     seed::Int
-    minevals::I
-    maxevals::I
+    minevals::Int64
+    maxevals::Int64
     key1::Int
     key2::Int
     key3::Int
@@ -38,92 +38,88 @@ immutable Divonne{T, I} <: Integral{T, I}
     border::Cdouble
     maxchisq::Cdouble
     mindeviation::Cdouble
-    ngiven::I
+    ngiven::Int64
     ldxgiven::Int
     xgiven::Array{Cdouble, 2}
-    nextra::I
+    nextra::Int64
     peakfinder::Ptr{Void}
     statefile::String
     spin::Ptr{Void}
 end
 
-for (CubaInt, prefix) in ((Int32, ""), (Int64, "ll"))
-    @eval @inline function dointegrate!{T}(x::Divonne{T, $CubaInt}, integrand, nregions,
-                                           neval, fail, integral, error, prob)
-        ccall(($(prefix * "Divonne"), libcuba), Cdouble,
-              (Cint, # ndim
-               Cint, # ncomp
-               Ptr{Void}, # integrand
-               Any, # userdata
-               $CubaInt, # nvec
-               Cdouble, # reltol
-               Cdouble, # abstol
-               Cint, # flags
-               Cint, # seed
-               $CubaInt, # minevals
-               $CubaInt, # maxevals
-               Cint, # key1
-               Cint, # key2
-               Cint, # key3
-               Cint, # maxpass
-               Cdouble, # border
-               Cdouble, # maxchisq
-               Cdouble, # mindeviation
-               $CubaInt, # ngiven
-               Cint, # ldxgiven
-               Ptr{Cdouble}, # xgiven
-               $CubaInt, # nextra
-               Ptr{Void}, # peakfinder
-               Ptr{Cchar}, # statefile
-               Ptr{Void}, # spin
-               Ptr{Cint}, # nregions
-               Ptr{$CubaInt}, # neval
-               Ptr{Cint}, # fail
-               Ptr{Cdouble}, # integral
-               Ptr{Cdouble}, # error
-               Ptr{Cdouble}),# prob
-              # Input
-              x.ndim, x.ncomp, integrand, x.func, x.nvec, x.reltol,
-              x.abstol, x.flags, x.seed, x.minevals, x.maxevals, x.key1, x.key2,
-              x.key3, x.maxpass, x.border, x.maxchisq, x.mindeviation, x.ngiven,
-              x.ldxgiven, x.xgiven, x.nextra, x.peakfinder, x.statefile, x.spin,
-              # Output
-              nregions, neval, fail, integral, error, prob)
-    end
+@inline function dointegrate!{T}(x::Divonne{T}, integrand, nregions,
+                                 neval, fail, integral, error, prob)
+    ccall((:llDivonne, libcuba), Cdouble,
+          (Cint, # ndim
+           Cint, # ncomp
+           Ptr{Void}, # integrand
+           Any, # userdata
+           Int64, # nvec
+           Cdouble, # reltol
+           Cdouble, # abstol
+           Cint, # flags
+           Cint, # seed
+           Int64, # minevals
+           Int64, # maxevals
+           Cint, # key1
+           Cint, # key2
+           Cint, # key3
+           Cint, # maxpass
+           Cdouble, # border
+           Cdouble, # maxchisq
+           Cdouble, # mindeviation
+           Int64, # ngiven
+           Cint, # ldxgiven
+           Ptr{Cdouble}, # xgiven
+           Int64, # nextra
+           Ptr{Void}, # peakfinder
+           Ptr{Cchar}, # statefile
+           Ptr{Void}, # spin
+           Ptr{Cint}, # nregions
+           Ptr{Int64}, # neval
+           Ptr{Cint}, # fail
+           Ptr{Cdouble}, # integral
+           Ptr{Cdouble}, # error
+           Ptr{Cdouble}),# prob
+          # Input
+          x.ndim, x.ncomp, integrand, x.func, x.nvec, x.reltol,
+          x.abstol, x.flags, x.seed, x.minevals, x.maxevals, x.key1, x.key2,
+          x.key3, x.maxpass, x.border, x.maxchisq, x.mindeviation, x.ngiven,
+          x.ldxgiven, x.xgiven, x.nextra, x.peakfinder, x.statefile, x.spin,
+          # Output
+          nregions, neval, fail, integral, error, prob)
+end
 
-    func = Symbol(prefix, "divonne")
-    @eval function $func{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
-                            nvec::Integer=NVEC, reltol::Real=RELTOL,
-                            abstol::Real=ABSTOL, flags::Integer=FLAGS,
-                            seed::Integer=SEED, minevals::Real=MINEVALS,
-                            maxevals::Real=MAXEVALS, key1::Integer=KEY1,
-                            key2::Integer=KEY2, key3::Integer=KEY3,
-                            maxpass::Integer=MAXPASS, border::Real=BORDER,
-                            maxchisq::Real=MAXCHISQ,
-                            mindeviation::Real=MINDEVIATION,
-                            ngiven::Integer=NGIVEN, ldxgiven::Integer=LDXGIVEN,
-                            xgiven::Array{Cdouble,2}=zeros(Cdouble, ldxgiven,
-                                                           ngiven),
-                            nextra::Integer=NEXTRA,
-                            peakfinder::Ptr{Void}=PEAKFINDER,
-                            statefile::AbstractString=STATEFILE,
-                            spin::Ptr{Void}=SPIN)
-        # Divonne requires "ndim" to be at least 2, even for an integral over a one
-        # dimensional domain.  Instead, we don't prevent users from setting wrong
-        # "ndim" values like 0 or negative ones.
-        ndim == 1 && (ndim = 2)
-        return dointegrate(Divonne(integrand, ndim, ncomp, $CubaInt(nvec), Cdouble(reltol),
-                                   Cdouble(abstol), flags, seed, trunc($CubaInt, minevals),
-                                   trunc($CubaInt, maxevals), key1, key2, key3, maxpass,
-                                   Cdouble(border), Cdouble(maxchisq), Cdouble(mindeviation),
-                                   $CubaInt(ngiven), ldxgiven, xgiven, $CubaInt(nextra),
-                                   peakfinder, String(statefile), spin))
-    end
+function divonne{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
+                    nvec::Integer=NVEC, reltol::Real=RELTOL,
+                    abstol::Real=ABSTOL, flags::Integer=FLAGS,
+                    seed::Integer=SEED, minevals::Real=MINEVALS,
+                    maxevals::Real=MAXEVALS, key1::Integer=KEY1,
+                    key2::Integer=KEY2, key3::Integer=KEY3,
+                    maxpass::Integer=MAXPASS, border::Real=BORDER,
+                    maxchisq::Real=MAXCHISQ,
+                    mindeviation::Real=MINDEVIATION,
+                    ngiven::Integer=NGIVEN, ldxgiven::Integer=LDXGIVEN,
+                    xgiven::Array{Cdouble,2}=zeros(Cdouble, ldxgiven,
+                                                   ngiven),
+                    nextra::Integer=NEXTRA,
+                    peakfinder::Ptr{Void}=PEAKFINDER,
+                    statefile::AbstractString=STATEFILE,
+                    spin::Ptr{Void}=SPIN)
+    # Divonne requires "ndim" to be at least 2, even for an integral over a one
+    # dimensional domain.  Instead, we don't prevent users from setting wrong
+    # "ndim" values like 0 or negative ones.
+    ndim == 1 && (ndim = 2)
+    return dointegrate(Divonne(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
+                               Cdouble(abstol), flags, seed, trunc(Int64, minevals),
+                               trunc(Int64, maxevals), key1, key2, key3, maxpass,
+                               Cdouble(border), Cdouble(maxchisq), Cdouble(mindeviation),
+                               Int64(ngiven), ldxgiven, xgiven, Int64(nextra),
+                               peakfinder, String(statefile), spin))
 end
 
 """
     divonne(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
-    lldivonne(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
 
 Calculate integral of `integrand` over the unit hypercube in `ndim` dimensions
 using Divonne algorithm.  `integrand` is a vectorial function with `ncomp`
@@ -153,4 +149,4 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-divonne, lldivonne
+divonne

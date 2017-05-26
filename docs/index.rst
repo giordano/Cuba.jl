@@ -154,9 +154,28 @@ or put this command into your Julia script.
 Large parts of the following sections are borrowed from Cuba manual.  Refer to
 it for more information on the details.
 
-All 64-bit integers functions (``llvegas``, ``llsuave``, ``lldivonne``,
-``llcuhre``) are wrapped and exported as well.  See `Long-integer Versions`_ for
-more information.
+``Cuba.jl`` wraps the 64-bit integers functions of Cuba library, in order to
+push the range of certain counters to its full extent.  In detail, the following
+arguments:
+
+- for Vegas: ``nvec``, ``minevals``, ``maxevals``, ``nstart``, ``nincrease``,
+  ``nbatch``, ``neval``,
+- for Suave: ``nvec``, ``minevals``, ``maxevals``, ``nnew``, ``nmin``,
+  ``neval``,
+- for Divonne: ``nvec``, ``minevals``, ``maxevals``, ``ngiven``, ``nextra``,
+  ``neval``,
+- for Cuhre: ``nvec``, ``minevals``, ``maxevals``, ``neval``,
+
+are passed to the Cuba library as 64-bit integers, so they are limited to be at
+most
+
+.. code:: julia
+
+    julia> typemax(Int64)
+    9223372036854775807
+
+There is no way to overcome this limit.  See the following sections for the
+meaning of each argument.
 
 Arguments
 '''''''''
@@ -519,7 +538,7 @@ error with ``result[2][i]``.
   the null hypothesis that is tested by the :math:`\chi^2` test, which is that
   ``error`` `is` a reliable estimate.  In statistics, the null hypothesis may be
   rejected only if ``prob`` is fairly close to unity, say ``prob`` :math:`>.95`
-- ``neval`` (type: ``Cint``): the actual number of integrand evaluations needed
+- ``neval`` (type: ``Int64``): the actual number of integrand evaluations needed
 - ``fail`` (type: ``Cint``): an error flag:
 
   - ``fail`` = ``0``, the desired accuracy was reached
@@ -532,57 +551,6 @@ error with ``result[2][i]``.
 
 - ``nregions`` (type: ``Cint``): the actual number of subregions needed (always
   ``0`` in :func:`vegas`)
-
-Long-integer Versions
-'''''''''''''''''''''
-
-The following arguments:
-
-- for Vegas: ``nvec``, ``minevals``, ``maxevals``, ``nstart``, ``nincrease``,
-  ``nbatch``, ``neval``,
-- for Suave: ``nvec``, ``minevals``, ``maxevals``, ``nnew``, ``nmin``,
-  ``neval``,
-- for Divonne: ``nvec``, ``minevals``, ``maxevals``, ``ngiven``, ``nextra``,
-  ``neval``,
-- for Cuhre: ``nvec``, ``minevals``, ``maxevals``, ``neval``,
-
-are passed, in ``vegas``, ``suave``, ``divonne``, ``cuhre``, to the Cuba library
-as 32-bit integers, so they are limited to be at most
-
-.. code:: julia
-
-    julia> typemax(Int32)
-    2147483647
-
-Thus, for example, this attempt to set a large number of maximum evaluations
-
-.. code:: julia
-
-    julia> cuhre((x,f) -> f[1] = cos(x[1]), maxevals = 3e9)
-    ERROR: InexactError()
-     in trunc(::Type{Int32}, ::Float64) at ./float.jl:458
-     in #cuhre#7(::Int64, ::Float64, ::Float64, ::Int64, ::Int64, ::Float64, ::Int64, ::String, ::Ptr{Void}, ::Cuba.#cuhre, ::##1#2, ::Int64, ::Int64) at /home/user/.julia/v0.5/Cuba/src/Cuba.jl:467
-     in (::Cuba.#kw##cuhre)(::Array{Any,1}, ::Cuba.#cuhre, ::Function, ::Int64, ::Int64) at ./<missing>:0 (repeats 2 times)
-
-results in an error (``InexactError``) because the number "3 billions" exceeds
-the maximum integer number that can be represented with a 32-bit integer
-(:math:`2^{31} - 1`).
-
-The functions ``llvegas``, ``llsuave``, ``lldivonne``, ``llcuhre`` take 64-bit
-integers for all the number-of-points-type quantities listed above.  They have
-the same syntax as the corresponding 32-bit integers functions and should be
-used in cases where convergence is not reached within the ordinary 32-bit
-integer range.
-
-Please note that the maximum integer that can be represented as a 64-bit integer
-is
-
-.. code:: julia
-
-    julia> typemax(Int64)
-    9223372036854775807
-
-and there is no way to overcome this limit.
 
 Vectorization
 -------------

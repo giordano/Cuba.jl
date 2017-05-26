@@ -24,7 +24,7 @@ __precompile__()
 
 module Cuba
 
-export vegas, llvegas, suave, llsuave, divonne, lldivonne, cuhre, llcuhre
+export vegas, suave, divonne, cuhre
 
 # Note: don't use Pkg.dir("PkgName") here because the package may be installed
 # elsewhere.
@@ -100,7 +100,7 @@ integrand_ptr{T}(integrand::T) = cfunction(generic_integrand!, Cint,
                                             Ptr{Cdouble}, # f
                                             Ref{T})) # userdata
 
-abstract Integral{T, I}
+abstract Integral{T}
 
 function __init__()
     Cuba.cores(0, 10000)
@@ -111,18 +111,16 @@ include("divonne.jl")
 include("suave.jl")
 include("vegas.jl")
 
-for CubaInt in (Int32, Int64)
-    @eval @inline function dointegrate{T}(x::Integral{T, $CubaInt})
-        integrand = integrand_ptr(x.func)
-        nregions  = Ref{Cint}(0)
-        neval     = Ref{$CubaInt}(0)
-        fail      = Ref{Cint}(0)
-        integral  = Vector{Cdouble}(x.ncomp)
-        error     = Vector{Cdouble}(x.ncomp)
-        prob      = Vector{Cdouble}(x.ncomp)
-        dointegrate!(x, integrand, nregions, neval, fail, integral, error, prob)
-        return integral, error, prob, neval[], fail[], nregions[]
-    end
+@inline function dointegrate{T}(x::Integral{T})
+    integrand = integrand_ptr(x.func)
+    nregions  = Ref{Cint}(0)
+    neval     = Ref{Int64}(0)
+    fail      = Ref{Cint}(0)
+    integral  = Vector{Cdouble}(x.ncomp)
+    error     = Vector{Cdouble}(x.ncomp)
+    prob      = Vector{Cdouble}(x.ncomp)
+    dointegrate!(x, integrand, nregions, neval, fail, integral, error, prob)
+    return integral, error, prob, neval[], fail[], nregions[]
 end
 
 ### Other functions, not exported

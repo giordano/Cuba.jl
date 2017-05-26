@@ -89,41 +89,42 @@ static int Integrand(const int *ndim, const double xx[],
 }
 
 int main() {
-  int comp, nregions, neval, fail;
+  int comp, nregions, fail;
+  long long int neval;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
   float start, end;
   start = (float)clock();
-  Vegas(NDIM, NCOMP, Integrand, USERDATA, NVEC,
-	EPSREL, EPSABS, VERBOSE, SEED,
-	MINEVAL, MAXEVAL, NSTART, NINCREASE, NBATCH,
-	GRIDNO, STATEFILE, SPIN,
-	&neval, &fail, integral, error, prob);
+  llVegas(NDIM, NCOMP, Integrand, USERDATA, NVEC,
+	  EPSREL, EPSABS, VERBOSE, SEED,
+	  MINEVAL, MAXEVAL, NSTART, NINCREASE, NBATCH,
+	  GRIDNO, STATEFILE, SPIN,
+	  &neval, &fail, integral, error, prob);
   end = (float)clock();
   printf("%10.6f seconds (Vegas)\n", (end - start)/CLOCKS_PER_SEC);
   start = (float)clock();
-  Suave(NDIM, NCOMP, Integrand, USERDATA, NVEC,
-	EPSREL, EPSABS, VERBOSE | LAST, SEED,
-	MINEVAL, MAXEVAL, NNEW, NMIN, 25.0,
-	STATEFILE, SPIN,
-	&nregions, &neval, &fail, integral, error, prob);
-  end = (float)clock();
-  printf("%10.6f seconds (Suave)\n", (end - start)/CLOCKS_PER_SEC);
-  start = (float)clock();
-  Divonne(NDIM, NCOMP, Integrand, USERDATA, NVEC,
-	  EPSREL, EPSABS, VERBOSE, SEED,
-	  MINEVAL, MAXEVAL, KEY1, KEY2, KEY3, MAXPASS,
-	  BORDER, MAXCHISQ, MINDEVIATION,
-	  NGIVEN, LDXGIVEN, NULL, NEXTRA, NULL,
+  llSuave(NDIM, NCOMP, Integrand, USERDATA, NVEC,
+	  EPSREL, EPSABS, VERBOSE | LAST, SEED,
+	  MINEVAL, MAXEVAL, NNEW, NMIN, 25.0,
 	  STATEFILE, SPIN,
 	  &nregions, &neval, &fail, integral, error, prob);
   end = (float)clock();
+  printf("%10.6f seconds (Suave)\n", (end - start)/CLOCKS_PER_SEC);
+  start = (float)clock();
+  llDivonne(NDIM, NCOMP, Integrand, USERDATA, NVEC,
+	    EPSREL, EPSABS, VERBOSE, SEED,
+	    MINEVAL, MAXEVAL, KEY1, KEY2, KEY3, MAXPASS,
+	    BORDER, MAXCHISQ, MINDEVIATION,
+	    NGIVEN, LDXGIVEN, NULL, NEXTRA, NULL,
+	    STATEFILE, SPIN,
+	    &nregions, &neval, &fail, integral, error, prob);
+  end = (float)clock();
   printf("%10.6f seconds (Divonne)\n", (end - start)/CLOCKS_PER_SEC);
   start = (float)clock();
-  Cuhre(NDIM, NCOMP, Integrand, USERDATA, NVEC,
-	EPSREL, EPSABS, VERBOSE | LAST,
-	MINEVAL, MAXEVAL, KEY,
-	STATEFILE, SPIN,
-	&nregions, &neval, &fail, integral, error, prob);
+  llCuhre(NDIM, NCOMP, Integrand, USERDATA, NVEC,
+	  EPSREL, EPSABS, VERBOSE | LAST,
+	  MINEVAL, MAXEVAL, KEY,
+	  STATEFILE, SPIN,
+	  &nregions, &neval, &fail, integral, error, prob);
   end = (float)clock();
   printf("%10.6f seconds (Cuhre)\n", (end - start)/CLOCKS_PER_SEC);
   return 0;
