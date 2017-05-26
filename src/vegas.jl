@@ -72,20 +72,6 @@ end
           neval, fail, integral, error, prob)
 end
 
-function vegas{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
-                  nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
-                  flags::Integer=FLAGS, seed::Integer=SEED,
-                  minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
-                  nstart::Integer=NSTART, nincrease::Integer=NINCREASE,
-                  nbatch::Integer=NBATCH, gridno::Integer=GRIDNO,
-                  statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
-    return dointegrate(Vegas(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
-                             Cdouble(abstol), flags, seed, trunc(Int64, minevals),
-                             trunc(Int64, maxevals), Int64(nstart),
-                             Int64(nincrease), Int64(nbatch), gridno,
-                             String(statefile), spin))
-end
-
 """
     vegas(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
 
@@ -109,4 +95,16 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-vegas
+function vegas{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
+                  nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
+                  flags::Integer=FLAGS, seed::Integer=SEED,
+                  minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
+                  nstart::Integer=NSTART, nincrease::Integer=NINCREASE,
+                  nbatch::Integer=NBATCH, gridno::Integer=GRIDNO,
+                  statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
+    return dointegrate(Vegas(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
+                             Cdouble(abstol), flags, seed, trunc(Int64, minevals),
+                             trunc(Int64, maxevals), Int64(nstart),
+                             Int64(nincrease), Int64(nbatch), gridno,
+                             String(statefile), spin))
+end

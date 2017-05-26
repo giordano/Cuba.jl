@@ -90,34 +90,6 @@ end
           nregions, neval, fail, integral, error, prob)
 end
 
-function divonne{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
-                    nvec::Integer=NVEC, reltol::Real=RELTOL,
-                    abstol::Real=ABSTOL, flags::Integer=FLAGS,
-                    seed::Integer=SEED, minevals::Real=MINEVALS,
-                    maxevals::Real=MAXEVALS, key1::Integer=KEY1,
-                    key2::Integer=KEY2, key3::Integer=KEY3,
-                    maxpass::Integer=MAXPASS, border::Real=BORDER,
-                    maxchisq::Real=MAXCHISQ,
-                    mindeviation::Real=MINDEVIATION,
-                    ngiven::Integer=NGIVEN, ldxgiven::Integer=LDXGIVEN,
-                    xgiven::Array{Cdouble,2}=zeros(Cdouble, ldxgiven,
-                                                   ngiven),
-                    nextra::Integer=NEXTRA,
-                    peakfinder::Ptr{Void}=PEAKFINDER,
-                    statefile::AbstractString=STATEFILE,
-                    spin::Ptr{Void}=SPIN)
-    # Divonne requires "ndim" to be at least 2, even for an integral over a one
-    # dimensional domain.  Instead, we don't prevent users from setting wrong
-    # "ndim" values like 0 or negative ones.
-    ndim == 1 && (ndim = 2)
-    return dointegrate(Divonne(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
-                               Cdouble(abstol), flags, seed, trunc(Int64, minevals),
-                               trunc(Int64, maxevals), key1, key2, key3, maxpass,
-                               Cdouble(border), Cdouble(maxchisq), Cdouble(mindeviation),
-                               Int64(ngiven), ldxgiven, xgiven, Int64(nextra),
-                               peakfinder, String(statefile), spin))
-end
-
 """
     divonne(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
 
@@ -149,4 +121,30 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-divonne
+function divonne{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
+                    nvec::Integer=NVEC, reltol::Real=RELTOL,
+                    abstol::Real=ABSTOL, flags::Integer=FLAGS,
+                    seed::Integer=SEED, minevals::Real=MINEVALS,
+                    maxevals::Real=MAXEVALS, key1::Integer=KEY1,
+                    key2::Integer=KEY2, key3::Integer=KEY3,
+                    maxpass::Integer=MAXPASS, border::Real=BORDER,
+                    maxchisq::Real=MAXCHISQ,
+                    mindeviation::Real=MINDEVIATION,
+                    ngiven::Integer=NGIVEN, ldxgiven::Integer=LDXGIVEN,
+                    xgiven::Array{Cdouble,2}=zeros(Cdouble, ldxgiven,
+                                                   ngiven),
+                    nextra::Integer=NEXTRA,
+                    peakfinder::Ptr{Void}=PEAKFINDER,
+                    statefile::AbstractString=STATEFILE,
+                    spin::Ptr{Void}=SPIN)
+    # Divonne requires "ndim" to be at least 2, even for an integral over a one
+    # dimensional domain.  Instead, we don't prevent users from setting wrong
+    # "ndim" values like 0 or negative ones.
+    ndim == 1 && (ndim = 2)
+    return dointegrate(Divonne(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
+                               Cdouble(abstol), flags, seed, trunc(Int64, minevals),
+                               trunc(Int64, maxevals), key1, key2, key3, maxpass,
+                               Cdouble(border), Cdouble(maxchisq), Cdouble(mindeviation),
+                               Int64(ngiven), ldxgiven, xgiven, Int64(nextra),
+                               peakfinder, String(statefile), spin))
+end

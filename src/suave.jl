@@ -71,18 +71,6 @@ end
           nregions, neval, fail, integral, error, prob)
 end
 
-function suave{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
-                  nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
-                  flags::Integer=FLAGS, seed::Integer=SEED,
-                  minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
-                  nnew::Integer=NNEW, nmin::Integer=NMIN, flatness::Real=FLATNESS,
-                  statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
-    return dointegrate(Suave(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
-                             Cdouble(abstol), flags, seed, trunc(Int64, minevals),
-                             trunc(Int64, maxevals), Int64(nnew), Int64(nmin),
-                             Cdouble(flatness), String(statefile), spin))
-end
-
 """
     suave(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
 
@@ -105,4 +93,14 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-suave
+function suave{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
+                  nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
+                  flags::Integer=FLAGS, seed::Integer=SEED,
+                  minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
+                  nnew::Integer=NNEW, nmin::Integer=NMIN, flatness::Real=FLATNESS,
+                  statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
+    return dointegrate(Suave(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
+                             Cdouble(abstol), flags, seed, trunc(Int64, minevals),
+                             trunc(Int64, maxevals), Int64(nnew), Int64(nmin),
+                             Cdouble(flatness), String(statefile), spin))
+end

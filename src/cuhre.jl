@@ -64,20 +64,6 @@ end
           nregions, neval, fail, integral, error, prob)
 end
 
-function cuhre{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
-                  nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
-                  flags::Integer=FLAGS, minevals::Real=MINEVALS,
-                  maxevals::Real=MAXEVALS, key::Integer=KEY,
-                  statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
-    # Cuhre requires "ndim" to be at least 2, even for an integral over a one
-    # dimensional domain.  Instead, we don't prevent users from setting wrong
-    # "ndim" values like 0 or negative ones.
-    ndim == 1 && (ndim = 2)
-    return dointegrate(Cuhre(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
-                             Cdouble(abstol), flags, trunc(Int64, minevals),
-                             trunc(Int64, maxevals), key, String(statefile), spin))
-end
-
 """
     cuhre(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
 
@@ -97,4 +83,16 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-cuhre
+function cuhre{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
+                  nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
+                  flags::Integer=FLAGS, minevals::Real=MINEVALS,
+                  maxevals::Real=MAXEVALS, key::Integer=KEY,
+                  statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
+    # Cuhre requires "ndim" to be at least 2, even for an integral over a one
+    # dimensional domain.  Instead, we don't prevent users from setting wrong
+    # "ndim" values like 0 or negative ones.
+    ndim == 1 && (ndim = 2)
+    return dointegrate(Cuhre(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
+                             Cdouble(abstol), flags, trunc(Int64, minevals),
+                             trunc(Int64, maxevals), key, String(statefile), spin))
+end
