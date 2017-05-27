@@ -86,11 +86,7 @@ divonne(integrand, ndim, ncomp[; keywords...])
 cuhre(integrand, ndim, ncomp[; keywords...])
 ```
 
-All 64-bit integers functions (`llvegas`, `llsuave`, `lldivonne`, `llcuhre`) are
-wrapped and exported as well.  They have the same syntax as the corresponding
-32-bit integers functions and should be used in cases where convergence is not
-reached within the ordinary 32-bit integer range.  See the manual for more
-information about these functions.
+These functions wrap the 64-bit integers functions provided by the Cuba library.
 
 The only mandatory argument is:
 
@@ -124,14 +120,17 @@ For example, the integral
 can be computed with one of the following lines
 
 ``` julia
-vegas((x,f)->f[1]=cos(x[1]))
-#  => 0.8414910005259609 ± 5.2708169787733e-5
-suave((x,f)->f[1]=cos(x[1]))
-#  => 0.8411523690658836 ± 8.357995611133613e-5
-divonne((x,f)->f[1]=cos(x[1]))
-#  => 0.841468071955942  ± 5.3955070531551656e-5
-cuhre((x,f)->f[1]=cos(x[1]))
-#  => 0.8414709848078966 ± 2.2204460420128823e-16
+julia> vegas((x, f) -> f[1] = cos(x[1]))
+([0.841491], [5.27082e-5], [0.0286072], 13500, 0, 0)
+
+julia> suave((x, f) -> f[1] = cos(x[1]))
+([0.841152], [8.358e-5], [1.0], 22000, 0, 22)
+
+julia> divonne((x, f) -> f[1] = cos(x[1]))
+([0.841468], [5.39551e-5], [0.0], 1686, 0, 14)
+
+julia> cuhre((x, f) -> f[1] = cos(x[1]))
+([0.841471], [2.22045e-16], [3.44354e-5], 195, 0, 2)
 ```
 
 The integrating functions `vegas`, `suave`, `divonne`, and `cuhre` return the

@@ -212,14 +212,17 @@ can be computed with one of the following lines
 
 .. code-block:: julia
 
-    vegas((x,f)->f[1]=cos(x[1]))
-    #  => 0.8414910005259609 ± 5.2708169787733e-5
-    suave((x,f)->f[1]=cos(x[1]))
-    #  => 0.8411523690658836 ± 8.357995611133613e-5
-    divonne((x,f)->f[1]=cos(x[1]))
-    #  => 0.841468071955942  ± 5.3955070531551656e-5
-    cuhre((x,f)->f[1]=cos(x[1]))
-    #  => 0.8414709848078966 ± 2.2204460420128823e-16
+    julia> vegas((x, f) -> f[1] = cos(x[1]))
+    ([0.841491], [5.27082e-5], [0.0286072], 13500, 0, 0)
+
+    julia> suave((x, f) -> f[1] = cos(x[1]))
+    ([0.841152], [8.358e-5], [1.0], 22000, 0, 22)
+
+    julia> divonne((x, f) -> f[1] = cos(x[1]))
+    ([0.841468], [5.39551e-5], [0.0], 1686, 0, 14)
+
+    julia> cuhre((x, f) -> f[1] = cos(x[1]))
+    ([0.841471], [2.22045e-16], [3.44354e-5], 195, 0, 2)
 
 In section `Examples`_ you can find more complete examples.  Note that ``x`` and
 ``f`` are both arrays with type ``Float64``, so ``Cuba.jl`` can be used to
