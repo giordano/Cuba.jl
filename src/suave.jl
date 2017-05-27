@@ -20,7 +20,7 @@
 
 ### Code:
 
-immutable Suave{T} <: Integral{T}
+immutable Suave{T} <: Integrand{T}
     func::T
     ndim::Int
     ncomp::Int

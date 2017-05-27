@@ -20,7 +20,7 @@
 
 ### Code:
 
-immutable Vegas{T} <: Integral{T}
+immutable Vegas{T} <: Integrand{T}
     func::T
     ndim::Int
     ncomp::Int

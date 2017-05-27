@@ -20,7 +20,7 @@
 
 ### Code:
 
-immutable Divonne{T} <: Integral{T}
+immutable Divonne{T} <: Integrand{T}
     func::T
     ndim::Int
     ncomp::Int

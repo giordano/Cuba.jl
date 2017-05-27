@@ -100,7 +100,7 @@ integrand_ptr{T}(integrand::T) = cfunction(generic_integrand!, Cint,
                                             Ptr{Cdouble}, # f
                                             Ref{T})) # userdata
 
-abstract Integral{T}
+abstract Integrand{T}
 
 function __init__()
     Cuba.cores(0, 10000)
@@ -111,7 +111,7 @@ include("divonne.jl")
 include("suave.jl")
 include("vegas.jl")
 
-@inline function dointegrate{T}(x::Integral{T})
+@inline function dointegrate{T}(x::Integrand{T})
     integrand = integrand_ptr(x.func)
     integral  = Vector{Cdouble}(x.ncomp)
     error     = Vector{Cdouble}(x.ncomp)

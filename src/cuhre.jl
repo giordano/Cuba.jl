@@ -20,7 +20,7 @@
 
 ### Code:
 
-immutable Cuhre{T} <: Integral{T}
+immutable Cuhre{T} <: Integrand{T}
     func::T
     ndim::Int
     ncomp::Int
