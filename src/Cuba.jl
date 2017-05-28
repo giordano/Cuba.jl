@@ -111,6 +111,32 @@ include("divonne.jl")
 include("suave.jl")
 include("vegas.jl")
 
+immutable Integral
+    integral::Vector{Float64}
+    error::Vector{Float64}
+    probability::Vector{Float64}
+    neval::Int64
+    fail::Int32
+    nregions::Int32
+end
+
+Base.getindex(x::Integral, n::Integer) = getfield(x, fieldname(Integral, n))
+Base.start(x::Integral)   = 1
+Base.next(x::Integral, i) = (x[i], i + 1)
+Base.done(x::Integral, i) = (i > 6)
+
+function Base.show(io::IO, x::Integral)
+    ncomp = length(x.integral)
+    println(io, ncomp == 1 ? "Component:" : "Components:")
+    for i in 1:ncomp
+        println(io, " ", lpad("$i", ceil(Int, log10(ncomp+1))), ": ", x.integral[i],
+                " ± ", x.error[i], " (prob: ", x.probability[i],")")
+    end
+    println(io, "Integrand evaluations: ", x.neval)
+    println(io, "Fail:                  ", x.fail)
+    print(io, "Number of subregions:  ", x.nregions)
+end
+
 @inline function dointegrate{T}(x::Integrand{T})
     integrand = integrand_ptr(x.func)
     integral  = Vector{Cdouble}(x.ncomp)
@@ -120,7 +146,7 @@ include("vegas.jl")
     fail      = Ref{Cint}(0)
     nregions  = Ref{Cint}(0)
     dointegrate!(x, integrand, integral, error, prob, neval, fail, nregions)
-    return integral, error, prob, neval[], fail[], nregions[]
+    return Integral(integral, error, prob, neval[], fail[], nregions[])
 end
 
 ### Other functions, not exported

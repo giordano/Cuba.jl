@@ -517,24 +517,30 @@ Output
 ''''''
 
 The integrating functions :func:`vegas`, :func:`suave`, :func:`divonne`, and
-:func:`cuhre` (and the corresponding 64-bit integers functions) return the
-6-tuple
+:func:`cuhre` (and the corresponding 64-bit integers functions) return an
+``Integral`` object whose fields are
 
 .. code-block:: julia
 
-    (integral, error, probability, neval, fail, nregions)
+    integral :: Vector{Float64}
+    error    :: Vector{Float64}
+    probl    :: Vector{Float64}
+    neval    :: Int64
+    fail     :: Int32
+    nregions :: Int32
 
-The first three elements of the tuple are arrays with length ``ncomp``, the last
-three ones are scalars. In particular, if you assign the output of integrator
-functions to the variable named ``result``, you can access the value of the
-``i``-th component of the integral with ``result[1][i]`` and the associated
-error with ``result[2][i]``.
+The first three fields are arrays with length ``ncomp``, the last three ones are
+scalars.  The ``Integral`` object can also be iterated over like a tuple.  In
+particular, if you assign the output of integrator functions to the variable
+named ``result``, you can access the value of the ``i``-th component of the
+integral with ``result[1][i]`` or ``result.integral[i]`` and the associated
+error with ``result[2][i]`` or ``result.error[i]``.
 
-- ``integral`` (type: ``Cdouble`` array with ``ncomp`` components): the integral
-  of ``integrand`` over the unit hypercube
-- ``error`` (type: ``Cdouble`` array with ``ncomp`` components): the presumed
+- ``integral`` (type: ``Vector{Float64}``, with ``ncomp`` components): the
+  integral of ``integrand`` over the unit hypercube
+- ``error`` (type: ``Vector{Float64}``, with ``ncomp`` components): the presumed
   absolute error for each component of ``integral``
-- ``probability`` (type: ``Cdouble`` array with ``ncomp`` components): the
+- ``probability`` (type: ``Vector{Float64}``, with ``ncomp`` components): the
   :math:`\chi^2` -probability (not the :math:`\chi^2` -value itself!) that
   ``error`` is not a reliable estimate of the true integration error.  To judge
   the reliability of the result expressed through ``prob``, remember that it is
@@ -542,7 +548,7 @@ error with ``result[2][i]``.
   ``error`` `is` a reliable estimate.  In statistics, the null hypothesis may be
   rejected only if ``prob`` is fairly close to unity, say ``prob`` :math:`>.95`
 - ``neval`` (type: ``Int64``): the actual number of integrand evaluations needed
-- ``fail`` (type: ``Cint``): an error flag:
+- ``fail`` (type: ``Int32``): an error flag:
 
   - ``fail`` = ``0``, the desired accuracy was reached
   - ``fail`` = ``-1``, dimension out of range
@@ -552,7 +558,7 @@ error with ``result[2][i]``.
     ``maxevals`` needs to be increased to reach the desired accuracy and returns
     this value.
 
-- ``nregions`` (type: ``Cint``): the actual number of subregions needed (always
+- ``nregions`` (type: ``Int32``): the actual number of subregions needed (always
   ``0`` in :func:`vegas`)
 
 Vectorization
@@ -592,14 +598,33 @@ approximation of this integral using one of the following commands:
 
 .. code-block:: julia
 
-    vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
-    #  => -3.9981623937128483 ± 0.0004406643716840934
-    suave( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
-    #  => -3.999976286717149  ± 0.0003950486666134314
-    divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
-    #  => -3.9997602130594374 ± 0.00035678748149012664
-    cuhre( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
-    #  => -4.00000035506719   ± 0.0003395484028625721
+    julia> vegas((x, f) -> f[1] = cos(x[1]))
+    Component:
+     1: 0.8414910005259612 ± 5.2708169787342156e-5 (prob: 0.028607201258072673)
+    Integrand evaluations: 13500
+    Fail:                  0
+    Number of subregions:  0
+
+    julia> suave((x, f) -> f[1] = cos(x[1]))
+    Component:
+     1: 0.84115236906584 ± 8.357995609919512e-5 (prob: 1.0)
+    Integrand evaluations: 22000
+    Fail:                  0
+    Number of subregions:  22
+
+    julia> divonne((x, f) -> f[1] = cos(x[1]))
+    Component:
+     1: 0.841468071955942 ± 5.3955070531551656e-5 (prob: 0.0)
+    Integrand evaluations: 1686
+    Fail:                  0
+    Number of subregions:  14
+
+    julia> cuhre((x, f) -> f[1] = cos(x[1]))
+    Component:
+     1: 0.8414709848078966 ± 2.2204460420128823e-16 (prob: 3.443539937576958e-5)
+    Integrand evaluations: 195
+    Fail:                  0
+    Number of subregions:  2
 
 Vector-valued integrand
 '''''''''''''''''''''''
@@ -618,21 +643,21 @@ above integral
 
 .. code-block:: julia
 
-    using Cuba
+    using Cuba, SpecialFunctions
 
     function integrand(x, f)
         f[1] = sin(x[1])*cos(x[2])*exp(x[3])
         f[2] = exp(-(x[1]^2 + x[2]^2 + x[3]^2))
-        f[3] = 1/(1 - x[1]*x[2]*x[3])
+        f[3] = 1/(1 - prod(x))
     end
 
-    result = cuhre(integrand, 3, 3, abstol=1e-12, reltol=1e-10)
+    result, err = cuhre(integrand, 3, 3, abstol=1e-12, reltol=1e-10)
     answer = [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
     for i = 1:3
         println("Component ", i)
-        println(" Result of Cuba: ", result[1][i], " ± ", result[2][i])
+        println(" Result of Cuba: ", result[i], " ± ", err[i])
         println(" Exact result:   ", answer[i])
-        println(" Actual error:   ", abs(result[1][i] - answer[i]))
+        println(" Actual error:   ", abs(result[i] - answer[i]))
     end
 
 This is the output
@@ -677,11 +702,11 @@ that can be computed with ``Cuba.jl`` using the following Julia script
                sin(pi*x[2]*x[3])*exp(pi*x[3])
     end
 
-    result = cuhre(integrand, 3, 1, abstol=1e-12, reltol=1e-10)
+    result, err = cuhre(integrand, 3, 1, abstol=1e-12, reltol=1e-10)
     answer = pi*e^pi - (4e^pi - 4)/5
-    println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
+    println("Result of Cuba: ", result[1], " ± ", err[1])
     println("Exact result:   ", answer)
-    println("Actual error:   ", abs(result[1][1] - answer))
+    println("Actual error:   ", abs(result[1] - answer))
 
 This is the output
 
@@ -719,11 +744,11 @@ following Julia script:
        f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2
    end
 
-   result = cuhre(integrand, abstol = 1e-12, reltol = 1e-10)
+   result, err = cuhre(integrand, abstol = 1e-12, reltol = 1e-10)
    answer = pi*log(2)
-   println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
+   println("Result of Cuba: ", result[1], " ± ", err[1])
    println("Exact result:   ", answer)
-   println("Actual error:   ", abs(result[1][1] - answer))
+   println("Actual error:   ", abs(result[1] - answer))
 
 This is the output:
 
@@ -754,11 +779,11 @@ to inform Julia about this.
            (2*x[1]^2 - 2*x[1] + 1)/x[1]^2/(1 - x[1])^2
    end
 
-   result = cuhre(integrand, abstol = 1e-7, reltol = 1e-7)
+   result, err = cuhre(integrand, abstol = 1e-7, reltol = 1e-7)
    answer = float(pi)
-   println("Result of Cuba: ", result[1][1], " ± ", result[2][1])
+   println("Result of Cuba: ", result[1], " ± ", err[1])
    println("Exact result:   ", answer)
-   println("Actual error:   ", abs(result[1][1] - answer))
+   println("Actual error:   ", abs(result[1] - answer))
 
 The output of this script is
 

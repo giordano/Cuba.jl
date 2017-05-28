@@ -46,11 +46,11 @@ for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
     info("Testing ", ucfirst(string(alg)[6:end]), " algorithm")
     # Make sure that using maxevals > typemax(Int32) doesn't result into InexactError.
     if alg == divonne
-        result = alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8, flags=0,
-                     border = 1e-5, maxevals = 3000000000)
+        result = @inferred alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8,
+                               flags=0, border = 1e-5, maxevals = 3000000000)
     else
-        result = alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8, flags=0,
-                     maxevals = 3e9)
+        result = @inferred alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8,
+                               flags=0, maxevals = 3e9)
     end
     for i = 1:ncomp
         println("Component $i: ", result[1][i], " ± ", result[2][i])
@@ -63,16 +63,16 @@ integrand2(x, f) = f[1], f[2] = reim(cis(x[1]))
 
 # Test Cuhre and Divonne with ndim = 1.
 answer = sin(1) + im*(1 - cos(1))
-result = @inferred cuhre(integrand2, 1, 2)
-@test complex(result[1]...) ≈ answer
-result = divonne(integrand2, 1, 2, reltol=1e-8, abstol=1e-8)
-@test isapprox(complex(result[1]...), answer, atol=1e-8)
+result, rest = @inferred cuhre(integrand2, 1, 2)
+@test complex(result...) ≈ answer
+result, rest = divonne(integrand2, 1, 2, reltol=1e-8, abstol=1e-8)
+@test isapprox(complex(result...), answer, atol=1e-8)
 
 # Test taken from one of the examples of integrals over infinite domains.
 func(x) = log(1 + x^2)/(1 + x^2)
-result = @inferred cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
-                         abstol = 1e-12, reltol = 1e-10)
-@test isapprox(result[1][1], pi*log(2), atol=3e-12)
+result, rest = @inferred cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
+                               abstol = 1e-12, reltol = 1e-10)
+@test isapprox(result[1], pi*log(2), atol=3e-12)
 
 # Make sure these functions don't crash.
 Cuba.init(C_NULL, C_NULL)
@@ -80,3 +80,6 @@ Cuba.exit(C_NULL, C_NULL)
 
 # Dummy call just to increase code coverage
 Cuba.integrand_ptr(Cuba.generic_integrand!)
+
+# Dummy call to show
+show(DevNull, cuhre((x, f) -> f[1] = x[]))

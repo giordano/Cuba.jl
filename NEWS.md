@@ -11,6 +11,12 @@ v0.4.0 (2017-??-??)
   `llsuave`, `lldivonne`, `llcuhre` are deprecated and will be removed at some
   point in the future.  This change reduces confusion about the function to use.
 
+### New Features
+
+* The result of integration is wrapped in an `Integral` object.  This is not a
+  breaking change because its fields can be iterated over like a tuple, exactly
+  as before.
+
 v0.3.1 (2017-05-02)
 -------------------
 
