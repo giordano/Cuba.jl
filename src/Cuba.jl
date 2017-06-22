@@ -120,7 +120,7 @@ immutable Integral
     nregions::Int32
 end
 
-Base.getindex(x::Integral, n::Integer) = getfield(x, fieldname(Integral, n))
+Base.getindex(x::Integral, n::Integer) = getfield(x, n)
 Base.start(x::Integral)   = 1
 Base.next(x::Integral, i) = (x[i], i + 1)
 Base.done(x::Integral, i) = (i > 6)
