@@ -214,28 +214,28 @@ can be computed with one of the following commands
 
     julia> vegas((x, f) -> f[1] = cos(x[1]))
     Component:
-     1: 0.8414910005259612 ± 5.2708169787342156e-5 (prob: 0.028607201258072673)
+     1: 0.8414910005259612 ± 5.2708169787342156e-5 (prob.: 0.028607201258072673)
     Integrand evaluations: 13500
     Fail:                  0
     Number of subregions:  0
 
     julia> suave((x, f) -> f[1] = cos(x[1]))
     Component:
-     1: 0.84115236906584 ± 8.357995609919512e-5 (prob: 1.0)
+     1: 0.84115236906584 ± 8.357995609919512e-5 (prob.: 1.0)
     Integrand evaluations: 22000
     Fail:                  0
     Number of subregions:  22
 
     julia> divonne((x, f) -> f[1] = cos(x[1]))
     Component:
-     1: 0.841468071955942 ± 5.3955070531551656e-5 (prob: 0.0)
+     1: 0.841468071955942 ± 5.3955070531551656e-5 (prob.: 0.0)
     Integrand evaluations: 1686
     Fail:                  0
     Number of subregions:  14
 
     julia> cuhre((x, f) -> f[1] = cos(x[1]))
     Component:
-     1: 0.8414709848078966 ± 2.2204460420128823e-16 (prob: 3.443539937576958e-5)
+     1: 0.8414709848078966 ± 2.2204460420128823e-16 (prob.: 3.443539937576958e-5)
     Integrand evaluations: 195
     Fail:                  0
     Number of subregions:  2
@@ -245,8 +245,8 @@ In section `Examples`_ you can find more complete examples.  Note that ``x`` and
 integrate real-valued functions of real arguments.  See how to work with a
 `complex integrand`_.
 
-**Note:** if you used ``Cuba.jl`` until version 0.4, be aware that the user
-interface has been reworked in version 0.5 in a backward incompatible way.
+**Note:** if you used ``Cuba.jl`` until version 0.0.4, be aware that the user
+interface has been reworked in version 0.0.5 in a backward incompatible way.
 
 Optional Keywords
 '''''''''''''''''
@@ -616,28 +616,28 @@ approximation of this integral using one of the following commands:
 
     julia> vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
     Component:
-     1: -3.998162393712848 ± 0.0004406643716840933 (prob: 0.28430529682022004)
+     1: -3.998162393712848 ± 0.0004406643716840933 (prob.: 0.28430529682022004)
     Integrand evaluations: 1007500
     Fail:                  1
     Number of subregions:  0
 
     julia> suave( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
     Component:
-     1: -3.9999762867171387 ± 0.00039504866661845624 (prob: 1.0)
+     1: -3.9999762867171387 ± 0.00039504866661845624 (prob.: 1.0)
     Integrand evaluations: 51000
     Fail:                  0
     Number of subregions:  51
 
     julia> divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
     Component:
-     1: -3.9997602130594374 ± 0.0003567874814901272 (prob: 1.0)
+     1: -3.9997602130594374 ± 0.0003567874814901272 (prob.: 1.0)
     Integrand evaluations: 11593
     Fail:                  0
     Number of subregions:  76
 
     julia> cuhre( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
     Component:
-     1: -4.00000035506719 ± 0.0003395484028625721 (prob: 0.0)
+     1: -4.00000035506719 ± 0.0003395484028625721 (prob.: 0.0)
     Integrand evaluations: 5915
     Fail:                  0
     Number of subregions:  46

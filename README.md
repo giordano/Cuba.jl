@@ -122,28 +122,28 @@ can be computed with one of the following commands
 ``` julia
 julia> vegas((x, f) -> f[1] = cos(x[1]))
 Component:
- 1: 0.8414910005259612 ± 5.2708169787342156e-5 (prob: 0.028607201258072673)
+ 1: 0.8414910005259612 ± 5.2708169787342156e-5 (prob.: 0.028607201258072673)
 Integrand evaluations: 13500
 Fail:                  0
 Number of subregions:  0
 
 julia> suave((x, f) -> f[1] = cos(x[1]))
 Component:
- 1: 0.84115236906584 ± 8.357995609919512e-5 (prob: 1.0)
+ 1: 0.84115236906584 ± 8.357995609919512e-5 (prob.: 1.0)
 Integrand evaluations: 22000
 Fail:                  0
 Number of subregions:  22
 
 julia> divonne((x, f) -> f[1] = cos(x[1]))
 Component:
- 1: 0.841468071955942 ± 5.3955070531551656e-5 (prob: 0.0)
+ 1: 0.841468071955942 ± 5.3955070531551656e-5 (prob.: 0.0)
 Integrand evaluations: 1686
 Fail:                  0
 Number of subregions:  14
 
 julia> cuhre((x, f) -> f[1] = cos(x[1]))
 Component:
- 1: 0.8414709848078966 ± 2.2204460420128823e-16 (prob: 3.443539937576958e-5)
+ 1: 0.8414709848078966 ± 2.2204460420128823e-16 (prob.: 3.443539937576958e-5)
 Integrand evaluations: 195
 Fail:                  0
 Number of subregions:  2
@@ -172,8 +172,8 @@ found in Cuba manual.
 All other arguments listed in Cuba documentation can be passed as optional
 keywords.
 
-**Note:** if you used `Cuba.jl` until version 0.4, be aware that the user
-interface has been reworked in version 0.5 in a backward incompatible way.
+**Note:** if you used `Cuba.jl` until version 0.0.4, be aware that the user
+interface has been reworked in version 0.0.5 in a backward incompatible way.
 
 ### Documentation ###
 

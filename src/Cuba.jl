@@ -130,7 +130,7 @@ function Base.show(io::IO, x::Integral)
     println(io, ncomp == 1 ? "Component:" : "Components:")
     for i in 1:ncomp
         println(io, " ", lpad("$i", ceil(Int, log10(ncomp+1))), ": ", x.integral[i],
-                " ± ", x.error[i], " (prob: ", x.probability[i],")")
+                " ± ", x.error[i], " (prob.: ", x.probability[i],")")
     end
     println(io, "Integrand evaluations: ", x.neval)
     println(io, "Fail:                  ", x.fail)
