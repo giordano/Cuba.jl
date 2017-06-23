@@ -41,9 +41,8 @@ Cuba.accel(0,1000)
 # Analytic expressions: [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
 answer = [0.6646696797813771, 0.41653838588663805, 1.2020569031595951]
 ncomp = 3
-for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
+@testset "$alg" for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
                       (divonne, 1e-4), (cuhre, 1e-8))
-    info("Testing ", ucfirst(string(alg)[6:end]), " algorithm")
     # Make sure that using maxevals > typemax(Int32) doesn't result into InexactError.
     if alg == divonne
         result = @inferred alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8,
@@ -53,26 +52,26 @@ for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
                                flags=0, maxevals = 3e9)
     end
     for i = 1:ncomp
-        println("Component $i: ", result[1][i], " ± ", result[2][i])
-        println("Should be:   ", answer[i])
         @test isapprox(result[1][i], answer[i], atol=result[2][i])
     end
 end
 
 integrand2(x, f) = f[1], f[2] = reim(cis(x[1]))
 
-# Test Cuhre and Divonne with ndim = 1.
-answer = sin(1) + im*(1 - cos(1))
-result, rest = @inferred cuhre(integrand2, 1, 2)
-@test complex(result...) ≈ answer
-result, rest = divonne(integrand2, 1, 2, reltol=1e-8, abstol=1e-8)
-@test isapprox(complex(result...), answer, atol=1e-8)
+@testset "Cuhre and Divonne with ndim = 1" begin
+    answer = sin(1) + im*(1 - cos(1))
+    result, rest = @inferred cuhre(integrand2, 1, 2)
+    @test complex(result...) ≈ answer
+    result, rest = divonne(integrand2, 1, 2, reltol=1e-8, abstol=1e-8)
+    @test isapprox(complex(result...), answer, atol=1e-8)
+end
 
-# Test taken from one of the examples of integrals over infinite domains.
-func(x) = log(1 + x^2)/(1 + x^2)
-result, rest = @inferred cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
-                               abstol = 1e-12, reltol = 1e-10)
-@test isapprox(result[1], pi*log(2), atol=3e-12)
+@testset "Integral over infinite domain" begin
+    func(x) = log(1 + x^2)/(1 + x^2)
+    result, rest = @inferred cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
+                                   abstol = 1e-12, reltol = 1e-10)
+    @test isapprox(result[1], pi*log(2), atol=3e-12)
+end
 
 # Make sure these functions don't crash.
 Cuba.init(C_NULL, C_NULL)
