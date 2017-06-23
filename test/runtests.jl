@@ -73,6 +73,21 @@ end
     @test isapprox(result[1], pi*log(2), atol=3e-12)
 end
 
+@testset "Vectorization" begin
+    for alg in (vegas, suave, divonne, cuhre)
+        result1, err1, _ = @inferred alg((x,f) -> f[1] = x[1] + cos(x[2]) - exp(x[3]), 3)
+        result2, err2, _ = @inferred alg((x,f) -> f[1,:] .= x[1,:] .+ cos.(x[2,:]) .- exp.(x[3,:]),
+                                         3, nvec = 10)
+        @test result1 == result2
+        @test err1    == err2
+        result1, err1, _ = @inferred alg((x,f) -> begin f[1] = sin(x[1]); f[2] = sqrt(x[2]) end, 2, 2)
+        result2, err2, _ = @inferred alg((x,f) -> begin f[1,:] .= sin.(x[1,:]); f[2,:] .= sqrt.(x[2,:]) end,
+                                         2, 2, nvec = 10)
+        @test result1 == result2
+        @test err1    == err2
+    end
+end
+
 # Make sure these functions don't crash.
 Cuba.init(C_NULL, C_NULL)
 Cuba.exit(C_NULL, C_NULL)
