@@ -83,11 +83,22 @@ const KEY = 0
 # error.  See http://julialang.org/blog/2013/05/callback for more information on
 # this, in particular the section about "qsort_r" ("Passing closures via
 # pass-through pointers").  Thanks to Steven G. Johnson for pointing to this.
+#
+# For better performance, when nvec == 1 we store a simple Vector, instead of a Matrix with
+# second dimension equal to 1.
 function generic_integrand!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
                             f_::Ptr{Cdouble}, func!)
     # Get arrays from "x_" and "f_" pointers.
     x = unsafe_wrap(Array, x_, (ndim,))
     f = unsafe_wrap(Array, f_, (ncomp,))
+    func!(x, f)
+    return Cint(0)
+end
+function generic_integrand!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
+                            f_::Ptr{Cdouble}, func!, nvec::Cint)
+    # Get arrays from "x_" and "f_" pointers.
+    x = unsafe_wrap(Array, x_, (ndim, nvec))
+    f = unsafe_wrap(Array, f_, (ncomp, nvec))
     func!(x, f)
     return Cint(0)
 end
@@ -99,6 +110,13 @@ integrand_ptr{T}(integrand::T) = cfunction(generic_integrand!, Cint,
                                             Ref{Cint}, # ncomp
                                             Ptr{Cdouble}, # f
                                             Ref{T})) # userdata
+integrand_ptr_nvec{T}(integrand::T) = cfunction(generic_integrand!, Cint,
+                                                (Ref{Cint}, # ndim
+                                                 Ptr{Cdouble}, # x
+                                                 Ref{Cint}, # ncomp
+                                                 Ptr{Cdouble}, # f
+                                                 Ref{T}, # userdata
+                                                 Ref{Cint})) # nvec
 
 abstract Integrand{T}
 
@@ -138,7 +156,13 @@ function Base.show(io::IO, x::Integral)
 end
 
 @inline function dointegrate{T}(x::Integrand{T})
-    integrand = integrand_ptr(x.func)
+    # Choose the integrand function wrapper based on the value of `nvec`.  This function is
+    # called only once, so the overhead of the following if should be negligible.
+    if x.nvec == 1
+        integrand = integrand_ptr(x.func)
+    else
+        integrand = integrand_ptr_nvec(x.func)
+    end
     integral  = Vector{Cdouble}(x.ncomp)
     error     = Vector{Cdouble}(x.ncomp)
     prob      = Vector{Cdouble}(x.ncomp)

@@ -13,6 +13,9 @@ v0.4.0 (2017-??-??)
 
 ### New Features
 
+* Now it is possible to vectorize a function in order to speed up its evaluation
+  (see issue [#10](https://github.com/giordano/Cuba.jl/issues/10) and
+  PR [#11](https://github.com/giordano/Cuba.jl/pull/11)).
 * The result of integration is wrapped in an `Integral` object.  This is not a
   breaking change because its fields can be iterated over like a tuple, exactly
   as before.

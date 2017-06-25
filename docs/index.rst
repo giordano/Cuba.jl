@@ -199,6 +199,10 @@ f)`` taking two arguments:
 - the output vector ``f`` of length ``ncomp``, used to set the value of each
   component of the integrand at point ``x``
 
+``x`` and ``f`` are matrices with dimensions ``(ndim, nvec)`` and ``(ncomp,
+nvec)``, respectively, when ``nvec`` > 1.  See the `Vectorization`_ section
+below for more information.
+
 Also `anonymous functions
 <http://docs.julialang.org/en/stable/manual/functions/#anonymous-functions>`__
 are allowed as ``integrand``.  For those familiar with ``Cubature.jl`` package,
@@ -592,10 +596,19 @@ Keywords`_).  This value need not correspond to the hardware vector length --
 computing several points in one call can also make sense e.g. if the
 computations have significant intermediate results in common.
 
-A note for disambiguation: The ``nbatch`` argument of Vegas is related in
-purpose but not identical to ``nvec``.  It internally partitions the sampling
-done by Vegas but has no bearing on the number of points given to the integrand.
-On the other hand, it it pointless to choose ``nvec`` > ``nbatch`` for Vegas.
+When ``nvec`` > 1, the input ``x`` is a matrix of dimensions ``(ndim, nvec)``,
+while the output ``f`` is a matrix with dimensions ``(ncomp, nvec)``.
+Vectorization can be used to evaluate more quickly the integrand function, for
+example by exploiting parallelism, thus speeding up computation of the integral.
+See the section `Vectorized Function`_ below for an example of a vectorized
+funcion.
+
+.. Note::
+
+   Disambiguation: the ``nbatch`` argument of Vegas is related in purpose but
+   not identical to ``nvec``.  It internally partitions the sampling done by
+   Vegas but has no bearing on the number of points given to the integrand.  On
+   the other hand, it it pointless to choose ``nvec`` > ``nbatch`` for Vegas.
 
 Examples
 --------
@@ -904,6 +917,112 @@ This is the output
 
     Result of Cuba: 0.923681 0.792120 0.629694 0.465584 0.321833
     Exact result:   0.923681 0.792120 0.629695 0.465584 0.321833
+
+Vectorized Function
+'''''''''''''''''''
+
+Consider the integral
+
+.. math:: \int\limits_{\Omega} \prod_{i=1}^{10} \cos(x_{i})
+	  \,\mathrm{d}\boldsymbol{x} = \sin(1)^{10} = 0.1779883\dots
+
+where :math:`\Omega = [0, 1]^{10}` and :math:`\boldsymbol{x} = (x_{1}, \dots,
+x_{10})` is a 10-dimensional vector.  A simple way to compute this integral
+is the following:
+
+.. code-block:: julia
+
+   julia> using Cuba, BenchmarkTools
+
+   julia> cuhre((x, f) -> f[] = prod(cos.(x)), 10)
+   Component:
+    1: 0.1779870665870775 ± 1.0707995959536173e-6 (prob.: 0.2438374075714901)
+   Integrand evaluations: 7815
+   Fail:                  0
+   Number of subregions:  2
+
+   julia> @benchmark cuhre((x, f) -> f[] = prod(cos.(x)), 10)
+   BenchmarkTools.Trial:
+     memory estimate:  2.62 MiB
+     allocs estimate:  39082
+     --------------
+     minimum time:     1.633 ms (0.00% GC)
+     median time:      1.692 ms (0.00% GC)
+     mean time:        1.867 ms (8.62% GC)
+     maximum time:     3.660 ms (45.54% GC)
+     --------------
+     samples:          2674
+     evals/sample:     1
+
+We can use vectorization in order to speed up evaluation of the integrand
+function.
+
+.. code-block:: julia
+
+   julia> function fun_vec(x,f)
+              f[1,:] .= 1.0
+              for j in 1:size(x,2)
+                  for i in 1:size(x, 1)
+                      f[1, j] *= cos(x[i, j])
+                  end
+              end
+          end
+   fun_vec (generic function with 1 method)
+
+   julia> cuhre(fun_vec, 10, nvec = 1000)
+   Component:
+    1: 0.1779870665870775 ± 1.0707995959536173e-6 (prob.: 0.2438374075714901)
+   Integrand evaluations: 7815
+   Fail:                  0
+   Number of subregions:  2
+
+   julia> @benchmark cuhre(fun_vec2, 10, nvec = 1000)
+   BenchmarkTools.Trial:
+     memory estimate:  2.88 KiB
+     allocs estimate:  54
+     --------------
+     minimum time:     949.976 μs (0.00% GC)
+     median time:      954.039 μs (0.00% GC)
+     mean time:        966.930 μs (0.00% GC)
+     maximum time:     1.204 ms (0.00% GC)
+     --------------
+     samples:          5160
+     evals/sample:     1
+
+A further speed up can be gained by running the ``for`` loop in parallel with
+``Threads.@threads``.  For example, running Julia with 4 threads:
+
+.. code-block:: julia
+
+   julia> function fun_par(x,f)
+              f[1,:] .= 1.0
+              Threads.@threads for j in 1:size(x,2)
+                  for i in 1:size(x, 1)
+                      f[1, j] *= cos(x[i, j])
+                  end
+              end
+          end
+   fun_par (generic function with 1 method)
+
+   julia> cuhre(fun_par, 10, nvec = 1000)
+   Component:
+    1: 0.1779870665870775 ± 1.0707995959536173e-6 (prob.: 0.2438374075714901)
+   Integrand evaluations: 7815
+   Fail:                  0
+   Number of subregions:  2
+
+   julia> @benchmark cuhre(fun_par, 10, nvec = 1000)
+   BenchmarkTools.Trial:
+     memory estimate:  3.30 KiB
+     allocs estimate:  63
+     --------------
+     minimum time:     507.914 μs (0.00% GC)
+     median time:      515.182 μs (0.00% GC)
+     mean time:        520.667 μs (0.06% GC)
+     maximum time:     3.801 ms (85.06% GC)
+     --------------
+     samples:          9565
+     evals/sample:     1
 
 Performance
 -----------
