@@ -1,11 +1,12 @@
 History of Cuba.jl
 ==================
 
-v0.5.0 (2017-1?-??)
+v0.5.0 (2018-0?-??)
 -------------------
 
 ### Breaking Changes
 
+* Support for Julia 0.5 was dropped
 * The default value of argument `ndim` has been changed to 2 in `divonne` and
   `cuhre`.  These algorithms require the number of dimensions to be at least 2.
   Now setting `ndim` to 1 throws an error.  Your code will not be affected by

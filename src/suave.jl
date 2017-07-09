@@ -20,7 +20,7 @@
 
 ### Code:
 
-immutable Suave{T} <: Integrand{T}
+struct Suave{T} <: Integrand{T}
     func::T
     ndim::Int
     ncomp::Int
@@ -38,8 +38,8 @@ immutable Suave{T} <: Integrand{T}
     spin::Ptr{Void}
 end
 
-@inline function dointegrate!{T}(x::Suave{T}, integrand, integral,
-                                 error, prob, neval, fail, nregions)
+@inline function dointegrate!(x::Suave{T}, integrand, integral,
+                              error, prob, neval, fail, nregions) where {T}
     ccall((:llSuave, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
@@ -93,12 +93,12 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-function suave{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
-                  nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
-                  flags::Integer=FLAGS, seed::Integer=SEED,
-                  minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
-                  nnew::Integer=NNEW, nmin::Integer=NMIN, flatness::Real=FLATNESS,
-                  statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
+function suave(integrand::T, ndim::Integer=1, ncomp::Integer=1;
+               nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
+               flags::Integer=FLAGS, seed::Integer=SEED,
+               minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
+               nnew::Integer=NNEW, nmin::Integer=NMIN, flatness::Real=FLATNESS,
+               statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) where {T}
     return dointegrate(Suave(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
                              Cdouble(abstol), flags, seed, trunc(Int64, minevals),
                              trunc(Int64, maxevals), Int64(nnew), Int64(nmin),

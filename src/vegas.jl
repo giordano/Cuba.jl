@@ -20,7 +20,7 @@
 
 ### Code:
 
-immutable Vegas{T} <: Integrand{T}
+struct Vegas{T} <: Integrand{T}
     func::T
     ndim::Int
     ncomp::Int
@@ -39,8 +39,8 @@ immutable Vegas{T} <: Integrand{T}
     spin::Ptr{Void}
 end
 
-@inline function dointegrate!{T}(x::Vegas{T}, integrand, integral,
-                                 error, prob, neval, fail, nregions)
+@inline function dointegrate!(x::Vegas{T}, integrand, integral,
+                              error, prob, neval, fail, nregions) where {T}
     ccall((:llVegas, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
@@ -95,13 +95,13 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-function vegas{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
-                  nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
-                  flags::Integer=FLAGS, seed::Integer=SEED,
-                  minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
-                  nstart::Integer=NSTART, nincrease::Integer=NINCREASE,
-                  nbatch::Integer=NBATCH, gridno::Integer=GRIDNO,
-                  statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
+function vegas(integrand::T, ndim::Integer=1, ncomp::Integer=1;
+               nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
+               flags::Integer=FLAGS, seed::Integer=SEED,
+               minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
+               nstart::Integer=NSTART, nincrease::Integer=NINCREASE,
+               nbatch::Integer=NBATCH, gridno::Integer=GRIDNO,
+               statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) where {T}
     return dointegrate(Vegas(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
                              Cdouble(abstol), flags, seed, trunc(Int64, minevals),
                              trunc(Int64, maxevals), Int64(nstart),

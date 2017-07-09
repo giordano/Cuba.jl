@@ -20,7 +20,7 @@
 
 ### Code:
 
-immutable Cuhre{T} <: Integrand{T}
+struct Cuhre{T} <: Integrand{T}
     func::T
     ndim::Int
     ncomp::Int
@@ -35,8 +35,8 @@ immutable Cuhre{T} <: Integrand{T}
     spin::Ptr{Void}
 end
 
-@inline function dointegrate!{T}(x::Cuhre{T}, integrand, integral,
-                                 error, prob, neval, fail, nregions)
+@inline function dointegrate!(x::Cuhre{T}, integrand, integral,
+                              error, prob, neval, fail, nregions) where {T}
     ccall((:llCuhre, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
@@ -83,11 +83,11 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-function cuhre{T}(integrand::T, ndim::Integer=2, ncomp::Integer=1;
-                  nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
-                  flags::Integer=FLAGS, minevals::Real=MINEVALS,
-                  maxevals::Real=MAXEVALS, key::Integer=KEY,
-                  statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN)
+function cuhre(integrand::T, ndim::Integer=2, ncomp::Integer=1;
+               nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
+               flags::Integer=FLAGS, minevals::Real=MINEVALS,
+               maxevals::Real=MAXEVALS, key::Integer=KEY,
+               statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) where {T}
     # Cuhre requires "ndim" to be at least 2, even for an integral over a one
     # dimensional domain.  Instead, we don't prevent users from setting wrong
     # "ndim" values like 0 or negative ones.

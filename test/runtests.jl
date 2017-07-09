@@ -52,7 +52,7 @@ ncomp = 3
                                flags=0, maxevals = 3e9)
     end
     for i = 1:ncomp
-        @test isapprox(result[1][i], answer[i], atol=result[2][i])
+        @test result[1][i] ≈ answer[i] atol = result[2][i]
     end
 end
 
@@ -71,7 +71,7 @@ end
     func(x) = log(1 + x^2)/(1 + x^2)
     result, rest = @inferred cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
                                    abstol = 1e-12, reltol = 1e-10)
-    @test isapprox(result[1], pi*log(2), atol=3e-12)
+    @test result[1] ≈ pi * log(2) atol = 3e-12
 end
 
 @testset "Vectorization" begin

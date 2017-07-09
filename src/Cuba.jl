@@ -104,21 +104,21 @@ function generic_integrand!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
 end
 
 # Return pointer for "integrand", to be passed as "integrand" argument to Cuba functions.
-integrand_ptr{T}(integrand::T) = cfunction(generic_integrand!, Cint,
-                                           (Ref{Cint}, # ndim
-                                            Ptr{Cdouble}, # x
-                                            Ref{Cint}, # ncomp
-                                            Ptr{Cdouble}, # f
-                                            Ref{T})) # userdata
-integrand_ptr_nvec{T}(integrand::T) = cfunction(generic_integrand!, Cint,
-                                                (Ref{Cint}, # ndim
-                                                 Ptr{Cdouble}, # x
-                                                 Ref{Cint}, # ncomp
-                                                 Ptr{Cdouble}, # f
-                                                 Ref{T}, # userdata
-                                                 Ref{Cint})) # nvec
+integrand_ptr(integrand::T) where {T} = cfunction(generic_integrand!, Cint,
+                                                  (Ref{Cint}, # ndim
+                                                   Ptr{Cdouble}, # x
+                                                   Ref{Cint}, # ncomp
+                                                   Ptr{Cdouble}, # f
+                                                   Ref{T})) # userdata
+integrand_ptr_nvec(integrand::T) where {T} = cfunction(generic_integrand!, Cint,
+                                                       (Ref{Cint}, # ndim
+                                                        Ptr{Cdouble}, # x
+                                                        Ref{Cint}, # ncomp
+                                                        Ptr{Cdouble}, # f
+                                                        Ref{T}, # userdata
+                                                        Ref{Cint})) # nvec
 
-abstract Integrand{T}
+abstract type Integrand{T} end
 
 function __init__()
     Cuba.cores(0, 10000)
@@ -129,7 +129,7 @@ include("divonne.jl")
 include("suave.jl")
 include("vegas.jl")
 
-immutable Integral
+struct Integral
     integral::Vector{Float64}
     error::Vector{Float64}
     probability::Vector{Float64}
@@ -155,7 +155,7 @@ function Base.show(io::IO, x::Integral)
     print(io, "Number of subregions:  ", x.nregions)
 end
 
-@inline function dointegrate{T}(x::Integrand{T})
+@inline function dointegrate(x::Integrand{T}) where {T}
     # Choose the integrand function wrapper based on the value of `nvec`.  This function is
     # called only once, so the overhead of the following if should be negligible.
     if x.nvec == 1

@@ -20,7 +20,7 @@
 
 ### Code:
 
-immutable Divonne{T} <: Integrand{T}
+struct Divonne{T} <: Integrand{T}
     func::T
     ndim::Int
     ncomp::Int
@@ -47,8 +47,8 @@ immutable Divonne{T} <: Integrand{T}
     spin::Ptr{Void}
 end
 
-@inline function dointegrate!{T}(x::Divonne{T}, integrand, integral,
-                                 error, prob, neval, fail, nregions)
+@inline function dointegrate!(x::Divonne{T}, integrand, integral,
+                              error, prob, neval, fail, nregions) where {T}
     ccall((:llDivonne, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
@@ -121,22 +121,22 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-function divonne{T}(integrand::T, ndim::Integer=2, ncomp::Integer=1;
-                    nvec::Integer=NVEC, reltol::Real=RELTOL,
-                    abstol::Real=ABSTOL, flags::Integer=FLAGS,
-                    seed::Integer=SEED, minevals::Real=MINEVALS,
-                    maxevals::Real=MAXEVALS, key1::Integer=KEY1,
-                    key2::Integer=KEY2, key3::Integer=KEY3,
-                    maxpass::Integer=MAXPASS, border::Real=BORDER,
-                    maxchisq::Real=MAXCHISQ,
-                    mindeviation::Real=MINDEVIATION,
-                    ngiven::Integer=NGIVEN, ldxgiven::Integer=LDXGIVEN,
-                    xgiven::Array{Cdouble,2}=zeros(Cdouble, ldxgiven,
-                                                   ngiven),
-                    nextra::Integer=NEXTRA,
-                    peakfinder::Ptr{Void}=PEAKFINDER,
-                    statefile::AbstractString=STATEFILE,
-                    spin::Ptr{Void}=SPIN)
+function divonne(integrand::T, ndim::Integer=2, ncomp::Integer=1;
+                 nvec::Integer=NVEC, reltol::Real=RELTOL,
+                 abstol::Real=ABSTOL, flags::Integer=FLAGS,
+                 seed::Integer=SEED, minevals::Real=MINEVALS,
+                 maxevals::Real=MAXEVALS, key1::Integer=KEY1,
+                 key2::Integer=KEY2, key3::Integer=KEY3,
+                 maxpass::Integer=MAXPASS, border::Real=BORDER,
+                 maxchisq::Real=MAXCHISQ,
+                 mindeviation::Real=MINDEVIATION,
+                 ngiven::Integer=NGIVEN, ldxgiven::Integer=LDXGIVEN,
+                 xgiven::Array{Cdouble,2}=zeros(Cdouble, ldxgiven,
+                                                ngiven),
+                 nextra::Integer=NEXTRA,
+                 peakfinder::Ptr{Void}=PEAKFINDER,
+                 statefile::AbstractString=STATEFILE,
+                 spin::Ptr{Void}=SPIN) where {T}
     # Divonne requires "ndim" to be at least 2, even for an integral over a one
     # dimensional domain.  Instead, we don't prevent users from setting wrong
     # "ndim" values like 0 or negative ones.
