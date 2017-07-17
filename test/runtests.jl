@@ -97,3 +97,8 @@ Cuba.integrand_ptr(Cuba.generic_integrand!)
 
 # Dummy call to show
 show(DevNull, cuhre((x, f) -> f[1] = x[]))
+
+vegas((x, f) -> f[1] = cos(x[1]), maxevals=100)
+suave((x, f) -> f[1] = cos(x[1]), maxevals=100)
+divonne((x, f) -> f[1] = cos(x[1]), maxevals=100)
+cuhre((x, f) -> f[1] = cos(x[1]), maxevals=100)
