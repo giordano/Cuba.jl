@@ -86,3 +86,8 @@ Cuba.exit(C_NULL, C_NULL)
 
 # Dummy call just to increase code coverage
 Cuba.integrand_ptr(Cuba.generic_integrand!)
+
+vegas((x, f) -> f[1] = cos(x[1]), maxevals=100)
+suave((x, f) -> f[1] = cos(x[1]), maxevals=100)
+divonne((x, f) -> f[1] = cos(x[1]), maxevals=100)
+cuhre((x, f) -> f[1] = cos(x[1]), maxevals=100)
