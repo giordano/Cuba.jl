@@ -1,6 +1,17 @@
 History of Cuba.jl
 ==================
 
+v0.5.0 (2017-1?-??)
+-------------------
+
+### Breaking Changes
+
+* The default value of argument `ndim` has been changed to 2 in `divonne` and
+  `cuhre`.  These algorithms require the number of dimensions to be at least 2.
+  Now setting `ndim` to 1 throws an error.  Your code will not be affected by
+  this change if you did not explicitely set `ndim`.  See
+  issue [#14](https://github.com/giordano/Cuba.jl/issues/14).
+
 v0.4.0 (2017-07-08)
 -------------------
 

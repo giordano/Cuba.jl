@@ -148,8 +148,8 @@ or put this command into your Julia script.
 
 .. function:: vegas(integrand, ndim=1, ncomp=1[; keywords...])
 .. function:: suave(integrand, ndim=1, ncomp=1[; keywords...])
-.. function:: divonne(integrand, ndim=1, ncomp=1[; keywords...])
-.. function:: cuhre(integrand, ndim=1, ncomp=1[; keywords...])
+.. function:: divonne(integrand, ndim=2, ncomp=1[; keywords...])
+.. function:: cuhre(integrand, ndim=2, ncomp=1[; keywords...])
 
 Large parts of the following sections are borrowed from Cuba manual.  Refer to
 it for more information on the details.
@@ -187,7 +187,9 @@ The only mandatory argument of integrator functions is:
 Optional positional arguments are:
 
 - ``ndim`` (type: ``Integer``): the number of dimensions of the integratation
-  domain.  Defaults to 1 if omitted
+  domain.  If omitted, defaults to 1 in ``vegas`` and ``suave``, to 2 in
+  ``divonne`` and ``cuhre``.  Note: ``ndim`` must be at least 2 with the latest
+  two methods.
 - ``ncomp`` (type: ``Integer``): the number of components of the integrand.
   Default to 1 if omitted
 
