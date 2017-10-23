@@ -42,9 +42,9 @@ struct Divonne{T} <: Integrand{T}
     ldxgiven::Int
     xgiven::Array{Cdouble, 2}
     nextra::Int64
-    peakfinder::Ptr{Void}
+    peakfinder::Ptr{Cvoid}
     statefile::String
-    spin::Ptr{Void}
+    spin::Ptr{Cvoid}
 end
 
 @inline function dointegrate!(x::Divonne{T}, integrand, integral,
@@ -52,7 +52,7 @@ end
     ccall((:llDivonne, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
-           Ptr{Void}, # integrand
+           Ptr{Cvoid}, # integrand
            Any, # userdata
            Int64, # nvec
            Cdouble, # reltol
@@ -72,9 +72,9 @@ end
            Cint, # ldxgiven
            Ptr{Cdouble}, # xgiven
            Int64, # nextra
-           Ptr{Void}, # peakfinder
+           Ptr{Cvoid}, # peakfinder
            Ptr{Cchar}, # statefile
-           Ptr{Void}, # spin
+           Ptr{Cvoid}, # spin
            Ptr{Cint}, # nregions
            Ptr{Int64}, # neval
            Ptr{Cint}, # fail
@@ -134,9 +134,9 @@ function divonne(integrand::T, ndim::Integer=2, ncomp::Integer=1;
                  xgiven::Array{Cdouble,2}=zeros(Cdouble, ldxgiven,
                                                 ngiven),
                  nextra::Integer=NEXTRA,
-                 peakfinder::Ptr{Void}=PEAKFINDER,
+                 peakfinder::Ptr{Cvoid}=PEAKFINDER,
                  statefile::AbstractString=STATEFILE,
-                 spin::Ptr{Void}=SPIN) where {T}
+                 spin::Ptr{Cvoid}=SPIN) where {T}
     # Divonne requires "ndim" to be at least 2, even for an integral over a one
     # dimensional domain.  Instead, we don't prevent users from setting wrong
     # "ndim" values like 0 or negative ones.

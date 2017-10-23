@@ -25,7 +25,7 @@
 
 ### Code:
 
-using Cuba
+using Cuba, Printf
 
 const ndim=3
 const ncomp=11
@@ -58,29 +58,30 @@ function test(x::Vector{Float64}, f::Vector{Float64})
     @inbounds f[11] = t11(x[1], x[2], x[3])
 end
 
-info("Performance of Cuba.jl:")
+@info "Performance of Cuba.jl:"
 for alg in (vegas, suave, divonne, cuhre)
     # Run the integrator a first time to compile the function.
     alg(test, ndim, ncomp, abstol=abstol,
          reltol=reltol);
-    tic();
+    start_time = time_ns()
     alg(test, ndim, ncomp, abstol=abstol,
         reltol=reltol);
-    println(@sprintf("%10.6f seconds (%s)", toq(), ucfirst(string(alg)[6:end])))
+    end_time = time_ns()
+    println(@sprintf("%10.6f seconds (%s)", Int(end_time - start_time)/1e9, uppercasefirst(string(alg)[6:end])))
 end
 
 cd(dirname(@__FILE__)) do
     if mtime("benchmark.c") > mtime("benchmark-c")
         run(`gcc -O3 -I ../deps/usr/include -o benchmark-c benchmark.c ../deps/usr/lib/libcuba.a -lm`)
     end
-    info("Performance of Cuba Library in C:")
+    @info "Performance of Cuba Library in C:"
     run(`./benchmark-c`)
 
     if success(`which gfortran`)
         if mtime("benchmark.f") > mtime("benchmark-fortran")
             run(`gfortran -O3 -fcheck=no-bounds -cpp -o benchmark-fortran benchmark.f ../deps/usr/lib/libcuba.a -lm`)
         end
-        info("Performance of Cuba Library in Fortran:")
+        @info "Performance of Cuba Library in Fortran:"
         run(`./benchmark-fortran`)
     end
 end

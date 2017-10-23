@@ -108,19 +108,19 @@ function generic_integrand!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
 end
 
 # Return pointer for "integrand", to be passed as "integrand" argument to Cuba functions.
-integrand_ptr(integrand::T) where {T} = cfunction(generic_integrand!, Cint,
-                                                  (Ref{Cint}, # ndim
-                                                   Ptr{Cdouble}, # x
-                                                   Ref{Cint}, # ncomp
-                                                   Ptr{Cdouble}, # f
-                                                   Ref{T})) # userdata
-integrand_ptr_nvec(integrand::T) where {T} = cfunction(generic_integrand!, Cint,
-                                                       (Ref{Cint}, # ndim
-                                                        Ptr{Cdouble}, # x
-                                                        Ref{Cint}, # ncomp
-                                                        Ptr{Cdouble}, # f
-                                                        Ref{T}, # userdata
-                                                        Ref{Cint})) # nvec
+integrand_ptr(integrand::T)  where {T} = @cfunction(generic_integrand!, Cint,
+                                                    (Ref{Cint}, # ndim
+                                                     Ptr{Cdouble}, # x
+                                                     Ref{Cint}, # ncomp
+                                                     Ptr{Cdouble}, # f
+                                                     Ref{T})) # userdata
+integrand_ptr_nvec(integrand::T) where {T} = @cfunction(generic_integrand!, Cint,
+                                                        (Ref{Cint}, # ndim
+                                                         Ptr{Cdouble}, # x
+                                                         Ref{Cint}, # ncomp
+                                                         Ptr{Cdouble}, # f
+                                                         Ref{T}, # userdata
+                                                         Ref{Cint})) # nvec
 
 abstract type Integrand{T} end
 
@@ -167,9 +167,9 @@ end
     else
         integrand = integrand_ptr_nvec(x.func)
     end
-    integral  = Vector{Cdouble}(x.ncomp)
-    error     = Vector{Cdouble}(x.ncomp)
-    prob      = Vector{Cdouble}(x.ncomp)
+    integral  = Vector{Cdouble}(undef, x.ncomp)
+    error     = Vector{Cdouble}(undef, x.ncomp)
+    prob      = Vector{Cdouble}(undef, x.ncomp)
     neval     = Ref{Int64}(0)
     fail      = Ref{Cint}(0)
     nregions  = Ref{Cint}(0)
@@ -179,22 +179,22 @@ end
 
 ### Other functions, not exported
 function cores(n::Integer, p::Integer)
-    ccall((:cubacores, libcuba), Ptr{Void}, (Cint, Cint), n, p)
+    ccall((:cubacores, libcuba), Ptr{Cvoid}, (Cint, Cint), n, p)
     return 0
 end
 
 function accel(n::Integer, p::Integer)
-    ccall((:cubaaccel, libcuba), Ptr{Void}, (Cint, Cint), n, p)
+    ccall((:cubaaccel, libcuba), Ptr{Cvoid}, (Cint, Cint), n, p)
     return 0
 end
 
-function init(f::Ptr{Void}, arg::Ptr{Void})
-    ccall((:cubainit, libcuba), Ptr{Void}, (Ptr{Void}, Ptr{Void}), f, arg)
+function init(f::Ptr{Cvoid}, arg::Ptr{Cvoid})
+    ccall((:cubainit, libcuba), Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}), f, arg)
     return 0
 end
 
-function exit(f::Ptr{Void}, arg::Ptr{Void})
-    ccall((:cubaexit, libcuba), Ptr{Void}, (Ptr{Void}, Ptr{Void}), f, arg)
+function exit(f::Ptr{Cvoid}, arg::Ptr{Cvoid})
+    ccall((:cubaexit, libcuba), Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{Cvoid}), f, arg)
     return 0
 end
 

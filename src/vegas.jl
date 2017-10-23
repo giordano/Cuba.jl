@@ -36,7 +36,7 @@ struct Vegas{T} <: Integrand{T}
     nbatch::Int64
     gridno::Int
     statefile::String
-    spin::Ptr{Void}
+    spin::Ptr{Cvoid}
 end
 
 @inline function dointegrate!(x::Vegas{T}, integrand, integral,
@@ -44,7 +44,7 @@ end
     ccall((:llVegas, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
-           Ptr{Void}, # integrand
+           Ptr{Cvoid}, # integrand
            Any, # userdata
            Int64, # nvec
            Cdouble, # reltol
@@ -58,7 +58,7 @@ end
            Int64, # nbatch
            Cint, # gridno
            Ptr{Cchar}, # statefile
-           Ptr{Void}, # spin
+           Ptr{Cvoid}, # spin
            Ptr{Int64}, # neval
            Ptr{Cint}, # fail
            Ptr{Cdouble}, # integral
@@ -101,7 +101,7 @@ function vegas(integrand::T, ndim::Integer=1, ncomp::Integer=1;
                minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
                nstart::Integer=NSTART, nincrease::Integer=NINCREASE,
                nbatch::Integer=NBATCH, gridno::Integer=GRIDNO,
-               statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) where {T}
+               statefile::AbstractString=STATEFILE, spin::Ptr{Cvoid}=SPIN) where {T}
     return dointegrate(Vegas(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
                              Cdouble(abstol), flags, seed, trunc(Int64, minevals),
                              trunc(Int64, maxevals), Int64(nstart),

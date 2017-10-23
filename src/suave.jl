@@ -35,7 +35,7 @@ struct Suave{T} <: Integrand{T}
     nmin::Int64
     flatness::Cdouble
     statefile::String
-    spin::Ptr{Void}
+    spin::Ptr{Cvoid}
 end
 
 @inline function dointegrate!(x::Suave{T}, integrand, integral,
@@ -43,7 +43,7 @@ end
     ccall((:llSuave, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
-           Ptr{Void}, # integrand
+           Ptr{Cvoid}, # integrand
            Any, # userdata
            Int64, # nvec
            Cdouble, # reltol
@@ -56,7 +56,7 @@ end
            Int64, # nmin
            Cdouble, # flatness
            Ptr{Cchar}, # statefile
-           Ptr{Void}, # spin
+           Ptr{Cvoid}, # spin
            Ptr{Cint}, # nregions
            Ptr{Int64}, # neval
            Ptr{Cint}, # fail
@@ -98,7 +98,7 @@ function suave(integrand::T, ndim::Integer=1, ncomp::Integer=1;
                flags::Integer=FLAGS, seed::Integer=SEED,
                minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
                nnew::Integer=NNEW, nmin::Integer=NMIN, flatness::Real=FLATNESS,
-               statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) where {T}
+               statefile::AbstractString=STATEFILE, spin::Ptr{Cvoid}=SPIN) where {T}
     return dointegrate(Suave(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
                              Cdouble(abstol), flags, seed, trunc(Int64, minevals),
                              trunc(Int64, maxevals), Int64(nnew), Int64(nmin),
