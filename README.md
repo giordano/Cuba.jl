@@ -94,7 +94,9 @@ The only mandatory argument is:
 
 Optional positional arguments are:
 
-* `ndim`: the number of dimensions of the integration domain.  Defaults to 1
+* `ndim`: the number of dimensions of the integration domain.  Defaults to 1 in
+  `vegas` and `suave`, to 2 in `divonne` and `cuhre`.  Note: `ndim` must be
+  at least 2 with the latest two methods.
 * `ncomp`: the number of components of the integrand.  Defaults to 1
 
 `ndim` and `ncomp` arguments must appear in this order, so you cannot omit

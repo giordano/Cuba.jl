@@ -58,12 +58,13 @@ end
 
 integrand2(x, f) = f[1], f[2] = reim(cis(x[1]))
 
-@testset "Cuhre and Divonne with ndim = 1" begin
-    answer = sin(1) + im*(1 - cos(1))
-    result, rest = @inferred cuhre(integrand2, 1, 2)
-    @test complex(result...) ≈ answer
-    result, rest = divonne(integrand2, 1, 2, reltol=1e-8, abstol=1e-8)
-    @test isapprox(complex(result...), answer, atol=1e-8)
+@testset "ndim in Cuhre and Divonne" begin
+    result, rest = @inferred cuhre((x,f) -> f[] = cos(x[]))
+    @test result[] ≈ sin(1)
+    result, rest = divonne((x,f) -> f[] = cos(x[]), reltol=1e-8, abstol=1e-8)
+    @test isapprox(result[], sin(1), atol=1e-8)
+    @test_throws ArgumentError cuhre((x,f) -> f[] = cos(x[]), 1)
+    @test_throws ArgumentError divonne((x,f) -> f[] = cos(x[]), 1)
 end
 
 @testset "Integral over infinite domain" begin

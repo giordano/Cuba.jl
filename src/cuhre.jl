@@ -65,11 +65,11 @@ end
 end
 
 """
-    cuhre(integrand, ndim=1, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
+    cuhre(integrand, ndim=2, ncomp=1[, keywords]) -> integral, error, probability, neval, fail, nregions
 
 Calculate integral of `integrand` over the unit hypercube in `ndim` dimensions
 using Cuhre algorithm.  `integrand` is a vectorial function with `ncomp`
-components.  `ndim` and `ncomp` default to 1.
+components.  `ncomp` defaults to 1, `ndim` defaults to 2 and must be ≥ 2.
 
 Accepted keywords:
 
@@ -83,7 +83,7 @@ Accepted keywords:
 * `statefile`
 * `spin`
 """
-function cuhre{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
+function cuhre{T}(integrand::T, ndim::Integer=2, ncomp::Integer=1;
                   nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
                   flags::Integer=FLAGS, minevals::Real=MINEVALS,
                   maxevals::Real=MAXEVALS, key::Integer=KEY,
@@ -91,7 +91,7 @@ function cuhre{T}(integrand::T, ndim::Integer=1, ncomp::Integer=1;
     # Cuhre requires "ndim" to be at least 2, even for an integral over a one
     # dimensional domain.  Instead, we don't prevent users from setting wrong
     # "ndim" values like 0 or negative ones.
-    ndim == 1 && (ndim = 2)
+    ndim >=2 || throw(ArgumentError("In Cuhre ndim must be ≥ 2"))
     return dointegrate(Cuhre(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
                              Cdouble(abstol), flags, trunc(Int64, minevals),
                              trunc(Int64, maxevals), key, String(statefile), spin))
