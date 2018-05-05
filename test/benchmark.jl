@@ -70,16 +70,15 @@ for alg in (vegas, suave, divonne, cuhre)
 end
 
 cd(dirname(@__FILE__)) do
-    sha = readchomp("../deps/installed_version")
     if mtime("benchmark.c") > mtime("benchmark-c")
-        run(`gcc -O3 -I../deps/cuba-$(sha) -o benchmark-c benchmark.c ../deps/cuba-$(sha)/libcuba.a -lm`)
+        run(`gcc -O3 -I ../deps/usr/include -o benchmark-c benchmark.c ../deps/usr/lib/libcuba.a -lm`)
     end
     info("Performance of Cuba Library in C:")
     run(`./benchmark-c`)
 
     if success(`which gfortran`)
         if mtime("benchmark.f") > mtime("benchmark-fortran")
-            run(`gfortran -O3 -fcheck=no-bounds -cpp -o benchmark-fortran benchmark.f ../deps/cuba-$(sha)/libcuba.a -lm`)
+            run(`gfortran -O3 -fcheck=no-bounds -cpp -o benchmark-fortran benchmark.f ../deps/usr/lib/libcuba.a -lm`)
         end
         info("Performance of Cuba Library in Fortran:")
         run(`./benchmark-fortran`)

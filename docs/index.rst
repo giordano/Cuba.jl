@@ -62,7 +62,7 @@ All algorithms provided by Cuba library are supported in ``Cuba.jl``:
 .. _`stratified sampling`: <https://en.wikipedia.org/wiki/Stratified_sampling>
 
 For more details on the algorithms see the manual included in Cuba library and
-available in ``deps/cuba-julia/cuba.pdf`` after successful installation
+available in ``deps/usr/share/cuba.pdf`` after successful installation
 of ``Cuba.jl``.
 
 Integration is always performed on the :math:`n`-dimensional `unit hypercube
@@ -125,11 +125,6 @@ Julia session run the commands
 
     julia> Pkg.update()
     julia> Pkg.add("Cuba")
-
-Installation script on GNU/Linux and Mac OS systems will download Cuba Library
-source code and build the Cuba shared object.  In order to accomplish this task
-a C compiler is needed.  Instead, on Windows a prebuilt version of the library
-is downloaded.
 
 Older versions are also available for Julia 0.4 and 0.5.
 

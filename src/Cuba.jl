@@ -26,9 +26,13 @@ module Cuba
 
 export vegas, suave, divonne, cuhre
 
-# Note: don't use Pkg.dir("PkgName") here because the package may be installed
-# elsewhere.
-const libcuba = joinpath(dirname(@__FILE__), "..", "deps", "libcuba")
+
+# Load in `deps.jl`, complaining if it does not exist
+const depsjl_path = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
+if !isfile(depsjl_path)
+    error("Cuba not installed properly, run Pkg.build(\"Cuba\"), restart Julia and try again")
+end
+include(depsjl_path)
 
 ### Default values of parameters
 # Common arguments.

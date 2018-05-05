@@ -12,6 +12,10 @@ v0.5.0 (2018-0?-??)
   Now setting `ndim` to 1 throws an error.  Your code will not be affected by
   this change if you did not explicitely set `ndim`.  See
   issue [#14](https://github.com/giordano/Cuba.jl/issues/14).
+* The package now
+  uses
+  [`BinaryProvider.jl`](https://github.com/JuliaPackaging/BinaryProvider.jl) to
+  install a pre-built version of the Cuba library on all platforms.
 
 v0.4.0 (2017-07-08)
 -------------------
