@@ -40,14 +40,14 @@ Cuba.accel(0,1000)
 
 # Test results and make sure the estimation of error is exact.
 ncomp = 3
-@testset "$alg" for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
+@testset "$alg" for (alg, atol) in ((vegas, 1e-4), (suave, 1e-3),
                       (divonne, 1e-4), (cuhre, 1e-8))
     # Make sure that using maxevals > typemax(Int32) doesn't result into InexactError.
     if alg == divonne
-        result = @inferred alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8,
+        result = @inferred alg(integrand1, 3, ncomp, atol=atol, rtol=1e-8,
                                flags=0, border = 1e-5, maxevals = 3000000000)
     else
-        result = @inferred alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8,
+        result = @inferred alg(integrand1, 3, ncomp, atol=atol, rtol=1e-8,
                                flags=0, maxevals = 3e9)
     end
     # Analytic expressions: ((e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3))
@@ -59,7 +59,7 @@ end
 @testset "ndim in Cuhre and Divonne" begin
     result, rest = @inferred cuhre((x,f) -> f[1] = cos(x[1]))
     @test result[1] ≈ sin(1)
-    result, rest = divonne((x,f) -> f[1] = cos(x[1]), reltol=1e-8, abstol=1e-8)
+    result, rest = divonne((x,f) -> f[1] = cos(x[1]), rtol=1e-8, atol=1e-8)
     @test result[1] ≈ sin(1) atol=1e-8
     @test_throws ArgumentError cuhre((x,f) -> f[1] = cos(x[1]), 1)
     @test_throws ArgumentError divonne((x,f) -> f[1] = cos(x[1]), 1)
@@ -68,7 +68,7 @@ end
 @testset "Integral over infinite domain" begin
     func(x) = log(1 + x^2)/(1 + x^2)
     result, rest = @inferred cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
-                                   abstol = 1e-12, reltol = 1e-10)
+                                   atol = 1e-12, rtol = 1e-10)
     @test result[1] ≈ pi * log(2) atol = 3e-12
 end
 

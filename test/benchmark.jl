@@ -29,8 +29,8 @@ using Cuba, Printf
 
 const ndim=3
 const ncomp=11
-const abstol=1e-8
-const reltol=1e-8
+const atol=1e-8
+const rtol=1e-8
 
 rsq(x,y,z) = abs2(x) + abs2(y) + abs2(z)
 t1(x,y,z)  = sin(x)*cos(y)*exp(z)
@@ -61,11 +61,11 @@ end
 @info "Performance of Cuba.jl:"
 for alg in (vegas, suave, divonne, cuhre)
     # Run the integrator a first time to compile the function.
-    alg(test, ndim, ncomp, abstol=abstol,
-         reltol=reltol);
+    alg(test, ndim, ncomp, atol=atol,
+         rtol=rtol);
     start_time = time_ns()
-    alg(test, ndim, ncomp, abstol=abstol,
-        reltol=reltol);
+    alg(test, ndim, ncomp, atol=atol,
+        rtol=rtol);
     end_time = time_ns()
     println(@sprintf("%10.6f seconds (%s)", Int(end_time - start_time)/1e9, uppercasefirst(string(alg)[6:end])))
 end

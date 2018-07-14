@@ -37,8 +37,8 @@ include(depsjl_path)
 ### Default values of parameters
 # Common arguments.
 const NVEC      = 1
-const RELTOL    = 1e-4
-const ABSTOL    = 1e-12
+const RTOL      = 1e-4
+const ATOL      = 1e-12
 const FLAGS     = 0
 const SEED      = 0
 const MINEVALS  = 0
@@ -126,6 +126,14 @@ abstract type Integrand{T} end
 
 function __init__()
     Cuba.cores(0, 10000)
+end
+
+# handle keyword deprecation
+function tols(atol,rtol,abstol,reltol)
+    if !ismissing(abstol) || !ismissing(reltol)
+        Base.depwarn("abstol and reltol keywords are now atol and rtol, respectively", :quadgk)
+    end
+    return coalesce(abstol,atol), coalesce(reltol,rtol)
 end
 
 include("cuhre.jl")

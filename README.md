@@ -193,7 +193,7 @@ function func(x, f)
     f[3] = 1/(1 - x[1]*x[2]*x[3])
 end
 
-result = cuhre(func, 3, 3, abstol=1e-12, reltol=1e-10)
+result = cuhre(func, 3, 3, atol=1e-12, rtol=1e-10)
 println("Results of Cuba:")
 for i=1:3; println("Component $i: ", result[1][i], " ± ", result[2][i]); end
 println("Exact results:")

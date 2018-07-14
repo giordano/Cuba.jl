@@ -25,8 +25,8 @@ struct Vegas{T} <: Integrand{T}
     ndim::Int
     ncomp::Int
     nvec::Int64
-    reltol::Cdouble
-    abstol::Cdouble
+    rtol::Cdouble
+    atol::Cdouble
     flags::Int
     seed::Int
     minevals::Int64
@@ -47,8 +47,8 @@ end
            Ptr{Cvoid}, # integrand
            Any, # userdata
            Int64, # nvec
-           Cdouble, # reltol
-           Cdouble, # abstol
+           Cdouble, # rtol
+           Cdouble, # atol
            Cint, # flags
            Cint, # seed
            Int64, # minevals
@@ -66,7 +66,7 @@ end
            Ptr{Cdouble}),# prob
           # Input
           x.ndim, x.ncomp, integrand, x.func, x.nvec,
-          x.reltol, x.abstol, x.flags, x.seed, x.minevals, x.maxevals,
+          x.rtol, x.atol, x.flags, x.seed, x.minevals, x.maxevals,
           x.nstart, x.nincrease, x.nbatch, x.gridno, x.statefile, x.spin,
           # Output
           neval, fail, integral, error, prob)
@@ -82,8 +82,8 @@ components.  `ndim` and `ncomp` default to 1.
 Accepted keywords:
 
 * `nvec`
-* `reltol`
-* `abstol`
+* `rtol`
+* `atol`
 * `flags`
 * `seed`
 * `minevals`
@@ -96,14 +96,16 @@ Accepted keywords:
 * `spin`
 """
 function vegas(integrand::T, ndim::Integer=1, ncomp::Integer=1;
-               nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
+               nvec::Integer=NVEC, rtol::Real=RTOL, atol::Real=ATOL,
                flags::Integer=FLAGS, seed::Integer=SEED,
                minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
                nstart::Integer=NSTART, nincrease::Integer=NINCREASE,
                nbatch::Integer=NBATCH, gridno::Integer=GRIDNO,
-               statefile::AbstractString=STATEFILE, spin::Ptr{Cvoid}=SPIN) where {T}
-    return dointegrate(Vegas(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
-                             Cdouble(abstol), flags, seed, trunc(Int64, minevals),
+               statefile::AbstractString=STATEFILE, spin::Ptr{Cvoid}=SPIN,
+               reltol=missing, abstol=missing) where {T}
+    atol_,rtol_ = tols(atol,rtol,abstol,reltol)
+    return dointegrate(Vegas(integrand, ndim, ncomp, Int64(nvec), Cdouble(rtol_),
+                             Cdouble(atol_), flags, seed, trunc(Int64, minevals),
                              trunc(Int64, maxevals), Int64(nstart),
                              Int64(nincrease), Int64(nbatch), gridno,
                              String(statefile), spin))

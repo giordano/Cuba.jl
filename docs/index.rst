@@ -268,7 +268,7 @@ These are optional keywords common to all functions:
   be given to the integrand routine in each invocation.  Usually this is 1 but
   if the integrand can profit from e.g. Single Instruction Multiple Data (SIMD)
   vectorization, a larger value can be chosen.  See `Vectorization`_ section.
-- ``reltol`` (type: ``Real``, default: ``1e-4``), and ``abstol`` (type:
+- ``rtol`` (type: ``Real``, default: ``1e-4``), and ``atol`` (type:
   ``Real``, default: ``1e-12``): the requested relative
   (:math:`\varepsilon_{\text{rel}}`) and absolute
   (:math:`\varepsilon_{\text{abs}}`) accuracies.  The integrator tries to find
@@ -677,7 +677,7 @@ above integral
         f[3] = 1/(1 - prod(x))
     end
 
-    result, err = cuhre(integrand, 3, 3, abstol=1e-12, reltol=1e-10)
+    result, err = cuhre(integrand, 3, 3, atol=1e-12, rtol=1e-10)
     answer = [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
     for i = 1:3
         println("Component ", i)
@@ -728,7 +728,7 @@ that can be computed with ``Cuba.jl`` using the following Julia script
                sin(pi*x[2]*x[3])*exp(pi*x[3])
     end
 
-    result, err = cuhre(integrand, 3, 1, abstol=1e-12, reltol=1e-10)
+    result, err = cuhre(integrand, 3, 1, atol=1e-12, rtol=1e-10)
     answer = pi*e^pi - (4e^pi - 4)/5
     println("Result of Cuba: ", result[1], " ± ", err[1])
     println("Exact result:   ", answer)
@@ -770,7 +770,7 @@ following Julia script:
        f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2
    end
 
-   result, err = cuhre(integrand, abstol = 1e-12, reltol = 1e-10)
+   result, err = cuhre(integrand, atol = 1e-12, rtol = 1e-10)
    answer = pi*log(2)
    println("Result of Cuba: ", result[1], " ± ", err[1])
    println("Exact result:   ", answer)
@@ -805,7 +805,7 @@ to inform Julia about this.
            (2*x[1]^2 - 2*x[1] + 1)/x[1]^2/(1 - x[1])^2
    end
 
-   result, err = cuhre(integrand, abstol = 1e-7, reltol = 1e-7)
+   result, err = cuhre(integrand, atol = 1e-7, rtol = 1e-7)
    answer = float(pi)
    println("Result of Cuba: ", result[1], " ± ", err[1])
    println("Exact result:   ", answer)
