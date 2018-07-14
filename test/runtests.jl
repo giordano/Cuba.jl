@@ -39,7 +39,6 @@ Cuba.cores(0, 10000)
 Cuba.accel(0,1000)
 
 # Test results and make sure the estimation of error is exact.
-# Analytic expressions: [(e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3)]
 ncomp = 3
 @testset "$alg" for (alg, abstol) in ((vegas, 1e-4), (suave, 1e-3),
                       (divonne, 1e-4), (cuhre, 1e-8))
@@ -51,18 +50,17 @@ ncomp = 3
         result = @inferred alg(integrand1, 3, ncomp, abstol=abstol, reltol=1e-8,
                                flags=0, maxevals = 3e9)
     end
-    for (i, answer) in enumerate([0.6646696797813771, 0.41653838588663805, 1.2020569031595951])
-        @test isapprox(result[1][i], answer, atol=result[2][i])
+    # Analytic expressions: ((e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3))
+    for (i, answer) in enumerate((0.6646696797813771, 0.41653838588663805, 1.2020569031595951))
+        @test result[1][i] ≈ answer atol=result[2][i]
     end
 end
-
-integrand2(x, f) = f[1], f[2] = reim(cis(x[1]))
 
 @testset "ndim in Cuhre and Divonne" begin
     result, rest = @inferred cuhre((x,f) -> f[1] = cos(x[1]))
     @test result[1] ≈ sin(1)
     result, rest = divonne((x,f) -> f[1] = cos(x[1]), reltol=1e-8, abstol=1e-8)
-    @test isapprox(result[1], sin(1), atol=1e-8)
+    @test result[1] ≈ sin(1) atol=1e-8
     @test_throws ArgumentError cuhre((x,f) -> f[1] = cos(x[1]), 1)
     @test_throws ArgumentError divonne((x,f) -> f[1] = cos(x[1]), 1)
 end
