@@ -9,6 +9,8 @@ v0.6.0 (2018-??-??)
 * Support for Julia 0.6 was dropped.
 * Keyword arguments `reltol` and `abstol` are now called, respectively, `rtol`
   and `atol` , to match keywords in `isapprox` function.
+* Deprecated `llvegas`, `llsuave`, `lldivonne`, and `llcuhre` functions have
+  been removed.
 
 v0.5.0 (2018-05-15)
 -------------------
