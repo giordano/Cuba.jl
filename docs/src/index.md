@@ -10,9 +10,10 @@ end
 Introduction
 ------------
 
-`Cuba.jl` is a [Julia](http://julialang.org/) library for multidimensional
-[numerical integration](https://en.wikipedia.org/wiki/Numerical_integration) of
-real-valued functions of real arguments, using different algorithms.
+[`Cuba.jl`](https://github.com/giordano/Cuba.jl) is a
+[Julia](http://julialang.org/) library for multidimensional [numerical
+integration](https://en.wikipedia.org/wiki/Numerical_integration) of real-valued
+functions of real arguments, using different algorithms.
 
 This is just a Julia wrapper around the C [Cuba
 library](http://www.feynarts.de/cuba/), version 4.2, by **Thomas Hahn**.  All
@@ -613,9 +614,9 @@ used to evaluate more quickly the integrand function, for example by exploiting
 parallelism, thus speeding up computation of the integral. See the section
 [Vectorized Function](@ref) below for an example of a vectorized funcion.
 
-!!! note
+!!! note "Disambiguation"
 
-    Disambiguation: the `nbatch` argument of Vegas is related in purpose but
+    The `nbatch` argument of [`vegas`](@ref) is related in purpose but
     not identical to `nvec`. It internally partitions the sampling done by
     Vegas but has no bearing on the number of points given to the integrand.
     On the other hand, it it pointless to choose `nvec` > `nbatch` for

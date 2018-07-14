@@ -175,8 +175,7 @@ interface has been reworked in version 0.0.5 in a backward incompatible way.
 ### Documentation ###
 
 A more detailed manual of `Cuba.jl`, with many complete examples, is available
-at http://cubajl.readthedocs.io/.  You can also download the latest PDF version
-from https://media.readthedocs.org/pdf/cubajl/latest/cubajl.pdf.
+at https://giordano.github.io/Cuba.jl//stable/.
 
 Example
 -------
@@ -293,10 +292,10 @@ http://adsabs.harvard.edu/abs/2015JPhCS.608a2066H).
 
 
 [docs-latest-img]: https://img.shields.io/badge/docs-latest-blue.svg
-[docs-latest-url]: https://cubajl.readthedocs.io/en/latest/
+[docs-latest-url]: https://giordano.github.io/Cuba.jl/latest/
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
-[docs-stable-url]: https://cubajl.readthedocs.io/en/stable/
+[docs-stable-url]: https://giordano.github.io/Cuba.jl//stable/
 
 [pkgeval-link]: http://pkg.julialang.org/?pkg=Cuba
 
