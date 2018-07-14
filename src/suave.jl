@@ -25,8 +25,8 @@ struct Suave{T} <: Integrand{T}
     ndim::Int
     ncomp::Int
     nvec::Int64
-    reltol::Cdouble
-    abstol::Cdouble
+    rtol::Cdouble
+    atol::Cdouble
     flags::Int
     seed::Int
     minevals::Int64
@@ -35,7 +35,7 @@ struct Suave{T} <: Integrand{T}
     nmin::Int64
     flatness::Cdouble
     statefile::String
-    spin::Ptr{Void}
+    spin::Ptr{Cvoid}
 end
 
 @inline function dointegrate!(x::Suave{T}, integrand, integral,
@@ -43,11 +43,11 @@ end
     ccall((:llSuave, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
-           Ptr{Void}, # integrand
+           Ptr{Cvoid}, # integrand
            Any, # userdata
            Int64, # nvec
-           Cdouble, # reltol
-           Cdouble, # abstol
+           Cdouble, # rtol
+           Cdouble, # atol
            Cint, # flags
            Cint, # seed
            Int64, # minevals
@@ -56,7 +56,7 @@ end
            Int64, # nmin
            Cdouble, # flatness
            Ptr{Cchar}, # statefile
-           Ptr{Void}, # spin
+           Ptr{Cvoid}, # spin
            Ptr{Cint}, # nregions
            Ptr{Int64}, # neval
            Ptr{Cint}, # fail
@@ -65,7 +65,7 @@ end
            Ptr{Cdouble}),# prob
           # Input
           x.ndim, x.ncomp, integrand, x.func, x.nvec,
-          x.reltol, x.abstol, x.flags, x.seed, x.minevals, x.maxevals,
+          x.rtol, x.atol, x.flags, x.seed, x.minevals, x.maxevals,
           x.nnew, x.nmin, x.flatness, x.statefile, x.spin,
           # Output
           nregions, neval, fail, integral, error, prob)
@@ -81,8 +81,8 @@ components. `ndim` and `ncomp` default to 1.
 Accepted keywords:
 
 * `nvec`
-* `reltol`
-* `abstol`
+* `rtol`
+* `atol`
 * `flags`
 * `seed`
 * `minevals`
@@ -94,13 +94,15 @@ Accepted keywords:
 * `spin`
 """
 function suave(integrand::T, ndim::Integer=1, ncomp::Integer=1;
-               nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
+               nvec::Integer=NVEC, rtol::Real=RTOL, atol::Real=ATOL,
                flags::Integer=FLAGS, seed::Integer=SEED,
                minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
                nnew::Integer=NNEW, nmin::Integer=NMIN, flatness::Real=FLATNESS,
-               statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) where {T}
-    return dointegrate(Suave(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
-                             Cdouble(abstol), flags, seed, trunc(Int64, minevals),
+               statefile::AbstractString=STATEFILE, spin::Ptr{Cvoid}=SPIN,
+               reltol=missing, abstol=missing) where {T}
+    atol_,rtol_ = tols(atol,rtol,abstol,reltol)
+    return dointegrate(Suave(integrand, ndim, ncomp, Int64(nvec), Cdouble(rtol_),
+                             Cdouble(atol_), flags, seed, trunc(Int64, minevals),
                              trunc(Int64, maxevals), Int64(nnew), Int64(nmin),
                              Cdouble(flatness), String(statefile), spin))
 end

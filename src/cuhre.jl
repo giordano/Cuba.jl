@@ -25,14 +25,14 @@ struct Cuhre{T} <: Integrand{T}
     ndim::Int
     ncomp::Int
     nvec::Int64
-    reltol::Cdouble
-    abstol::Cdouble
+    rtol::Cdouble
+    atol::Cdouble
     flags::Int
     minevals::Int64
     maxevals::Int64
     key::Int
     statefile::String
-    spin::Ptr{Void}
+    spin::Ptr{Cvoid}
 end
 
 @inline function dointegrate!(x::Cuhre{T}, integrand, integral,
@@ -40,17 +40,17 @@ end
     ccall((:llCuhre, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
-           Ptr{Void}, # integrand
+           Ptr{Cvoid}, # integrand
            Any, # userdata
            Int64, # nvec
-           Cdouble, # reltol
-           Cdouble, # abstol
+           Cdouble, # rtol
+           Cdouble, # atol
            Cint, # flags
            Int64, # minevals
            Int64, # maxevals
            Cint, # key
            Ptr{Cchar}, # statefile
-           Ptr{Void}, # spin
+           Ptr{Cvoid}, # spin
            Ptr{Cint}, # nregions
            Ptr{Int64}, # neval
            Ptr{Cint}, # fail
@@ -58,7 +58,7 @@ end
            Ptr{Cdouble}, # error
            Ptr{Cdouble}),# prob
           # Input
-          x.ndim, x.ncomp, integrand, x.func, x.nvec, x.reltol, x.abstol,
+          x.ndim, x.ncomp, integrand, x.func, x.nvec, x.rtol, x.atol,
           x.flags, x.minevals, x.maxevals, x.key, x.statefile, x.spin,
           # Output
           nregions, neval, fail, integral, error, prob)
@@ -74,8 +74,8 @@ components.  `ncomp` defaults to 1, `ndim` defaults to 2 and must be ≥ 2.
 Accepted keywords:
 
 * `nvec`
-* `reltol`
-* `abstol`
+* `rtol`
+* `atol`
 * `flags`
 * `minevals`
 * `maxevals`
@@ -84,15 +84,17 @@ Accepted keywords:
 * `spin`
 """
 function cuhre(integrand::T, ndim::Integer=2, ncomp::Integer=1;
-               nvec::Integer=NVEC, reltol::Real=RELTOL, abstol::Real=ABSTOL,
+               nvec::Integer=NVEC, rtol::Real=RTOL, atol::Real=ATOL,
                flags::Integer=FLAGS, minevals::Real=MINEVALS,
                maxevals::Real=MAXEVALS, key::Integer=KEY,
-               statefile::AbstractString=STATEFILE, spin::Ptr{Void}=SPIN) where {T}
+               statefile::AbstractString=STATEFILE, spin::Ptr{Cvoid}=SPIN,
+               abstol=missing, reltol=missing) where {T}
+    atol_,rtol_ = tols(atol,rtol,abstol,reltol)
     # Cuhre requires "ndim" to be at least 2, even for an integral over a one
     # dimensional domain.  Instead, we don't prevent users from setting wrong
     # "ndim" values like 0 or negative ones.
     ndim >=2 || throw(ArgumentError("In Cuhre ndim must be ≥ 2"))
-    return dointegrate(Cuhre(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
-                             Cdouble(abstol), flags, trunc(Int64, minevals),
+    return dointegrate(Cuhre(integrand, ndim, ncomp, Int64(nvec), Cdouble(rtol_),
+                             Cdouble(atol_), flags, trunc(Int64, minevals),
                              trunc(Int64, maxevals), key, String(statefile), spin))
 end

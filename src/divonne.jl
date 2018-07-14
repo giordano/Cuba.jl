@@ -25,8 +25,8 @@ struct Divonne{T} <: Integrand{T}
     ndim::Int
     ncomp::Int
     nvec::Int64
-    reltol::Cdouble
-    abstol::Cdouble
+    rtol::Cdouble
+    atol::Cdouble
     flags::Int
     seed::Int
     minevals::Int64
@@ -42,9 +42,9 @@ struct Divonne{T} <: Integrand{T}
     ldxgiven::Int
     xgiven::Array{Cdouble, 2}
     nextra::Int64
-    peakfinder::Ptr{Void}
+    peakfinder::Ptr{Cvoid}
     statefile::String
-    spin::Ptr{Void}
+    spin::Ptr{Cvoid}
 end
 
 @inline function dointegrate!(x::Divonne{T}, integrand, integral,
@@ -52,11 +52,11 @@ end
     ccall((:llDivonne, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
-           Ptr{Void}, # integrand
+           Ptr{Cvoid}, # integrand
            Any, # userdata
            Int64, # nvec
-           Cdouble, # reltol
-           Cdouble, # abstol
+           Cdouble, # rtol
+           Cdouble, # atol
            Cint, # flags
            Cint, # seed
            Int64, # minevals
@@ -72,9 +72,9 @@ end
            Cint, # ldxgiven
            Ptr{Cdouble}, # xgiven
            Int64, # nextra
-           Ptr{Void}, # peakfinder
+           Ptr{Cvoid}, # peakfinder
            Ptr{Cchar}, # statefile
-           Ptr{Void}, # spin
+           Ptr{Cvoid}, # spin
            Ptr{Cint}, # nregions
            Ptr{Int64}, # neval
            Ptr{Cint}, # fail
@@ -82,8 +82,8 @@ end
            Ptr{Cdouble}, # error
            Ptr{Cdouble}),# prob
           # Input
-          x.ndim, x.ncomp, integrand, x.func, x.nvec, x.reltol,
-          x.abstol, x.flags, x.seed, x.minevals, x.maxevals, x.key1, x.key2,
+          x.ndim, x.ncomp, integrand, x.func, x.nvec, x.rtol,
+          x.atol, x.flags, x.seed, x.minevals, x.maxevals, x.key1, x.key2,
           x.key3, x.maxpass, x.border, x.maxchisq, x.mindeviation, x.ngiven,
           x.ldxgiven, x.xgiven, x.nextra, x.peakfinder, x.statefile, x.spin,
           # Output
@@ -100,8 +100,8 @@ components. `ncomp` defaults to 1, `ndim` defaults to 2 and must be ≥ 2.
 Accepted keywords:
 
 * `nvec`
-* `reltol`
-* `abstol`
+* `rtol`
+* `atol`
 * `flags`
 * `seed`
 * `minevals`
@@ -122,8 +122,8 @@ Accepted keywords:
 * `spin`
 """
 function divonne(integrand::T, ndim::Integer=2, ncomp::Integer=1;
-                 nvec::Integer=NVEC, reltol::Real=RELTOL,
-                 abstol::Real=ABSTOL, flags::Integer=FLAGS,
+                 nvec::Integer=NVEC, rtol::Real=RTOL,
+                 atol::Real=ATOL, flags::Integer=FLAGS,
                  seed::Integer=SEED, minevals::Real=MINEVALS,
                  maxevals::Real=MAXEVALS, key1::Integer=KEY1,
                  key2::Integer=KEY2, key3::Integer=KEY3,
@@ -134,15 +134,16 @@ function divonne(integrand::T, ndim::Integer=2, ncomp::Integer=1;
                  xgiven::Array{Cdouble,2}=zeros(Cdouble, ldxgiven,
                                                 ngiven),
                  nextra::Integer=NEXTRA,
-                 peakfinder::Ptr{Void}=PEAKFINDER,
+                 peakfinder::Ptr{Cvoid}=PEAKFINDER,
                  statefile::AbstractString=STATEFILE,
-                 spin::Ptr{Void}=SPIN) where {T}
+                 spin::Ptr{Cvoid}=SPIN, reltol=missing, abstol=missing) where {T}
+    atol_,rtol_ = tols(atol,rtol,abstol,reltol)
     # Divonne requires "ndim" to be at least 2, even for an integral over a one
     # dimensional domain.  Instead, we don't prevent users from setting wrong
     # "ndim" values like 0 or negative ones.
     ndim >=2 || throw(ArgumentError("In Divonne ndim must be ≥ 2"))
-    return dointegrate(Divonne(integrand, ndim, ncomp, Int64(nvec), Cdouble(reltol),
-                               Cdouble(abstol), flags, seed, trunc(Int64, minevals),
+    return dointegrate(Divonne(integrand, ndim, ncomp, Int64(nvec), Cdouble(rtol_),
+                               Cdouble(atol_), flags, seed, trunc(Int64, minevals),
                                trunc(Int64, maxevals), key1, key2, key3, maxpass,
                                Cdouble(border), Cdouble(maxchisq), Cdouble(mindeviation),
                                Int64(ngiven), ldxgiven, xgiven, Int64(nextra),
