@@ -24,29 +24,29 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
 
 * [Vegas](https://en.wikipedia.org/wiki/VEGAS_algorithm):
 
-  | Basic integration method                                                                  | Type                                                                 | [Variance reduction](https://en.wikipedia.org/wiki/Variance_reduction)   |
-  |-------------------------------------------------------------------------------------------|----------------------------------------------------------------------|--------------------------------------------------------------------------|
-  | [Sobol quasi-random sample](https://en.wikipedia.org/wiki/Sobol_sequence)                 | [Monte Carlo](https://en.wikipedia.org/wiki/Monte_Carlo_integration) | [importance sampling](https://en.wikipedia.org/wiki/Importance_sampling) |
-  | or[Mersenne Twister pseudo-random sample](https://en.wikipedia.org/wiki/Mersenne_Twister) | "                                                                    | "                                                                        |
-  | or [Ranlux pseudo-random sample](http://arxiv.org/abs/hep-lat/9309020)                    | "                                                                    | "                                                                        |
+  | Basic integration method                                                                | Type                                                                 | [Variance reduction](https://en.wikipedia.org/wiki/Variance_reduction)   |
+  |-----------------------------------------------------------------------------------------|----------------------------------------------------------------------|--------------------------------------------------------------------------|
+  | [Sobol quasi-random sample](https://en.wikipedia.org/wiki/Sobol_sequence)               | [Monte Carlo](https://en.wikipedia.org/wiki/Monte_Carlo_integration) | [importance sampling](https://en.wikipedia.org/wiki/Importance_sampling) |
+  | [Mersenne Twister pseudo-random sample](https://en.wikipedia.org/wiki/Mersenne_Twister) | "                                                                    | "                                                                        |
+  | [Ranlux pseudo-random sample](http://arxiv.org/abs/hep-lat/9309020)                     | "                                                                    | "                                                                        |
 
 * Suave
 
-  | Basic integration method                 | Type        | Variance reduction                                                                                         |
-  |------------------------------------------|-------------|------------------------------------------------------------------------------------------------------------|
-  | Sobol quasi-random sample                | Monte Carlo | globally [adaptive subdivision](https://en.wikipedia.org/wiki/Adaptive_quadrature) and importance sampling |
-  | or Mersenne Twister pseudo-random sample | "           | "                                                                                                          |
-  | or Ranlux pseudo-random sample           | "           | "                                                                                                          |
+  | Basic integration method              | Type        | Variance reduction                                                                                         |
+  |---------------------------------------|-------------|------------------------------------------------------------------------------------------------------------|
+  | Sobol quasi-random sample             | Monte Carlo | globally [adaptive subdivision](https://en.wikipedia.org/wiki/Adaptive_quadrature) and importance sampling |
+  | Mersenne Twister pseudo-random sample | "           | "                                                                                                          |
+  | Ranlux pseudo-random sample           | "           | "                                                                                                          |
 
 * Divonne
 
-  | Basic integration method                 | Type          | Variance reduction                                                                                                    |
-  |------------------------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------|
-  | Korobov quasi-random sample              | Monte Carlo   | [stratified sampling](https://en.wikipedia.org/wiki/Stratified_sampling) aided by methods from numerical optimization |
-  | or Sobol quasi-random sample             | "             | "                                                                                                                     |
-  | or Mersenne Twister pseudo-random sample | "             | "                                                                                                                     |
-  | or Ranlux pseudo-random sample           | "             | "                                                                                                                     |
-  | or cubature rules                        | deterministic | "                                                                                                                     |
+  | Basic integration method              | Type          | Variance reduction                                                                                                    |
+  |---------------------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------|
+  | Korobov quasi-random sample           | Monte Carlo   | [stratified sampling](https://en.wikipedia.org/wiki/Stratified_sampling) aided by methods from numerical optimization |
+  | Sobol quasi-random sample             | "             | "                                                                                                                     |
+  | Mersenne Twister pseudo-random sample | "             | "                                                                                                                     |
+  | Ranlux pseudo-random sample           | "             | "                                                                                                                     |
+  | cubature rules                        | deterministic | "                                                                                                                     |
 
 * Cuhre
 
@@ -120,7 +120,6 @@ manager](http://docs.julialang.org/en/stable/manual/packages/). In a
 Julia session run the commands
 
 ```julia
-julia> using Pkg
 julia> Pkg.update()
 julia> Pkg.add("Cuba")
 ```
@@ -187,9 +186,7 @@ Optional positional arguments are:
 -   `ncomp` (type: `Integer`): the number of components of the
     integrand. Default to 1 if omitted
 
-`ndim` and `ncomp` arguments must appear in this order, so you cannot
-omit `ndim` but not `ncomp`. `integrand` should be a function
-`integrand(x, f)` taking two arguments:
+`integrand` should be a function `integrand(x, f)` taking two arguments:
 
 -   the input vector `x` of length `ndim`
 -   the output vector `f` of length `ncomp`, used to set the value of
@@ -919,33 +916,34 @@ expression of the cumulative distribution function, provided by
 [GSL.jl](https://github.com/jiahao/GSL.jl) package.
 
 ```julia
-using Cuba, GSL
+julia > using Cuba, GSL, Printf, SpecialFunctions
 
-function chi2cdf(x::Real, k::Real)
-    k2 = k/2
-    # Chi-squared probability density function, without constant denominator.
-    # The result of integration will be divided by that factor.
-    function chi2pdf(t::Float64)
-        # "k2" is taken from the outside.
-        return t^(k2 - 1.0)*exp(-t/2)
-    end
-    # Neither "x" is passed directly to the integrand function,
-    # but is visible to it.  "x" is used to scale the function
-    # in order to actually integrate in [0, 1].
-    x*cuhre((t,f) -> f[1] = chi2pdf(t[1]*x))[1][1]/(2^k2*gamma(k2))
-end
+julia > function chi2cdf(x::Real, k::Real)
+            k2 = k/2
+            # Chi-squared probability density function, without constant denominator.
+            # The result of integration will be divided by that factor.
+            function chi2pdf(t::Float64)
+                # "k2" is taken from the outside.
+                return t^(k2 - 1.0)*exp(-t/2)
+            end
+            # Neither "x" is passed directly to the integrand function,
+            # but is visible to it.  "x" is used to scale the function
+            # in order to actually integrate in [0, 1].
+            x*cuhre((t,f) -> f[1] = chi2pdf(t[1]*x))[1][1]/(2^k2*gamma(k2))
+        end
+chi2cdf (generic function with 1 method)
 
-x = pi
-@printf("Result of Cuba: %.6f %.6f %.6f %.6f %.6f\n",
-        map((k) -> chi2cdf(x, k), collect(1:5))...)
-@printf("Exact result:   %.6f %.6f %.6f %.6f %.6f\n",
-        map((k) -> cdf_chisq_P(x, k), collect(1:5))...)
+julia > x = float(pi);
+
+julia > begin
+            @printf("Result of Cuba: %.6f %.6f %.6f %.6f %.6f\n",
+                    map((k) -> chi2cdf(x, k), collect(1:5))...)
+            @printf("Exact result:   %.6f %.6f %.6f %.6f %.6f\n",
+                    map((k) -> cdf_chisq_P(x, k), collect(1:5))...)
+        end
+Result of Cuba: 0.923681 0.792120 0.629694 0.465584 0.321833
+Exact result:   0.923681 0.792120 0.629695 0.465584 0.321833
 ```
-
-This is the output
-
-    Result of Cuba: 0.923681 0.792120 0.629694 0.465584 0.321833
-    Exact result:   0.923681 0.792120 0.629695 0.465584 0.321833
 
 ### Vectorized Function
 
@@ -1063,47 +1061,51 @@ Nonetheless, it has performances comparable with equivalent native C or
 Fortran codes based on Cuba library when `CUBACORES` environment
 variable is set to `0` (i.e., multithreading is disabled). The following
 is the result of running the benchmark present in `test` directory on a
-64-bit GNU/Linux system running Julia 0.7.0-DEV.363 (commit 6071f1a02e)
+64-bit GNU/Linux system running Julia 0.7.0-beta2.3 (commit 83ce9c7524)
 equipped with an Intel(R) Core(TM) i7-4700MQ CPU. The C and FORTRAN 77
-benchmark codes have been compiled with GCC 6.3.0.
+benchmark codes have been compiled with GCC 7.3.0.
 
-    $ CUBACORES=0 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
-    INFO: Performance of Cuba.jl:
-      0.271304 seconds (Vegas)
-      0.579783 seconds (Suave)
-      0.329504 seconds (Divonne)
-      0.238852 seconds (Cuhre)
-    INFO: Performance of Cuba Library in C:
-      0.319799 seconds (Vegas)
-      0.619774 seconds (Suave)
-      0.340317 seconds (Divonne)
-      0.266906 seconds (Cuhre)
-    INFO: Performance of Cuba Library in Fortran:
-      0.272000 seconds (Vegas)
-      0.584000 seconds (Suave)
-      0.308000 seconds (Divonne)
-      0.232000 seconds (Cuhre)
+```
+$ CUBACORES=0 julia -e 'using Pkg; cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
+[ Info: Performance of Cuba.jl:
+  0.257360 seconds (Vegas)
+  0.682703 seconds (Suave)
+  0.329552 seconds (Divonne)
+  0.233190 seconds (Cuhre)
+[ Info: Performance of Cuba Library in C:
+  0.268249 seconds (Vegas)
+  0.682682 seconds (Suave)
+  0.319553 seconds (Divonne)
+  0.234099 seconds (Cuhre)
+[ Info: Performance of Cuba Library in Fortran:
+  0.233532 seconds (Vegas)
+  0.669809 seconds (Suave)
+  0.284515 seconds (Divonne)
+  0.195740 seconds (Cuhre)
+```
 
 Of course, native C and Fortran codes making use of Cuba Library
 outperform `Cuba.jl` when higher values of `CUBACORES` are used, for
 example:
 
-    $ CUBACORES=1 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
-    INFO: Performance of Cuba.jl:
-      0.279524 seconds (Vegas)
-      0.581078 seconds (Suave)
-      0.327319 seconds (Divonne)
-      0.241211 seconds (Cuhre)
-    INFO: Performance of Cuba Library in C:
-      0.115113 seconds (Vegas)
-      0.596503 seconds (Suave)
-      0.152511 seconds (Divonne)
-      0.085805 seconds (Cuhre)
-    INFO: Performance of Cuba Library in Fortran:
-      0.108000 seconds (Vegas)
-      0.604000 seconds (Suave)
-      0.160000 seconds (Divonne)
-      0.092000 seconds (Cuhre)
+```
+$ CUBACORES=1 julia -e 'using Pkg; cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
+[ Info: Performance of Cuba.jl:
+  0.260080 seconds (Vegas)
+  0.677036 seconds (Suave)
+  0.342396 seconds (Divonne)
+  0.233280 seconds (Cuhre)
+[ Info: Performance of Cuba Library in C:
+  0.096388 seconds (Vegas)
+  0.574647 seconds (Suave)
+  0.150003 seconds (Divonne)
+  0.102817 seconds (Cuhre)
+[ Info: Performance of Cuba Library in Fortran:
+  0.094413 seconds (Vegas)
+  0.556084 seconds (Suave)
+  0.139606 seconds (Divonne)
+  0.107335 seconds (Cuhre)
+```
 
 `Cuba.jl` internally fixes `CUBACORES` to 0 in order to prevent from
 forking `julia` processes that would only slow down calculations eating
@@ -1114,9 +1116,11 @@ Furthemore, without this measure, adding more Julia processes with
 Related projects
 ----------------
 
-Another Julia package for multidimenensional numerical integration is
-available: [Cubature.jl](https://github.com/stevengj/Cubature.jl), by
-Steven G. Johnson.
+There are other Julia packages for multidimenensional numerical integration:
+
+* [`Cubature.jl`](https://github.com/stevengj/Cubature.jl)
+* [`HCubature.jl`](https://github.com/stevengj/HCubature.jl)
+* [`NIntegration.jl`](https://github.com/pabloferz/NIntegration.jl)
 
 Development
 -----------
