@@ -27,21 +27,9 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
 * `cuhre` (type: deterministic; variance reduction with globally adaptive
   subdivision)
 
-For more details on the algorithms see the manual included in Cuba library and
-available in `deps/usr/share/cuba.pdf` after successful installation
-of `Cuba.jl`.
-
-Integration is performed on the n-dimensional unit hypercube $[0, 1]^n$.  If you
-want to compute an integral over a different set, you have to scale the
-integrand function in order to have an equivalent integral on $[0, 1]^n$.  For
-example, recall that in one dimension
-
-```
-∫_a^b dx f[x] → ∫_0^1 dy f[a + (b - a) y] (b - a)
-```
-
-where the final `(b - a)` is the one-dimensional version of the Jacobian.  This
-generalizes straightforwardly to more than one dimension.
+Integration is performed on the n-dimensional unit hypercube [0, 1]^n.  For more
+details on the algorithms see the manual included in Cuba library and available
+in `deps/usr/share/cuba.pdf` after successful installation of `Cuba.jl`.
 
 `Cuba.jl` is available for GNU/Linux, Mac OS, and Windows (`i686` and `x86_64`
 architectures).
@@ -49,7 +37,7 @@ architectures).
 Installation
 ------------
 
-`Cuba.jl` is available for Julia 0.6 and later versions, and can be installed
+`Cuba.jl` is available for Julia 0.7 and later versions, and can be installed
 with
 [Julia built-in package manager](http://docs.julialang.org/en/stable/manual/packages/).
 In a Julia session run the commands
@@ -59,7 +47,7 @@ julia> Pkg.update()
 julia> Pkg.add("Cuba")
 ```
 
-Older versions are also available for Julia 0.4 and 0.5.
+Older versions are also available for Julia 0.4-0.6.
 
 Usage
 -----
@@ -169,115 +157,19 @@ found in Cuba manual.
 All other arguments listed in Cuba documentation can be passed as optional
 keywords.
 
-**Note:** if you used `Cuba.jl` until version 0.0.4, be aware that the user
-interface has been reworked in version 0.0.5 in a backward incompatible way.
-
 ### Documentation ###
 
 A more detailed manual of `Cuba.jl`, with many complete examples, is available
-at https://giordano.github.io/Cuba.jl//stable/.
-
-Example
--------
-
-Here is an example of a 3-component integral in 3D space (so `ndim=3` and
-`ncomp=3`) using the integrand function tested in `test/runtests.jl`:
-
-``` julia
-using Cuba
-
-function func(x, f)
-    f[1] = sin(x[1])*cos(x[2])*exp(x[3])
-    f[2] = exp(-(x[1]^2 + x[2]^2 + x[3]^2))
-    f[3] = 1/(1 - x[1]*x[2]*x[3])
-end
-
-result = cuhre(func, 3, 3, atol=1e-12, rtol=1e-10)
-println("Results of Cuba:")
-for i=1:3; println("Component $i: ", result[1][i], " ± ", result[2][i]); end
-println("Exact results:")
-println("Component 1: ", (e-1)*(1-cos(1))*sin(1))
-println("Component 2: ", (sqrt(pi)*erf(1)/2)^3)
-println("Component 3: ", zeta(3))
-```
-
-This is the output
-
-```
-Results of Cuba:
-Component 1: 0.6646696797813739 ± 1.0050367631018485e-13
-Component 2: 0.4165383858806454 ± 2.932866749838454e-11
-Component 3: 1.2020569031649702 ± 1.1958522385908214e-10
-Exact results:
-Component 1: 0.6646696797813771
-Component 2: 0.41653838588663805
-Component 3: 1.2020569031595951
-```
-
-Performance
------------
-
-`Cuba.jl` cannot ([yet?](https://github.com/giordano/Cuba.jl/issues/1)) take
-advantage of parallelization capabilities of Cuba Library.  Nonetheless, it has
-performances competitive with equivalent native C or Fortran codes based on Cuba
-library when `CUBACORES` environment variable is set to `0` (i.e.,
-multithreading is disabled).  The following is the result of running the
-benchmark present in `test` directory on a 64-bit GNU/Linux system running Julia
-0.7.0-DEV.363 (commit 6071f1a02e) equipped with an Intel(R) Core(TM) i7-4700MQ
-CPU.  The C and FORTRAN 77 benchmark codes have been compiled with GCC 6.3.0.
-
-```
-$ CUBACORES=0 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
-INFO: Performance of Cuba.jl:
-  0.271304 seconds (Vegas)
-  0.579783 seconds (Suave)
-  0.329504 seconds (Divonne)
-  0.238852 seconds (Cuhre)
-INFO: Performance of Cuba Library in C:
-  0.319799 seconds (Vegas)
-  0.619774 seconds (Suave)
-  0.340317 seconds (Divonne)
-  0.266906 seconds (Cuhre)
-INFO: Performance of Cuba Library in Fortran:
-  0.272000 seconds (Vegas)
-  0.584000 seconds (Suave)
-  0.308000 seconds (Divonne)
-  0.232000 seconds (Cuhre)
-```
-
-Of course, native C and Fortran codes making use of Cuba Library outperform
-`Cuba.jl` when higher values of `CUBACORES` are used, for example:
-
-```
-$ CUBACORES=1 julia -e 'cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
-INFO: Performance of Cuba.jl:
-  0.279524 seconds (Vegas)
-  0.581078 seconds (Suave)
-  0.327319 seconds (Divonne)
-  0.241211 seconds (Cuhre)
-INFO: Performance of Cuba Library in C:
-  0.115113 seconds (Vegas)
-  0.596503 seconds (Suave)
-  0.152511 seconds (Divonne)
-  0.085805 seconds (Cuhre)
-INFO: Performance of Cuba Library in Fortran:
-  0.108000 seconds (Vegas)
-  0.604000 seconds (Suave)
-  0.160000 seconds (Divonne)
-  0.092000 seconds (Cuhre)
-```
-
-`Cuba.jl` internally fixes `CUBACORES` to 0 in order to prevent from forking
-`julia` processes that would only slow down calculations eating up the memory,
-without actually taking advantage of concurrency.  Furthemore, without this
-measure, adding more Julia processes with `addprocs()` would only make the
-program segfault.
+at https://giordano.github.io/Cuba.jl/stable/.
 
 Related projects
 ----------------
 
-Another Julia package for multidimenensional numerical integration is available:
-[Cubature.jl](https://github.com/stevengj/Cubature.jl), by Steven G. Johnson.
+There are other Julia packages for multidimenensional numerical integration:
+
+* [`Cubature.jl`](https://github.com/stevengj/Cubature.jl)
+* [`HCubature.jl`](https://github.com/stevengj/HCubature.jl)
+* [`NIntegration.jl`](https://github.com/pabloferz/NIntegration.jl)
 
 License
 -------
@@ -295,7 +187,7 @@ http://adsabs.harvard.edu/abs/2015JPhCS.608a2066H).
 [docs-latest-url]: https://giordano.github.io/Cuba.jl/latest/
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
-[docs-stable-url]: https://giordano.github.io/Cuba.jl//stable/
+[docs-stable-url]: https://giordano.github.io/Cuba.jl/stable/
 
 [pkgeval-link]: http://pkg.julialang.org/?pkg=Cuba
 
