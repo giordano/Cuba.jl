@@ -915,10 +915,10 @@ and compares the result with more precise values, based on the analytic
 expression of the cumulative distribution function, provided by
 [GSL.jl](https://github.com/jiahao/GSL.jl) package.
 
-```julia
-julia > using Cuba, GSL, Printf, SpecialFunctions
+```jldoctest
+julia> using Cuba, GSL, Printf, SpecialFunctions
 
-julia > function chi2cdf(x::Real, k::Real)
+julia> function chi2cdf(x::Real, k::Real)
             k2 = k/2
             # Chi-squared probability density function, without constant denominator.
             # The result of integration will be divided by that factor.
@@ -933,9 +933,9 @@ julia > function chi2cdf(x::Real, k::Real)
         end
 chi2cdf (generic function with 1 method)
 
-julia > x = float(pi);
+julia> x = float(pi);
 
-julia > begin
+julia> begin
             @printf("Result of Cuba: %.6f %.6f %.6f %.6f %.6f\n",
                     map((k) -> chi2cdf(x, k), collect(1:5))...)
             @printf("Exact result:   %.6f %.6f %.6f %.6f %.6f\n",
