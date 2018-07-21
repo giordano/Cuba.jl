@@ -919,17 +919,17 @@ expression of the cumulative distribution function, provided by
 julia> using Cuba, GSL, Printf, SpecialFunctions
 
 julia> function chi2cdf(x::Real, k::Real)
-            k2 = k/2
-            # Chi-squared probability density function, without constant denominator.
-            # The result of integration will be divided by that factor.
-            function chi2pdf(t::Float64)
-                # "k2" is taken from the outside.
-                return t^(k2 - 1.0)*exp(-t/2)
-            end
-            # Neither "x" is passed directly to the integrand function,
-            # but is visible to it.  "x" is used to scale the function
-            # in order to actually integrate in [0, 1].
-            x*cuhre((t,f) -> f[1] = chi2pdf(t[1]*x))[1][1]/(2^k2*gamma(k2))
+           k2 = k/2
+           # Chi-squared probability density function, without constant denominator.
+           # The result of integration will be divided by that factor.
+           function chi2pdf(t::Float64)
+               # "k2" is taken from the outside.
+               return t^(k2 - 1.0)*exp(-t/2)
+           end
+           # Neither "x" is passed directly to the integrand function,
+           # but is visible to it.  "x" is used to scale the function
+           # in order to actually integrate in [0, 1].
+           x*cuhre((t,f) -> f[1] = chi2pdf(t[1]*x))[1][1]/(2^k2*gamma(k2))
         end
 chi2cdf (generic function with 1 method)
 
