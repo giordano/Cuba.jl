@@ -12,6 +12,11 @@ v0.6.0 (2018-??-??)
 * Deprecated `llvegas`, `llsuave`, `lldivonne`, and `llcuhre` functions have
   been removed.
 
+### New Features
+
+* The build script has been updated, now the package support Linux-musl and
+  FreeBSD systems.
+
 v0.5.0 (2018-05-15)
 -------------------
 

@@ -108,7 +108,7 @@ hypercube](https://en.wikipedia.org/wiki/Hypercube) ``[0, 1]^{n}``.
     [integral with non-constant boundaries](#Integral-with-non-constant-boundaries-1)
     using `Cuba.jl` and two [integrals over infinite domains](#Integrals-over-Infinite-Domains-1).
 
-`Cuba.jl` is available for GNU/Linux, Mac OS, and Windows (`i686` and
+`Cuba.jl` is available for GNU/Linux, FreeBSD, Mac OS, and Windows (`i686` and
 `x86_64` architectures).
 
 Installation
