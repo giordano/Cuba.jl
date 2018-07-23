@@ -930,7 +930,7 @@ julia> function chi2cdf(x::Real, k::Real)
            # but is visible to it.  "x" is used to scale the function
            # in order to actually integrate in [0, 1].
            x*cuhre((t,f) -> f[1] = chi2pdf(t[1]*x))[1][1]/(2^k2*gamma(k2))
-        end
+       end
 chi2cdf (generic function with 1 method)
 
 julia> x = float(pi);
