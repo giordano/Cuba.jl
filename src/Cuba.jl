@@ -151,9 +151,10 @@ struct Integral
 end
 
 Base.getindex(x::Integral, n::Integer) = getfield(x, n)
-Base.start(x::Integral)   = 1
-Base.next(x::Integral, i) = (x[i], i + 1)
-Base.done(x::Integral, i) = (i > 6)
+function Base.iterate(x::Integral, i=1)
+    i > 6 && return nothing
+    return x[i], i + 1
+end
 
 function Base.show(io::IO, x::Integral)
     ncomp = length(x.integral)
