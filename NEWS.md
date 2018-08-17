@@ -1,20 +1,20 @@
 History of Cuba.jl
 ==================
 
-v0.6.0 (2018-??-??)
+v1.0.0 (2018-??-??)
 -------------------
 
 ### Breaking Changes
 
 * Support for Julia 0.6 was dropped.
-* Keyword arguments `reltol` and `abstol` are now called, respectively, `rtol`
-  and `atol` , to match keywords in `isapprox` function.
-* Deprecated `llvegas`, `llsuave`, `lldivonne`, and `llcuhre` functions have
+* Keyword arguments `reltol` and `abstol` are now called `rtol` and `atol`,
+  respectively, to match keywords in `isapprox` function.
+* Deprecated functions `llvegas`, `llsuave`, `lldivonne`, and `llcuhre` have
   been removed.
 
 ### New Features
 
-* The build script has been updated, now the package support Linux-musl and
+* The build script has been updated, now the package supports Linux-musl and
   FreeBSD systems.
 
 v0.5.0 (2018-05-15)

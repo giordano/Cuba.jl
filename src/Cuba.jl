@@ -28,7 +28,7 @@ export vegas, suave, divonne, cuhre
 
 
 # Load in `deps.jl`, complaining if it does not exist
-const depsjl_path = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
+const depsjl_path = joinpath(@__DIR__, "..", "deps", "deps.jl")
 if !isfile(depsjl_path)
     error("Cuba not installed properly, run Pkg.build(\"Cuba\"), restart Julia and try again")
 end
