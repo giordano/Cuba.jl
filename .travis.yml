@@ -24,4 +24,4 @@ matrix:
 # # - julia -e 'import Pkg; cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
 after_success:
  - julia -e 'using Pkg; cd(Pkg.dir("Cuba")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
- - julia -e 'using Pkg; cd(Pkg.dir("Cuba")); Pkg.add("Documenter"); Pkg.add("GSL"); Pkg.add("SpecialFunctions"); include(joinpath("docs", "make.jl"))'
+ - julia -e 'using Pkg; cd(Pkg.dir("Cuba")); Pkg.add("Documenter"); Pkg.add("SpecialFunctions"); include(joinpath("docs", "make.jl"))'

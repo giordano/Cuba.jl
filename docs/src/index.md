@@ -915,7 +915,7 @@ and compares the result with more precise values, based on the analytic
 expression of the cumulative distribution function, provided by
 [GSL.jl](https://github.com/jiahao/GSL.jl) package.
 
-```jldoctest
+```julia
 julia> using Cuba, GSL, Printf, SpecialFunctions
 
 julia> function chi2cdf(x::Real, k::Real)
