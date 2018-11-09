@@ -215,29 +215,29 @@ julia> vegas((x, f) -> f[1] = cos(x[1]))
 Component:
  1: 0.8414910005259609 ± 5.2708169787733e-5 (prob.: 0.028607201257039333)
 Integrand evaluations: 13500
-Fail:                  0
 Number of subregions:  0
+Note: The desired accuracy was reached
 
 julia> suave((x, f) -> f[1] = cos(x[1]))
 Component:
  1: 0.8411523690658836 ± 8.357995611133613e-5 (prob.: 1.0)
 Integrand evaluations: 22000
-Fail:                  0
 Number of subregions:  22
+Note: The desired accuracy was reached
 
 julia> divonne((x, f) -> f[1] = cos(x[1]))
 Component:
  1: 0.841468071955942 ± 5.3955070531551656e-5 (prob.: 0.0)
 Integrand evaluations: 1686
-Fail:                  0
 Number of subregions:  14
+Note: The desired accuracy was reached
 
 julia> cuhre((x, f) -> f[1] = cos(x[1]))
 Component:
  1: 0.8414709848078966 ± 2.2204460420128823e-16 (prob.: 3.443539937576958e-5)
 Integrand evaluations: 195
-Fail:                  0
 Number of subregions:  2
+Note: The desired accuracy was reached
 ```
 
 In section [Examples](@ref) you can find more complete examples.  Note that `x`
@@ -640,29 +640,30 @@ julia> vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
 Component:
  1: -3.9981623937128465 ± 0.00044066437168409464 (prob.: 0.2843052968819913)
 Integrand evaluations: 1007500
-Fail:                  1
 Number of subregions:  0
+Note: The accuracy was not met within the maximum number of evaluations
 
 julia> suave( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
 Component:
  1: -3.999976286717141 ± 0.00039504866661339003 (prob.: 1.0)
 Integrand evaluations: 51000
-Fail:                  0
 Number of subregions:  51
+Note: The desired accuracy was reached
 
-julia> divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
+julia> divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), atol = 1e-8, rtol = 1e-8)
 Component:
- 1: -3.9997602130594365 ± 0.000356787481490126 (prob.: 1.0)
-Integrand evaluations: 11593
-Fail:                  0
-Number of subregions:  76
+ 1: -3.999999899620808 ± 2.1865962888459237e-7 (prob.: 0.0)
+Integrand evaluations: 1002059
+Number of subregions:  1582
+Note: The accuracy was not met within the maximum number of evaluations
+Hint: Try increasing `maxevals` to 4884287
 
 julia> cuhre( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
 Component:
  1: -4.000000355067187 ± 0.0003395484028626406 (prob.: 0.0)
 Integrand evaluations: 5915
-Fail:                  0
 Number of subregions:  46
+Note: The desired accuracy was reached
 ```
 
 ### Vector-valued integrand

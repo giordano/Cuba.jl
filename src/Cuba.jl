@@ -141,7 +141,7 @@ include("divonne.jl")
 include("suave.jl")
 include("vegas.jl")
 
-struct Integral
+struct Integral{T}
     integral::Vector{Float64}
     error::Vector{Float64}
     probability::Vector{Float64}
@@ -156,6 +156,22 @@ function Base.iterate(x::Integral, i=1)
     return x[i], i + 1
 end
 
+_print_fail_extra(io::IO, x::Integral) = nothing
+_print_fail_extra(io::IO, x::Integral{<:Divonne}) =
+    print(io, "\nHint: Try increasing `maxevals` to ", x.neval+x.fail)
+function print_fail(io::IO, x::Integral)
+    print(io, "Note: ")
+    fail = x.fail
+    if fail < 0
+        print(io, "Dimension out of range")
+    elseif fail == 0
+        print(io, "The desired accuracy was reached")
+    elseif fail > 0
+        print(io, "The accuracy was not met within the maximum number of evaluations")
+        _print_fail_extra(io, x)
+    end
+end
+
 function Base.show(io::IO, x::Integral)
     ncomp = length(x.integral)
     println(io, ncomp == 1 ? "Component:" : "Components:")
@@ -164,11 +180,11 @@ function Base.show(io::IO, x::Integral)
                 " ± ", x.error[i], " (prob.: ", x.probability[i],")")
     end
     println(io, "Integrand evaluations: ", x.neval)
-    println(io, "Fail:                  ", x.fail)
-    print(io, "Number of subregions:  ", x.nregions)
+    println(io, "Number of subregions:  ", x.nregions)
+    print_fail(io, x)
 end
 
-@inline function dointegrate(x::Integrand{T}) where {T}
+@inline function dointegrate(x::T) where {T<:Integrand}
     # Choose the integrand function wrapper based on the value of `nvec`.  This function is
     # called only once, so the overhead of the following if should be negligible.
     if x.nvec == 1
@@ -183,7 +199,7 @@ end
     fail      = Ref{Cint}(0)
     nregions  = Ref{Cint}(0)
     dointegrate!(x, integrand, integral, error, prob, neval, fail, nregions)
-    return Integral(integral, error, prob, neval[], fail[], nregions[])
+    return Integral{T}(integral, error, prob, neval[], fail[], nregions[])
 end
 
 ### Other functions, not exported

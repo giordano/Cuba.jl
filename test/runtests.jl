@@ -87,12 +87,25 @@ end
     end
 end
 
+@testset "Show" begin
+    @test occursin("Note: The desired accuracy was reached",
+                   repr(vegas((x, f) -> f[1] = x[1])))
+    @test occursin("Note: The accuracy was not met",
+                   repr(suave((x,f) -> f[1] = x[1], atol = 1e-12, rtol = 1e-12)))
+    @test occursin("Try increasing `maxevals` to",
+                   repr(divonne((x, f) -> f[1] = exp(x[1])*cos(x[1]),
+                                atol = 1e-9, rtol = 1e-9)))
+    @test occursin("Note: Dimension out of range",
+                   repr(Cuba.dointegrate(Cuba.Cuhre((x, f) -> f[1] = x[1], 1, 1, Cuba.NVEC,
+                                                    Cuba.RTOL, Cuba.ATOL, Cuba.FLAGS,
+                                                    Cuba.MINEVALS, Cuba.MAXEVALS, Cuba.KEY,
+                                                    Cuba.STATEFILE, Cuba.SPIN))))
+end
+
+
 # Make sure these functions don't crash.
 Cuba.init(C_NULL, C_NULL)
 Cuba.exit(C_NULL, C_NULL)
 
 # Dummy call just to increase code coverage
 Cuba.integrand_ptr(Cuba.generic_integrand!)
-
-# Dummy call to show
-show(devnull, cuhre((x, f) -> f[1] = x[1]))

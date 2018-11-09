@@ -1,6 +1,14 @@
 History of Cuba.jl
 ==================
 
+v1.0.1 (2018-??-??)
+-------------------
+
+### New Features
+
+* When using the package in the REPL, the result of the integration now has a
+  more informative description about the error flag.
+
 v1.0.0 (2018-08-17)
 -------------------
 
