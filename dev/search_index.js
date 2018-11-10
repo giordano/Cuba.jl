@@ -1,7 +1,7 @@
 var documenterSearchIndex = {"docs": [
 
 {
-    "location": "index.html#",
+    "location": "#",
     "page": "Cuba",
     "title": "Cuba",
     "category": "page",
@@ -9,7 +9,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Cuba-1",
+    "location": "#Cuba-1",
     "page": "Cuba",
     "title": "Cuba",
     "category": "section",
@@ -17,7 +17,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Introduction-1",
+    "location": "#Introduction-1",
     "page": "Cuba",
     "title": "Introduction",
     "category": "section",
@@ -25,7 +25,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Installation-1",
+    "location": "#Installation-1",
     "page": "Cuba",
     "title": "Installation",
     "category": "section",
@@ -33,7 +33,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Cuba.vegas",
+    "location": "#Cuba.vegas",
     "page": "Cuba",
     "title": "Cuba.vegas",
     "category": "function",
@@ -41,7 +41,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Cuba.suave",
+    "location": "#Cuba.suave",
     "page": "Cuba",
     "title": "Cuba.suave",
     "category": "function",
@@ -49,7 +49,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Cuba.divonne",
+    "location": "#Cuba.divonne",
     "page": "Cuba",
     "title": "Cuba.divonne",
     "category": "function",
@@ -57,7 +57,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Cuba.cuhre",
+    "location": "#Cuba.cuhre",
     "page": "Cuba",
     "title": "Cuba.cuhre",
     "category": "function",
@@ -65,7 +65,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Usage-1",
+    "location": "#Usage-1",
     "page": "Cuba",
     "title": "Usage",
     "category": "section",
@@ -73,15 +73,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Arguments-1",
+    "location": "#Arguments-1",
     "page": "Cuba",
     "title": "Arguments",
     "category": "section",
-    "text": "The only mandatory argument of integrator functions is:integrand (type: Function): the function to be integratedOptional positional arguments are:ndim (type: Integer): the number of dimensions of the   integratation domain. If omitted, defaults to 1 in vegas and   suave, to 2 in divonne and cuhre. Note: ndim must be at   least 2 with the latest two methods.\nncomp (type: Integer): the number of components of the   integrand. Default to 1 if omittedintegrand should be a function integrand(x, f) taking two arguments:the input vector x of length ndim\nthe output vector f of length ncomp, used to set the value of   each component of the integrand at point xx and f are matrices with dimensions (ndim, nvec) and (ncomp, nvec), respectively, when nvec > 1. See the Vectorization section below for more information.Also anonymous functions are allowed as integrand. For those familiar with Cubature.jl package, this is the same syntax used for integrating vector-valued functions.For example, the integralint_0^1 cos (x) mathrmdx = sin(1) = 08414709848078965can be computed with one of the following commandsjulia> vegas((x, f) -> f[1] = cos(x[1]))\nComponent:\n 1: 0.8414910005259609 ± 5.2708169787733e-5 (prob.: 0.028607201257039333)\nIntegrand evaluations: 13500\nFail:                  0\nNumber of subregions:  0\n\njulia> suave((x, f) -> f[1] = cos(x[1]))\nComponent:\n 1: 0.8411523690658836 ± 8.357995611133613e-5 (prob.: 1.0)\nIntegrand evaluations: 22000\nFail:                  0\nNumber of subregions:  22\n\njulia> divonne((x, f) -> f[1] = cos(x[1]))\nComponent:\n 1: 0.841468071955942 ± 5.3955070531551656e-5 (prob.: 0.0)\nIntegrand evaluations: 1686\nFail:                  0\nNumber of subregions:  14\n\njulia> cuhre((x, f) -> f[1] = cos(x[1]))\nComponent:\n 1: 0.8414709848078966 ± 2.2204460420128823e-16 (prob.: 3.443539937576958e-5)\nIntegrand evaluations: 195\nFail:                  0\nNumber of subregions:  2In section Examples you can find more complete examples.  Note that x and f are both arrays with type Float64, so Cuba.jl can be used to integrate real-valued functions of real arguments. See how to work with a complex integrand.Note: if you used Cuba.jl until version 0.0.4, be aware that the user interface has been reworked in version 0.0.5 in a backward incompatible way."
+    "text": "The only mandatory argument of integrator functions is:integrand (type: Function): the function to be integratedOptional positional arguments are:ndim (type: Integer): the number of dimensions of the   integratation domain. If omitted, defaults to 1 in vegas and   suave, to 2 in divonne and cuhre. Note: ndim must be at   least 2 with the latest two methods.\nncomp (type: Integer): the number of components of the   integrand. Default to 1 if omittedintegrand should be a function integrand(x, f) taking two arguments:the input vector x of length ndim\nthe output vector f of length ncomp, used to set the value of   each component of the integrand at point xx and f are matrices with dimensions (ndim, nvec) and (ncomp, nvec), respectively, when nvec > 1. See the Vectorization section below for more information.Also anonymous functions are allowed as integrand. For those familiar with Cubature.jl package, this is the same syntax used for integrating vector-valued functions.For example, the integralint_0^1 cos (x) mathrmdx = sin(1) = 08414709848078965can be computed with one of the following commandsjulia> vegas((x, f) -> f[1] = cos(x[1]))\nComponent:\n 1: 0.8414910005259609 ± 5.2708169787733e-5 (prob.: 0.028607201257039333)\nIntegrand evaluations: 13500\nNumber of subregions:  0\nNote: The desired accuracy was reached\n\njulia> suave((x, f) -> f[1] = cos(x[1]))\nComponent:\n 1: 0.8411523690658836 ± 8.357995611133613e-5 (prob.: 1.0)\nIntegrand evaluations: 22000\nNumber of subregions:  22\nNote: The desired accuracy was reached\n\njulia> divonne((x, f) -> f[1] = cos(x[1]))\nComponent:\n 1: 0.841468071955942 ± 5.3955070531551656e-5 (prob.: 0.0)\nIntegrand evaluations: 1686\nNumber of subregions:  14\nNote: The desired accuracy was reached\n\njulia> cuhre((x, f) -> f[1] = cos(x[1]))\nComponent:\n 1: 0.8414709848078966 ± 2.2204460420128823e-16 (prob.: 3.443539937576958e-5)\nIntegrand evaluations: 195\nNumber of subregions:  2\nNote: The desired accuracy was reachedIn section Examples you can find more complete examples.  Note that x and f are both arrays with type Float64, so Cuba.jl can be used to integrate real-valued functions of real arguments. See how to work with a complex integrand.Note: if you used Cuba.jl until version 0.0.4, be aware that the user interface has been reworked in version 0.0.5 in a backward incompatible way."
 },
 
 {
-    "location": "index.html#Optional-Keywords-1",
+    "location": "#Optional-Keywords-1",
     "page": "Cuba",
     "title": "Optional Keywords",
     "category": "section",
@@ -89,7 +89,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Common-Keywords-1",
+    "location": "#Common-Keywords-1",
     "page": "Cuba",
     "title": "Common Keywords",
     "category": "section",
@@ -97,7 +97,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Vegas-Specific-Keywords-1",
+    "location": "#Vegas-Specific-Keywords-1",
     "page": "Cuba",
     "title": "Vegas-Specific Keywords",
     "category": "section",
@@ -105,7 +105,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Suave-Specific-Keywords-1",
+    "location": "#Suave-Specific-Keywords-1",
     "page": "Cuba",
     "title": "Suave-Specific Keywords",
     "category": "section",
@@ -113,7 +113,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Divonne-Specific-Keywords-1",
+    "location": "#Divonne-Specific-Keywords-1",
     "page": "Cuba",
     "title": "Divonne-Specific Keywords",
     "category": "section",
@@ -121,7 +121,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Cuhre-Specific-Keyword-1",
+    "location": "#Cuhre-Specific-Keyword-1",
     "page": "Cuba",
     "title": "Cuhre-Specific Keyword",
     "category": "section",
@@ -129,7 +129,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Output-1",
+    "location": "#Output-1",
     "page": "Cuba",
     "title": "Output",
     "category": "section",
@@ -137,7 +137,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Vectorization-1",
+    "location": "#Vectorization-1",
     "page": "Cuba",
     "title": "Vectorization",
     "category": "section",
@@ -145,7 +145,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Examples-1",
+    "location": "#Examples-1",
     "page": "Cuba",
     "title": "Examples",
     "category": "section",
@@ -153,15 +153,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#One-dimensional-integral-1",
+    "location": "#One-dimensional-integral-1",
     "page": "Cuba",
     "title": "One dimensional integral",
     "category": "section",
-    "text": "The integrand ofint_0^1 fraclog(x)sqrtx mathrmdxhas an algebraic-logarithmic divergence for x = 0, but the integral is convergent and its value is -4. Cuba.jl integrator routines can handle this class of functions and you can easily compute the numerical approximation of this integral using one of the following commands:julia> vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))\nComponent:\n 1: -3.9981623937128465 ± 0.00044066437168409464 (prob.: 0.2843052968819913)\nIntegrand evaluations: 1007500\nFail:                  1\nNumber of subregions:  0\n\njulia> suave( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))\nComponent:\n 1: -3.999976286717141 ± 0.00039504866661339003 (prob.: 1.0)\nIntegrand evaluations: 51000\nFail:                  0\nNumber of subregions:  51\n\njulia> divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))\nComponent:\n 1: -3.9997602130594365 ± 0.000356787481490126 (prob.: 1.0)\nIntegrand evaluations: 11593\nFail:                  0\nNumber of subregions:  76\n\njulia> cuhre( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))\nComponent:\n 1: -4.000000355067187 ± 0.0003395484028626406 (prob.: 0.0)\nIntegrand evaluations: 5915\nFail:                  0\nNumber of subregions:  46"
+    "text": "The integrand ofint_0^1 fraclog(x)sqrtx mathrmdxhas an algebraic-logarithmic divergence for x = 0, but the integral is convergent and its value is -4. Cuba.jl integrator routines can handle this class of functions and you can easily compute the numerical approximation of this integral using one of the following commands:julia> vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))\nComponent:\n 1: -3.9981623937128465 ± 0.00044066437168409464 (prob.: 0.2843052968819913)\nIntegrand evaluations: 1007500\nNumber of subregions:  0\nNote: The accuracy was not met within the maximum number of evaluations\n\njulia> suave( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))\nComponent:\n 1: -3.999976286717141 ± 0.00039504866661339003 (prob.: 1.0)\nIntegrand evaluations: 51000\nNumber of subregions:  51\nNote: The desired accuracy was reached\n\njulia> divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), atol = 1e-8, rtol = 1e-8)\nComponent:\n 1: -3.999999899620808 ± 2.1865962888459237e-7 (prob.: 0.0)\nIntegrand evaluations: 1002059\nNumber of subregions:  1582\nNote: The accuracy was not met within the maximum number of evaluations\nHint: Try increasing `maxevals` to 4884287\n\njulia> cuhre( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))\nComponent:\n 1: -4.000000355067187 ± 0.0003395484028626406 (prob.: 0.0)\nIntegrand evaluations: 5915\nNumber of subregions:  46\nNote: The desired accuracy was reached"
 },
 
 {
-    "location": "index.html#Vector-valued-integrand-1",
+    "location": "#Vector-valued-integrand-1",
     "page": "Cuba",
     "title": "Vector-valued integrand",
     "category": "section",
@@ -169,7 +169,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Integral-with-non-constant-boundaries-1",
+    "location": "#Integral-with-non-constant-boundaries-1",
     "page": "Cuba",
     "title": "Integral with non-constant boundaries",
     "category": "section",
@@ -177,7 +177,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Integrals-over-Infinite-Domains-1",
+    "location": "#Integrals-over-Infinite-Domains-1",
     "page": "Cuba",
     "title": "Integrals over Infinite Domains",
     "category": "section",
@@ -185,7 +185,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Complex-integrand-1",
+    "location": "#Complex-integrand-1",
     "page": "Cuba",
     "title": "Complex integrand",
     "category": "section",
@@ -193,7 +193,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Passing-data-to-the-integrand-function-1",
+    "location": "#Passing-data-to-the-integrand-function-1",
     "page": "Cuba",
     "title": "Passing data to the integrand function",
     "category": "section",
@@ -201,7 +201,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Vectorized-Function-1",
+    "location": "#Vectorized-Function-1",
     "page": "Cuba",
     "title": "Vectorized Function",
     "category": "section",
@@ -209,7 +209,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Performance-1",
+    "location": "#Performance-1",
     "page": "Cuba",
     "title": "Performance",
     "category": "section",
@@ -217,7 +217,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Related-projects-1",
+    "location": "#Related-projects-1",
     "page": "Cuba",
     "title": "Related projects",
     "category": "section",
@@ -225,7 +225,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Development-1",
+    "location": "#Development-1",
     "page": "Cuba",
     "title": "Development",
     "category": "section",
@@ -233,7 +233,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#History-1",
+    "location": "#History-1",
     "page": "Cuba",
     "title": "History",
     "category": "section",
@@ -241,7 +241,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#License-1",
+    "location": "#License-1",
     "page": "Cuba",
     "title": "License",
     "category": "section",
@@ -249,7 +249,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Credits-1",
+    "location": "#Credits-1",
     "page": "Cuba",
     "title": "Credits",
     "category": "section",
