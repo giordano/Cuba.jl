@@ -21,7 +21,7 @@
 
 using Cuba
 using Test
-using Distributed
+using Distributed, LinearAlgebra
 
 f1(x,y,z) = sin(x)*cos(y)*exp(z)
 f2(x,y,z) = exp(-(x*x + y*y + z*z))
@@ -56,13 +56,16 @@ ncomp = 3
     end
 end
 
-@testset "ndim in Cuhre and Divonne" begin
-    result, rest = @inferred cuhre((x,f) -> f[1] = cos(x[1]))
-    @test result[1] ≈ sin(1)
-    result, rest = divonne((x,f) -> f[1] = cos(x[1]), rtol=1e-8, atol=1e-8)
-    @test result[1] ≈ sin(1) atol=1e-8
-    @test_throws ArgumentError cuhre((x,f) -> f[1] = cos(x[1]), 1)
-    @test_throws ArgumentError divonne((x,f) -> f[1] = cos(x[1]), 1)
+@testset "ndim" begin
+    func(x, f) = (f[] = norm(x))
+    answer_1d = 1/2 # integral of abs(x) in 1D
+    answer_2d = (8 * asinh(1) + 2^(7/2))/24 # integral of sqrt(x^2 + y^2) in 2D
+    @test @inferred(vegas(func))[1][1]   ≈ answer_1d rtol = 1e-4
+    @test @inferred(suave(func))[1][1]   ≈ answer_1d rtol = 1e-2
+    @test @inferred(divonne(func))[1][1] ≈ answer_2d rtol = 1e-4
+    @test @inferred(cuhre(func))[1][1]   ≈ answer_2d rtol = 1e-4
+    @test_throws ArgumentError cuhre(func, 1)
+    @test_throws ArgumentError divonne(func, 1)
 end
 
 @testset "Integral over infinite domain" begin
