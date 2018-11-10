@@ -99,10 +99,10 @@ end
                    repr(divonne((x, f) -> f[1] = exp(x[1])*cos(x[1]),
                                 atol = 1e-9, rtol = 1e-9)))
     @test occursin("Note: Dimension out of range",
-                   repr(Cuba.dointegrate(Cuba.Cuhre((x, f) -> f[1] = x[1], 1, 1, Cuba.NVEC,
+                   repr(Cuba.dointegrate(Cuba.Cuhre((x, f) -> f[1] = x[1], 1, 1, Int64(Cuba.NVEC),
                                                     Cuba.RTOL, Cuba.ATOL, Cuba.FLAGS,
-                                                    Cuba.MINEVALS, Cuba.MAXEVALS, Cuba.KEY,
-                                                    Cuba.STATEFILE, Cuba.SPIN))))
+                                                    Int64(Cuba.MINEVALS), Int64(Cuba.MAXEVALS),
+                                                    Cuba.KEY, Cuba.STATEFILE, Cuba.SPIN))))
 end
 
 
