@@ -1,8 +1,12 @@
 History of Cuba.jl
 ==================
 
-v1.0.1 (2018-??-??)
+v2.0.0 (2019-0?-??)
 -------------------
+
+### Breaking Changes
+
+* Support for Julia 0.7 was dropped.
 
 ### New Features
 

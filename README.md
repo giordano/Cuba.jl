@@ -1,9 +1,9 @@
 # Cuba.jl
 
-| **Documentation**                       | [**Package Evaluator**][pkgeval-link] | **Build Status**                          | **Code Coverage**               |
-|:---------------------------------------:|:-------------------------------------:|:-----------------------------------------:|:-------------------------------:|
-| [![][docs-stable-img]][docs-stable-url] | [![][pkg-0.5-img]][pkg-0.5-url]       | [![Build Status][travis-img]][travis-url] | [![][coveral-img]][coveral-url] |
-| [![][docs-latest-img]][docs-latest-url] | [![][pkg-0.6-img]][pkg-0.6-url]       | [![Build Status][appvey-img]][appvey-url] | [![][codecov-img]][codecov-url] |
+| **Documentation**                       |  **Build Status**                          | **Code Coverage**               |
+|:---------------------------------------:|::-----------------------------------------:|:-------------------------------:|
+| [![][docs-stable-img]][docs-stable-url] |  [![Build Status][travis-img]][travis-url] | [![][coveral-img]][coveral-url] |
+| [![][docs-latest-img]][docs-latest-url] |  [![Build Status][appvey-img]][appvey-url] | [![][codecov-img]][codecov-url] |
 
 Introduction
 ------------
@@ -37,17 +37,17 @@ in `deps/usr/share/cuba.pdf` after successful installation of `Cuba.jl`.
 Installation
 ------------
 
-`Cuba.jl` is available for Julia 0.7 and later versions, and can be installed
-with
-[Julia built-in package manager](http://docs.julialang.org/en/stable/manual/packages/).
-In a Julia session run the commands
+The latest version of `Cuba.jl` is available for Julia 1.0 and later versions,
+and can be installed with [Julia built-in package
+manager](https://docs.julialang.org/en/v1/stdlib/Pkg/). In a Julia session run
+the commands
 
 ```julia
-julia> Pkg.update()
-julia> Pkg.add("Cuba")
+pkg> update
+pkg> add Cuba
 ```
 
-Older versions are also available for Julia 0.4-0.6.
+Older versions are also available for Julia 0.4-0.7.
 
 Usage
 -----
@@ -91,7 +91,7 @@ taking two arguments:
   component of the integrand at point `x`
 
 Also
-[anonymous functions](http://docs.julialang.org/en/stable/manual/functions/#anonymous-functions)
+[anonymous functions](https://docs.julialang.org/en/v1/manual/functions/#man-anonymous-functions-1)
 are allowed as `integrand`.  For those familiar with
 [`Cubature.jl`](https://github.com/stevengj/Cubature.jl) package, this is the
 same syntax used for integrating vector-valued functions.
@@ -188,13 +188,6 @@ http://adsabs.harvard.edu/abs/2015JPhCS.608a2066H).
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
 [docs-stable-url]: https://giordano.github.io/Cuba.jl/stable/
-
-[pkgeval-link]: http://pkg.julialang.org/?pkg=Cuba
-
-[pkg-0.5-img]: http://pkg.julialang.org/badges/Cuba_0.5.svg
-[pkg-0.5-url]: http://pkg.julialang.org/detail/Cuba.html
-[pkg-0.6-img]: http://pkg.julialang.org/badges/Cuba_0.6.svg
-[pkg-0.6-url]: http://pkg.julialang.org/detail/Cuba.html
 
 [travis-img]: https://travis-ci.org/giordano/Cuba.jl.svg?branch=master
 [travis-url]: https://travis-ci.org/giordano/Cuba.jl

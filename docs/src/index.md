@@ -114,17 +114,17 @@ hypercube](https://en.wikipedia.org/wiki/Hypercube) ``[0, 1]^{n}``.
 Installation
 ------------
 
-`Cuba.jl` is available for Julia 0.7 and later versions, and can be
-installed with [Julia built-in package
-manager](http://docs.julialang.org/en/stable/manual/packages/). In a
-Julia session run the commands
+The latest version of `Cuba.jl` is available for Julia 1.0 and later versions,
+and can be installed with [Julia built-in package
+manager](https://docs.julialang.org/en/v1/stdlib/Pkg/). In a Julia session run
+the commands
 
 ```julia
-julia> Pkg.update()
-julia> Pkg.add("Cuba")
+pkg> update
+pkg> add Cuba
 ```
 
-Older versions are also available for Julia 0.4-0.6.
+Older versions are also available for Julia 0.4-0.7.
 
 Usage
 -----
@@ -197,10 +197,9 @@ Optional positional arguments are:
 [Vectorization](@ref) section below for more information.
 
 Also [anonymous
-functions](http://docs.julialang.org/en/stable/manual/functions/#anonymous-functions)
-are allowed as `integrand`. For those familiar with `Cubature.jl`
-package, this is the same syntax used for integrating vector-valued
-functions.
+functions](https://docs.julialang.org/en/v1/manual/functions/#man-anonymous-functions-1)
+are allowed as `integrand`. For those familiar with `Cubature.jl` package, this
+is the same syntax used for integrating vector-valued functions.
 
 For example, the integral
 
@@ -906,14 +905,13 @@ F(x; k) = \int_{0}^{x} \frac{t^{k/2 - 1}\exp(-t/2)}{2^{k/2}\Gamma(k/2)}
 
 The cumulative distribution function depends on parameter ``k``, but the
 function passed as integrand to `Cuba.jl` integrator routines accepts as
-arguments only the input and output vectors. However you can easily
-define a function to calculate a numerical approximation of ``F(x; k)``
-based on the above integral expression because the integrand can access
-any variable visible in its
-[scope](http://docs.julialang.org/en/stable/manual/variables-and-scoping/).
-The following Julia script computes ``F(x = \pi; k)`` for different ``k``
-and compares the result with more precise values, based on the analytic
-expression of the cumulative distribution function, provided by
+arguments only the input and output vectors. However you can easily define a
+function to calculate a numerical approximation of ``F(x; k)`` based on the
+above integral expression because the integrand can access any variable visible
+in its [scope](https://docs.julialang.org/en/v1/manual/variables-and-scoping/).
+The following Julia script computes ``F(x = \pi; k)`` for different ``k`` and
+compares the result with more precise values, based on the analytic expression
+of the cumulative distribution function, provided by
 [GSL.jl](https://github.com/jiahao/GSL.jl) package.
 
 ```julia
