@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Cuba",
     "title": "Installation",
     "category": "section",
-    "text": "Cuba.jl is available for Julia 0.7 and later versions, and can be installed with Julia built-in package manager. In a Julia session run the commandsjulia> Pkg.update()\njulia> Pkg.add(\"Cuba\")Older versions are also available for Julia 0.4-0.6."
+    "text": "The latest version of Cuba.jl is available for Julia 1.0 and later versions, and can be installed with Julia built-in package manager. In a Julia session run the commandspkg> update\npkg> add CubaOlder versions are also available for Julia 0.4-0.7."
 },
 
 {
