@@ -125,6 +125,7 @@ integrand_ptr_nvec(integrand::T) where {T} = @cfunction(generic_integrand!, Cint
 abstract type Integrand{T} end
 
 function __init__()
+    check_deps()
     Cuba.cores(0, 10000)
 end
 

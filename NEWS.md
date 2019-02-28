@@ -1,6 +1,15 @@
 History of Cuba.jl
 ==================
 
+v2.1.0 (2019-0?-??)
+-------------------
+
+### New Features
+
+* You can now build the Cuba library locally, instead of using a pre-built
+  package, by setting the `JULIA_CUBA_BUILD_SOURCE` environment variable to
+  `"true"`.
+
 v2.0.0 (2019-02-27)
 -------------------
 
