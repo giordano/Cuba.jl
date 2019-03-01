@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Cuba",
     "title": "Installation",
     "category": "section",
-    "text": "The latest version of Cuba.jl is available for Julia 1.0 and later versions, and can be installed with Julia built-in package manager. In a Julia session run the commandspkg> update\npkg> add CubaOlder versions are also available for Julia 0.4-0.7."
+    "text": "The latest version of Cuba.jl is available for Julia 1.0 and later versions, and can be installed with Julia built-in package manager. In a Julia session run the commandspkg> update\npkg> add CubaBy default, on all systems a pre-built version of the Cuba library will be installed.  On UNIX systems, you can optionally compile Cuba locally by setting the JULIA_CUBA_BUILD_SOURCE environment variable to \"true\":julia> ENV[\"JULIA_CUBA_BUILD_SOURCE\"] = \"true\"\n\"true\"\n\npkg> build CubaOlder versions are also available for Julia 0.4-0.7."
 },
 
 {
