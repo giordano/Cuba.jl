@@ -7,6 +7,10 @@ julia:
   - 1.0
   - 1.1
   - nightly
+env:
+  matrix:
+    - JULIA_CUBA_BUILD_SOURCE=true
+    - JULIA_CUBA_BUILD_SOURCE=false
 notifications:
   email: false
 git:

@@ -47,6 +47,17 @@ pkg> update
 pkg> add Cuba
 ```
 
+By default, on all systems a pre-built version of the Cuba library will be
+installed.  On UNIX systems, you can optionally compile Cuba locally by setting
+the `JULIA_CUBA_BUILD_SOURCE` environment variable to `"true"`:
+
+```julia
+julia> ENV["JULIA_CUBA_BUILD_SOURCE"] = "true"
+"true"
+
+pkg> build Cuba
+```
+
 Older versions are also available for Julia 0.4-0.7.
 
 Usage

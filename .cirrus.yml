@@ -5,8 +5,17 @@ task:
   env:
     matrix:
       - JULIA_VERSION: 1.0
+        env: JULIA_CUBA_BUILD_SOURCE=false
+      - JULIA_VERSION: 1.0
+        env: JULIA_CUBA_BUILD_SOURCE=true
       - JULIA_VERSION: 1.1
+        env: JULIA_CUBA_BUILD_SOURCE=false
+      - JULIA_VERSION: 1.1
+        env: JULIA_CUBA_BUILD_SOURCE=true
       - JULIA_VERSION: nightly
+        env: JULIA_CUBA_BUILD_SOURCE=false
+      - JULIA_VERSION: nightly
+        env: JULIA_CUBA_BUILD_SOURCE=true
   install_script:
     - sh -c "$(fetch https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh -o -)"
   build_script:

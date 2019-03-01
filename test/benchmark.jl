@@ -1,6 +1,6 @@
 ### benchmark.jl --- Benchmark Cuba.jl and Cuba C Library
 
-# Copyright (C) 2016  Mosè Giordano
+# Copyright (C) 2016-2019  Mosè Giordano
 
 # Maintainer: Mosè Giordano <mose AT gnu DOT org>
 # Keywords: numeric integration
@@ -72,14 +72,14 @@ end
 
 cd(dirname(@__FILE__)) do
     if mtime("benchmark.c") > mtime("benchmark-c")
-        run(`gcc -O3 -I ../deps/usr/include -o benchmark-c benchmark.c ../deps/usr/lib/libcuba.a -lm`)
+        run(`gcc -O3 -I ../deps/usr/include -o benchmark-c benchmark.c $(Cuba.libcuba) -lm`)
     end
     @info "Performance of Cuba Library in C:"
     run(`./benchmark-c`)
 
     if success(`which gfortran`)
         if mtime("benchmark.f") > mtime("benchmark-fortran")
-            run(`gfortran -O3 -fcheck=no-bounds -cpp -o benchmark-fortran benchmark.f ../deps/usr/lib/libcuba.a -lm`)
+            run(`gfortran -O3 -fcheck=no-bounds -cpp -o benchmark-fortran benchmark.f $(Cuba.libcuba) -lm`)
         end
         @info "Performance of Cuba Library in Fortran:"
         run(`./benchmark-fortran`)
