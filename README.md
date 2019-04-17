@@ -39,8 +39,8 @@ Installation
 
 The latest version of `Cuba.jl` is available for Julia 1.0 and later versions,
 and can be installed with [Julia built-in package
-manager](https://docs.julialang.org/en/v1/stdlib/Pkg/). In a Julia session run
-the commands
+manager](https://julialang.github.io/Pkg.jl/stable/).  In a Julia session, after
+entering the package manager mode with `]`, run the command
 
 ```julia
 pkg> update

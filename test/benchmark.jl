@@ -67,10 +67,11 @@ for alg in (vegas, suave, divonne, cuhre)
     alg(test, ndim, ncomp, atol=atol,
         rtol=rtol);
     end_time = time_ns()
-    println(@sprintf("%10.6f seconds (%s)", Int(end_time - start_time)/1e9, uppercasefirst(string(alg)[6:end])))
+    println(@sprintf("%10.6f", Int(end_time - start_time)/1e9),
+            " seconds (", uppercasefirst(string(nameof(alg))), ")")
 end
 
-cd(dirname(@__FILE__)) do
+cd(@__DIR__) do
     if mtime("benchmark.c") > mtime("benchmark-c")
         run(`gcc -O3 -I ../deps/usr/include -o benchmark-c benchmark.c $(Cuba.libcuba) -lm`)
     end
