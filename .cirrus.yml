@@ -12,6 +12,10 @@ task:
         env: JULIA_CUBA_BUILD_SOURCE=false
       - JULIA_VERSION: 1.1
         env: JULIA_CUBA_BUILD_SOURCE=true
+      - JULIA_VERSION: 1.2
+        env: JULIA_CUBA_BUILD_SOURCE=false
+      - JULIA_VERSION: 1.2
+        env: JULIA_CUBA_BUILD_SOURCE=true
       - JULIA_VERSION: nightly
         env: JULIA_CUBA_BUILD_SOURCE=false
       - JULIA_VERSION: nightly
