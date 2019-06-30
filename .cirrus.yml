@@ -12,14 +12,11 @@ task:
         env: JULIA_CUBA_BUILD_SOURCE=false
       - JULIA_VERSION: 1.1
         env: JULIA_CUBA_BUILD_SOURCE=true
-      - JULIA_VERSION: 1.2
-        env: JULIA_CUBA_BUILD_SOURCE=false
-      - JULIA_VERSION: 1.2
-        env: JULIA_CUBA_BUILD_SOURCE=true
       - JULIA_VERSION: nightly
         env: JULIA_CUBA_BUILD_SOURCE=false
       - JULIA_VERSION: nightly
         env: JULIA_CUBA_BUILD_SOURCE=true
+  allow_failures: $JULIA_VERSION == "nightly"
   install_script:
     - sh -c "$(fetch https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh -o -)"
   build_script:
