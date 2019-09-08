@@ -1,0 +1,3 @@
+.drone.jsonnet linguist-detectable=false
+test/benchmark.c linguist-detectable=false
+test/benchmark.f linguist-detectable=false
