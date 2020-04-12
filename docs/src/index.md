@@ -223,28 +223,28 @@ can be computed with one of the following commands
 ```jldoctest
 julia> vegas((x, f) -> f[1] = cos(x[1]))
 Component:
- 1: 0.8414910005259609 ± 5.2708169787733e-5 (prob.: 0.028607201257039333)
+ 1: 0.841491000525961 ± 5.2708169786483034e-5 (prob.: 0.028607201258847748)
 Integrand evaluations: 13500
 Number of subregions:  0
 Note: The desired accuracy was reached
 
 julia> suave((x, f) -> f[1] = cos(x[1]))
 Component:
- 1: 0.8411523690658836 ± 8.357995611133613e-5 (prob.: 1.0)
-Integrand evaluations: 22000
-Number of subregions:  22
+ 1: 0.8413748866950329 ± 7.772872640815592e-5 (prob.: 1.0)
+Integrand evaluations: 23000
+Number of subregions:  23
 Note: The desired accuracy was reached
 
 julia> divonne((x, f) -> f[1] = cos(x[1]))
 Component:
- 1: 0.841468071955942 ± 5.3955070531551656e-5 (prob.: 0.0)
+ 1: 0.841468071955942 ± 5.3955070531551656e-5 (prob.: 1.1102230246251565e-16)
 Integrand evaluations: 1686
 Number of subregions:  14
 Note: The desired accuracy was reached
 
 julia> cuhre((x, f) -> f[1] = cos(x[1]))
 Component:
- 1: 0.8414709848078966 ± 2.2204460420128823e-16 (prob.: 3.443539937576958e-5)
+ 1: 0.8414709848078967 ± 2.304857594221477e-15 (prob.: 4.869900880782919e-5)
 Integrand evaluations: 195
 Number of subregions:  2
 Note: The desired accuracy was reached
@@ -648,21 +648,21 @@ approximation of this integral using one of the following commands:
 ```jldoctest
 julia> vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
 Component:
- 1: -3.9981623937128465 ± 0.00044066437168409464 (prob.: 0.2843052968819913)
+ 1: -3.9981623937128448 ± 0.00044066437168409865 (prob.: 0.28430529712907515)
 Integrand evaluations: 1007500
 Number of subregions:  0
 Note: The accuracy was not met within the maximum number of evaluations
 
 julia> suave( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
 Component:
- 1: -3.999976286717141 ± 0.00039504866661339003 (prob.: 1.0)
-Integrand evaluations: 51000
-Number of subregions:  51
+ 1: -4.000246664970977 ± 0.00039262438882794375 (prob.: 1.0)
+Integrand evaluations: 50000
+Number of subregions:  50
 Note: The desired accuracy was reached
 
 julia> divonne( (x,f) -> f[1] = log(x[1])/sqrt(x[1]), atol = 1e-8, rtol = 1e-8)
 Component:
- 1: -3.999999899620808 ± 2.1865962888459237e-7 (prob.: 0.0)
+ 1: -3.999999899620808 ± 2.1865962888458758e-7 (prob.: 0.0)
 Integrand evaluations: 1002059
 Number of subregions:  1582
 Note: The accuracy was not met within the maximum number of evaluations
@@ -670,7 +670,7 @@ Hint: Try increasing `maxevals` to 4884287
 
 julia> cuhre( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
 Component:
- 1: -4.000000355067187 ± 0.0003395484028626406 (prob.: 0.0)
+ 1: -4.000000355067185 ± 0.00033954840286260385 (prob.: 0.0)
 Integrand evaluations: 5915
 Number of subregions:  46
 Note: The desired accuracy was reached
@@ -716,17 +716,17 @@ julia> for i = 1:3
            println(" Actual error:   ", abs(result[i] - answer[i]))
        end
 Component 1
- Result of Cuba: 0.6646696797813745 ± 1.0056262721114345e-13
+ Result of Cuba: 0.664669679781373 ± 1.0083294368207878e-13
  Exact result:   0.6646696797813771
- Actual error:   2.6645352591003757e-15
+ Actual error:   4.107825191113079e-15
 Component 2
- Result of Cuba: 0.41653838588064585 ± 2.932867102879894e-11
+ Result of Cuba: 0.41653838588064573 ± 2.932867146064799e-11
  Exact result:   0.41653838588663805
- Actual error:   5.992206730809357e-12
+ Actual error:   5.99231775311182e-12
 Component 3
- Result of Cuba: 1.2020569031649704 ± 1.1958521782293645e-10
+ Result of Cuba: 1.202056903164971 ± 1.195855757269273e-10
  Exact result:   1.2020569031595951
- Actual error:   5.375255796025158e-12
+ Actual error:   5.375921929839933e-12
 ```
 
 ### Integral with non-constant boundaries
@@ -767,9 +767,9 @@ julia> begin
                println("Exact result:   ", answer)
                println("Actual error:   ", abs(result[1] - answer))
        end
-Result of Cuba: 54.98607586826155 ± 5.4606062189698135e-9
+Result of Cuba: 54.98607586826154 ± 5.46060653920107e-9
 Exact result:   54.98607586789537
-Actual error:   3.6617819887396763e-10
+Actual error:   3.6616398801925243e-10
 ```
 
 ### Integrals over Infinite Domains
@@ -813,9 +813,9 @@ julia> begin
                println("Exact result:   ", answer)
                println("Actual error:   ", abs(result[1] - answer))
        end
-Result of Cuba: 2.1775860903056885 ± 2.150398850102772e-10
+Result of Cuba: 2.1775860903056903 ± 2.153947023352171e-10
 Exact result:   2.177586090303602
-Actual error:   2.086331107875594e-12
+Actual error:   2.0881074647149944e-12
 ```
 
 Now we want to calculate this integral, over an infinite domain
@@ -853,9 +853,9 @@ julia> begin
                println("Exact result:   ", answer)
                println("Actual error:   ", abs(result[1] - answer))
        end
-Result of Cuba: 3.1415928900555046 ± 2.050669142074607e-6
+Result of Cuba: 3.1415928900554886 ± 2.050669142055499e-6
 Exact result:   3.141592653589793
-Actual error:   2.3646571145619077e-7
+Actual error:   2.3646569546897922e-7
 ```
 
 ### Complex integrand
@@ -891,7 +891,7 @@ julia> begin
            println("Result of Cuba: ", complex(result[1]...))
            println("Exact result:   ", complex(1.0, 1.0))
        end
-Result of Cuba: 1.0 + 1.0im
+Result of Cuba: 1.0000000000000002 + 1.0000000000000002im
 Exact result:   1.0 + 1.0im
 ```
 
@@ -1076,7 +1076,7 @@ equipped with an Intel(R) Core(TM) i7-4700MQ CPU. The C and FORTRAN 77
 benchmark codes have been compiled with GCC 7.3.0.
 
 ```
-$ CUBACORES=0 julia -e 'using Pkg; cd(Pkg.dir("Cuba")); include("test/benchmark.jl")'
+$ CUBACORES=0 julia -e 'using Pkg; import Cuba; include(joinpath(dirname(dirname(pathof(Cuba))), "benchmarks", "benchmark.jl"))'
 [ Info: Performance of Cuba.jl:
   0.257360 seconds (Vegas)
   0.682703 seconds (Suave)

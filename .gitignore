@@ -1,9 +1,7 @@
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
-/deps
-/docs/build/
 /docs/site/
-/test/benchmark-fortran
-/test/benchmark-c
+/benchmarks/benchmark-fortran
+/benchmarks/benchmark-c
 Manifest.toml

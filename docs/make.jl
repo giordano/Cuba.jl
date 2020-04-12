@@ -2,7 +2,6 @@ using Documenter, Cuba
 
 makedocs(
     modules = [Cuba],
-    format = :html,
     sitename = "Cuba",
 )
 

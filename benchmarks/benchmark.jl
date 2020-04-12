@@ -73,16 +73,20 @@ end
 
 cd(@__DIR__) do
     if mtime("benchmark.c") > mtime("benchmark-c")
-        run(`gcc -O3 -I ../deps/usr/include -o benchmark-c benchmark.c $(Cuba.libcuba) -lm`)
+        run(`gcc -O3 -I $(Cuba.Cuba_jll.artifact_dir)/include -o benchmark-c benchmark.c $(Cuba.Cuba_jll.libcuba_path) -lm`)
     end
     @info "Performance of Cuba Library in C:"
-    run(`./benchmark-c`)
+    withenv(Cuba.Cuba_jll.LIBPATH_env => Cuba.Cuba_jll.LIBPATH) do
+        run(`./benchmark-c`)
+    end
 
     if success(`which gfortran`)
         if mtime("benchmark.f") > mtime("benchmark-fortran")
-            run(`gfortran -O3 -fcheck=no-bounds -cpp -o benchmark-fortran benchmark.f $(Cuba.libcuba) -lm`)
+            run(`gfortran -O3 -fcheck=no-bounds -cpp -o benchmark-fortran benchmark.f $(Cuba.Cuba_jll.libcuba_path) -lm`)
         end
         @info "Performance of Cuba Library in Fortran:"
-        run(`./benchmark-fortran`)
+        withenv(Cuba.Cuba_jll.LIBPATH_env => Cuba.Cuba_jll.LIBPATH) do
+            run(`./benchmark-fortran`)
+        end
     end
 end

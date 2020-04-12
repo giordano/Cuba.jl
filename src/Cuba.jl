@@ -24,15 +24,9 @@ __precompile__()
 
 module Cuba
 
+using Cuba_jll
+
 export vegas, suave, divonne, cuhre
-
-
-# Load in `deps.jl`, complaining if it does not exist
-const depsjl_path = joinpath(@__DIR__, "..", "deps", "deps.jl")
-if !isfile(depsjl_path)
-    error("Cuba not installed properly, run Pkg.build(\"Cuba\"), restart Julia and try again")
-end
-include(depsjl_path)
 
 ### Default values of parameters
 # Common arguments.
@@ -125,7 +119,6 @@ integrand_ptr_nvec(integrand::T) where {T} = @cfunction(generic_integrand!, Cint
 abstract type Integrand{T} end
 
 function __init__()
-    check_deps()
     Cuba.cores(0, 10000)
 end
 
