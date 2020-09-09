@@ -22,7 +22,7 @@
 using Cuba
 using Test
 using Distributed, LinearAlgebra
-
+@show Sys.ARCH
 f1(x,y,z) = sin(x)*cos(y)*exp(z)
 f2(x,y,z) = exp(-(x*x + y*y + z*z))
 f3(x,y,z) = 1/(1 - x*y*z)
