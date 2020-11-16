@@ -76,7 +76,7 @@ cd(@__DIR__) do
         run(`gcc -O3 -I $(Cuba.Cuba_jll.artifact_dir)/include -o benchmark-c benchmark.c $(Cuba.Cuba_jll.libcuba_path) -lm`)
     end
     @info "Performance of Cuba Library in C:"
-    withenv(Cuba.Cuba_jll.LIBPATH_env => Cuba.Cuba_jll.LIBPATH) do
+    withenv(Cuba.Cuba_jll.JLLWrappers.LIBPATH_env => Cuba.Cuba_jll.LIBPATH[]) do
         run(`./benchmark-c`)
     end
 
@@ -85,7 +85,7 @@ cd(@__DIR__) do
             run(`gfortran -O3 -fcheck=no-bounds -cpp -o benchmark-fortran benchmark.f $(Cuba.Cuba_jll.libcuba_path) -lm`)
         end
         @info "Performance of Cuba Library in Fortran:"
-        withenv(Cuba.Cuba_jll.LIBPATH_env => Cuba.Cuba_jll.LIBPATH) do
+        withenv(Cuba.Cuba_jll.JLLWrappers.LIBPATH_env => Cuba.Cuba_jll.LIBPATH[]) do
             run(`./benchmark-fortran`)
         end
     end
