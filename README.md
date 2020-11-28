@@ -1,9 +1,9 @@
 # Cuba.jl
 
-| **Documentation**                       | **Build Status**                          | **Code Coverage**               |
-|:---------------------------------------:|:-----------------------------------------:|:-------------------------------:|
-| [![][docs-stable-img]][docs-stable-url] | [![Build Status][travis-img]][travis-url] | [![][coveral-img]][coveral-url] |
-| [![][docs-latest-img]][docs-latest-url] | [![Build Status][appvey-img]][appvey-url] | [![][codecov-img]][codecov-url] |
+| **Documentation**                       | **Build Status**                    | **Code Coverage**               |
+|:---------------------------------------:|:-----------------------------------:|:-------------------------------:|
+| [![][docs-stable-img]][docs-stable-url] | [![Build Status][gha-img]][gha-url] | [![][coveral-img]][coveral-url] |
+| [![][docs-latest-img]][docs-latest-url] |                                     | [![][codecov-img]][codecov-url] |
 
 Introduction
 ------------
@@ -200,11 +200,8 @@ http://adsabs.harvard.edu/abs/2015JPhCS.608a2066H).
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
 [docs-stable-url]: https://giordano.github.io/Cuba.jl/stable/
 
-[travis-img]: https://travis-ci.org/giordano/Cuba.jl.svg?branch=master
-[travis-url]: https://travis-ci.org/giordano/Cuba.jl
-
-[appvey-img]: https://ci.appveyor.com/api/projects/status/ivqy72upfjxplbcn/branch/master?svg=true
-[appvey-url]: https://ci.appveyor.com/project/giordano/cuba-jl
+[gha-img]: https://github.com/giordano/Cuba.jl/workflows/CI/badge.svg
+[gha-url]: https://github.com/giordano/Cuba.jl/actions?query=workflow%3ACI
 
 [coveral-img]: https://coveralls.io/repos/github/giordano/Cuba.jl/badge.svg?branch=master
 [coveral-url]: https://coveralls.io/github/giordano/Cuba.jl?branch=master

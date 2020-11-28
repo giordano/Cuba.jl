@@ -5,3 +5,4 @@
 /benchmarks/benchmark-fortran
 /benchmarks/benchmark-c
 Manifest.toml
+/docs/build/
