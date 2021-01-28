@@ -198,12 +198,12 @@ end
 
 ### Other functions, not exported
 function cores(n::Integer, p::Integer)
-    ccall((:cubacores, libcuba), Ptr{Cvoid}, (Cint, Cint), n, p)
+    ccall((:cubacores, libcuba), Ptr{Cvoid}, (Ptr{Cint}, Ptr{Cint}), Ref{Cint}(n), Ref{Cint}(p))
     return 0
 end
 
 function accel(n::Integer, p::Integer)
-    ccall((:cubaaccel, libcuba), Ptr{Cvoid}, (Cint, Cint), n, p)
+    ccall((:cubaaccel, libcuba), Ptr{Cvoid}, (Ptr{Cint}, Ptr{Cint}), Ref{Cint}(n), Ref{Cint}(p))
     return 0
 end
 

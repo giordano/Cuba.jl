@@ -1,14 +1,18 @@
-History of Cuba.jl
-==================
+# History of Cuba.jl
 
-v2.1.0 (2019-0?-??)
--------------------
+## v2.2.0 (2021-01-28)
 
 ### New Features
 
-* You can now build the Cuba library locally, instead of using a pre-built
-  package, by setting the `JULIA_CUBA_BUILD_SOURCE` environment variable to
-  `"true"`.
+* Update to support Cuba v4.2.1.
+
+## v2.1.0 (2020-04-12)
+
+### New Features
+
+* The Cuba binary library is now installed as a [JLL
+  package](https://docs.binarybuilder.org/stable/jll/).  This requires Julia
+  v1.3 or later version.
 
 v2.0.0 (2019-02-27)
 -------------------
