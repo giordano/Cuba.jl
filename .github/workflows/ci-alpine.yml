@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: "**"
+    tags: ["*"]
+  pull_request:
+  release:
+
+jobs:
+  test:
+    name: Julia ${{ matrix.julia-version }} - Alpine Linux - ${{ matrix.julia-arch }}
+    runs-on: ubuntu-latest
+    container:
+      image: julia:${{ matrix.julia-version }}-alpine
+    strategy:
+      fail-fast: false
+      matrix:
+        julia-version:
+          - "1"
+        julia-arch:
+          - x64
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache artifacts
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-artifacts
+        with:
+          path: ~/.julia/artifacts
+          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-test-${{ env.cache-name }}-
+            ${{ runner.os }}-test-
+            ${{ runner.os }}-
+      - uses: julia-actions/julia-buildpkg@latest
+      - uses: julia-actions/julia-runtest@latest
+      - uses: julia-actions/julia-uploadcodecov@v0.1
+        continue-on-error: true
+      - uses: julia-actions/julia-uploadcoveralls@v0.1
+        continue-on-error: true
