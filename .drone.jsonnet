@@ -25,6 +25,6 @@ local Pipeline(os, arch, version, alpine=false) = {
     Pipeline("linux", "arm",   "1.3.1"),
     Pipeline("linux", "arm",   "1.4.1"),
     Pipeline("linux", "arm64", "1.3"),
-    Pipeline("linux", "arm64", "1.5"),
-    # Pipeline("linux", "amd64", "1.6", true)
+    Pipeline("linux", "arm64", "1.6"),
+    Pipeline("linux", "amd64", "1.6", true)
 ]
