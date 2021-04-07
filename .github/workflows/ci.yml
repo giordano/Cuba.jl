@@ -15,12 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         julia-version:
-          - "1.3"
+          # - "1.3"
           # - "1"
-          # - "nightly"
+          - "nightly"
         os:
-          - ubuntu-latest
-          # - macos-latest
+          # - ubuntu-latest
+          - macos-latest
           # - windows-latest
         julia-arch:
           - x64
@@ -31,15 +31,15 @@ jobs:
             julia-arch: x86
 
     steps:
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        # with:
-        #   limit-access-to-actor: true
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
           arch: ${{ matrix.julia-arch }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        # with:
+        #   limit-access-to-actor: true
       - name: Cache artifacts
         uses: actions/cache@v2
         env:
