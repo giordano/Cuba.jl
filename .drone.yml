@@ -20,7 +20,7 @@ trigger:
 
 ---
 kind: pipeline
-name: linux - arm - Julia 1.4.1
+name: linux - arm - Julia 1.6.1
 
 platform:
   os: linux
@@ -28,7 +28,7 @@ platform:
 
 steps:
 - name: Run tests
-  image: julia:1.4.1
+  image: julia:1.6.1
   commands:
   - "julia --project=. --check-bounds=yes --color=yes -e 'using InteractiveUtils; versioninfo(verbose=true)'"
   - "julia --project=. --check-bounds=yes --color=yes -e 'using Pkg; Pkg.build()'"
