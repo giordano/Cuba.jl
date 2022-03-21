@@ -37,7 +37,7 @@ in `deps/usr/share/cuba.pdf` after successful installation of `Cuba.jl`.
 Installation
 ------------
 
-The latest version of `Cuba.jl` is available for Julia 1.0 and later versions,
+The latest version of `Cuba.jl` is available for Julia 1.3 and later versions,
 and can be installed with [Julia built-in package
 manager](https://julialang.github.io/Pkg.jl/stable/).  In a Julia session, after
 entering the package manager mode with `]`, run the command
@@ -47,18 +47,7 @@ pkg> update
 pkg> add Cuba
 ```
 
-By default, on all systems a pre-built version of the Cuba library will be
-installed.  On UNIX systems, you can optionally compile Cuba locally by setting
-the `JULIA_CUBA_BUILD_SOURCE` environment variable to `"true"`:
-
-```julia
-julia> ENV["JULIA_CUBA_BUILD_SOURCE"] = "true"
-"true"
-
-pkg> build Cuba
-```
-
-Older versions are also available for Julia 0.4-0.7.
+Older versions are also available for Julia 0.4-1.2.
 
 Usage
 -----
