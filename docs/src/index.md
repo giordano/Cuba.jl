@@ -61,7 +61,7 @@ installation of `Cuba.jl`.
 Integration is always performed on the ``n``-dimensional [unit
 hypercube](https://en.wikipedia.org/wiki/Hypercube) ``[0, 1]^{n}``.
 
-!!! tip
+!!! tip "Integrate over different domains"
 
     If you want to compute an integral over a different set, you have to scale the
     integrand function in order to have an equivalent integral on ``[0, 1]^{n}`` using
@@ -244,9 +244,25 @@ and `f` are both arrays with type `Float64`, so `Cuba.jl` can be used to
 integrate real-valued functions of real arguments. See how to work with a
 [complex integrand](#Complex-integrand-1).
 
-**Note:** if you used `Cuba.jl` until version 0.0.4, be aware that the
-user interface has been reworked in version 0.0.5 in a backward
-incompatible way.
+!!! note "Limit on number of components"
+
+	The Cuba C library has a hard limit on the number of components that you can use for
+	your integrand function, which is set at compile time.  The build of the library
+	currently used by `Cuba.jl` has this limit set to 1024, the default.  If you use an
+	integrand with a larger number of components, the integration will fail, which you can
+	detect by checking the `fail` field of the `Integral` output object, which will be
+	non-zero, see the "[Output](@ref)" section below.
+
+	If you need to integrate functions with components larger than 1024, consider using
+	other packages which don't have this limitation, like
+	[`HCubature.jl`](https://github.com/JuliaMath/HCubature.jl) or
+	[`Cubature.jl`](https://github.com/JuliaMath/Cubature.jl).
+
+!!! note "Compatibility"
+
+	If you used `Cuba.jl` until version 0.0.4, be aware that the
+	user interface has been reworked in version 0.0.5 in a backward
+	incompatible way.
 
 ### Optional Keywords
 
@@ -705,13 +721,13 @@ julia> for i = 1:3
            println(" Actual error:   ", abs(result[i] - answer[i]))
        end
 Component 1
- Result of Cuba: 0.664669679781373 ± 1.0083294368207878e-13
+ Result of Cuba: 0.6646696797813743 ± 1.0083313461375621e-13
  Exact result:   0.6646696797813771
- Actual error:   4.107825191113079e-15
+ Actual error:   2.886579864025407e-15
 Component 2
- Result of Cuba: 0.41653838588064573 ± 2.932867146064799e-11
+ Result of Cuba: 0.4165383858806458 ± 2.9328672381493003e-11
  Exact result:   0.41653838588663805
- Actual error:   5.99231775311182e-12
+ Actual error:   5.992262241960589e-12
 Component 3
  Result of Cuba: 1.202056903164971 ± 1.195855757269273e-10
  Exact result:   1.2020569031595951
@@ -756,9 +772,9 @@ julia> begin
                println("Exact result:   ", answer)
                println("Actual error:   ", abs(result[1] - answer))
        end
-Result of Cuba: 54.98607586826154 ± 5.46060653920107e-9
+Result of Cuba: 54.98607586826152 ± 5.460606620717379e-9
 Exact result:   54.98607586789537
-Actual error:   3.6616398801925243e-10
+Actual error:   3.6614977716453723e-10
 ```
 
 ### Integrals over Infinite Domains
@@ -962,23 +978,22 @@ julia> using Cuba, BenchmarkTools
 
 julia> cuhre((x, f) -> f[] = prod(cos.(x)), 10)
 Component:
- 1: 0.1779870665870775 ± 1.0707995959536173e-6 (prob.: 0.2438374075714901)
+ 1: 0.17798706658707045 ± 1.070799596273229e-6 (prob.: 0.2438374079277991)
 Integrand evaluations: 7815
-Fail:                  0
 Number of subregions:  2
+Note: The desired accuracy was reached
 
 julia> @benchmark cuhre((x, f) -> f[] = prod(cos.(x)), 10)
-BenchmarkTools.Trial:
-  memory estimate:  2.62 MiB
-  allocs estimate:  39082
-  --------------
-  minimum time:     1.633 ms (0.00% GC)
-  median time:      1.692 ms (0.00% GC)
-  mean time:        1.867 ms (8.62% GC)
-  maximum time:     3.660 ms (45.54% GC)
-  --------------
-  samples:          2674
-  evals/sample:     1
+BenchmarkTools.Trial: 2448 samples with 1 evaluation.
+ Range (min … max):  1.714 ms …   7.401 ms  ┊ GC (min … max): 0.00% … 75.31%
+ Time  (median):     1.820 ms               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   2.035 ms ± 858.367 μs  ┊ GC (mean ± σ):  9.08% ± 14.32%
+
+  ██▅▅▄▁                                                   ▁  ▁
+  ███████▇▆▆▄▁▄▁▁▁▄▃▃▅▁▁▃▃▁▃▃▁▁▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▃▁▁▅▆▇▇██▇ █
+  1.71 ms      Histogram: log(frequency) by time      5.97 ms <
+
+ Memory estimate: 2.03 MiB, allocs estimate: 39078.
 ```
 
 We can use vectorization in order to speed up evaluation of the
@@ -997,23 +1012,22 @@ fun_vec (generic function with 1 method)
 
 julia> cuhre(fun_vec, 10, nvec = 1000)
 Component:
- 1: 0.1779870665870775 ± 1.0707995959536173e-6 (prob.: 0.2438374075714901)
+ 1: 0.17798706658707045 ± 1.070799596273229e-6 (prob.: 0.2438374079277991)
 Integrand evaluations: 7815
-Fail:                  0
 Number of subregions:  2
+Note: The desired accuracy was reached
 
 julia> @benchmark cuhre(fun_vec, 10, nvec = 1000)
-BenchmarkTools.Trial:
-  memory estimate:  2.88 KiB
-  allocs estimate:  54
-  --------------
-  minimum time:     949.976 μs (0.00% GC)
-  median time:      954.039 μs (0.00% GC)
-  mean time:        966.930 μs (0.00% GC)
-  maximum time:     1.204 ms (0.00% GC)
-  --------------
-  samples:          5160
-  evals/sample:     1
+BenchmarkTools.Trial: 4971 samples with 1 evaluation.
+ Range (min … max):  951.837 μs …  1.974 ms  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     981.597 μs              ┊ GC (median):    0.00%
+ Time  (mean ± σ):     1.001 ms ± 69.101 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+  █▂  ▁▆▇▁▂▂▂▆▅▂▁▁▁▁                                           ▁
+  ██▇▆█████████████████████▇██▇████▇▆▇█▆▆▆▇▆▅▆▆█▇▅▅▅▅▄▅▆▄▅▄▂▃▂ █
+  952 μs        Histogram: log(frequency) by time      1.24 ms <
+
+ Memory estimate: 1.59 KiB, allocs estimate: 39.
 ```
 
 A further speed up can be gained by running the `for` loop in parallel
@@ -1032,23 +1046,22 @@ fun_par (generic function with 1 method)
 
 julia> cuhre(fun_par, 10, nvec = 1000)
 Component:
- 1: 0.1779870665870775 ± 1.0707995959536173e-6 (prob.: 0.2438374075714901)
+ 1: 0.17798706658707045 ± 1.070799596273229e-6 (prob.: 0.2438374079277991)
 Integrand evaluations: 7815
-Fail:                  0
 Number of subregions:  2
+Note: The desired accuracy was reached
 
 julia> @benchmark cuhre(fun_par, 10, nvec = 1000)
-BenchmarkTools.Trial:
-  memory estimate:  3.30 KiB
-  allocs estimate:  63
-  --------------
-  minimum time:     507.914 μs (0.00% GC)
-  median time:      515.182 μs (0.00% GC)
-  mean time:        520.667 μs (0.06% GC)
-  maximum time:     3.801 ms (85.06% GC)
-  --------------
-  samples:          9565
-  evals/sample:     1
+BenchmarkTools.Trial: 6198 samples with 1 evaluation.
+ Range (min … max):  587.456 μs …   7.076 ms  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     798.933 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   801.498 μs ± 149.908 μs  ┊ GC (mean ± σ):  0.18% ± 1.50%
+
+                            ▇█▇▃
+  ▂▄▆▃▂▃▃▂▂▂▂▂▂▁▂▁▁▁▁▂▄▅▃▂▅██████▆▆▆▆▆█▇▇▆▄▄▃▂▃▂▂▂▂▂▂▁▂▁▁▁▁▁▁▁▁ ▃
+  587 μs           Histogram: frequency by time         1.03 ms <
+
+ Memory estimate: 19.31 KiB, allocs estimate: 228.
 ```
 
 Performance

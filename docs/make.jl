@@ -3,6 +3,7 @@ using Documenter, Cuba
 makedocs(
     modules = [Cuba],
     sitename = "Cuba",
+    strict = true,
 )
 
 deploydocs(
