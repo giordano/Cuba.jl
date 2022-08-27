@@ -56,6 +56,30 @@ ncomp = 3
     end
 end
 
+struct UserData
+    para::Float64
+end
+function integrand2(x, f, userdata)
+    f[1] = f1(x[1], x[2], x[3]) + userdata.para
+    f[2] = f2(x[1], x[2], x[3]) + userdata.para
+    f[3] = f3(x[1], x[2], x[3]) + userdata.para
+end
+@testset "$alg with userdata" for (alg, atol) in ((vegas, 1e-4), (suave, 1e-3),
+                      (divonne, 1e-4), (cuhre, 1e-8))
+    # Make sure that using maxevals > typemax(Int32) doesn't result into InexactError.
+    if alg == divonne
+        result = @inferred alg(integrand2, 3, ncomp, atol=atol, rtol=1e-8,
+                               flags=0, border = 1e-5, maxevals = 3000000000, userdata = UserData(0.1))
+    else
+        result = @inferred alg(integrand2, 3, ncomp, atol=atol, rtol=1e-8,
+                               flags=0, maxevals = 3e9, userdata = UserData(0.1))
+    end
+    # Analytic expressions: ((e-1)*(1-cos(1))*sin(1)+1.0, (sqrt(pi)*erf(1)/2)^3+1.0, zeta(3)+1.0)
+    for (i, answer) in enumerate((0.7646696797813771, 0.51653838588663805, 1.3020569031595951))
+        @test result[1][i] ≈ answer atol=result[2][i]
+    end
+end
+
 @testset "ndim" begin
     func(x, f) = (f[] = norm(x))
     answer_1d = 1/2 # integral of abs(x) in 1D
@@ -99,7 +123,7 @@ end
                    repr(divonne((x, f) -> f[1] = exp(x[1])*cos(x[1]),
                                 atol = 1e-9, rtol = 1e-9)))
     @test occursin("Note: Dimension out of range",
-                   repr(Cuba.dointegrate(Cuba.Cuhre((x, f) -> f[1] = x[1], 1, 1, Int64(Cuba.NVEC),
+                   repr(Cuba.dointegrate(Cuba.Cuhre((x, f) -> f[1] = x[1], missing, 1, 1, Int64(Cuba.NVEC),
                                                     Cuba.RTOL, Cuba.ATOL, Cuba.FLAGS,
                                                     Int64(Cuba.MINEVALS), Int64(Cuba.MAXEVALS),
                                                     Cuba.KEY, Cuba.STATEFILE, Cuba.SPIN))))
@@ -112,3 +136,6 @@ Cuba.exit(C_NULL, C_NULL)
 
 # Dummy call just to increase code coverage
 Cuba.integrand_ptr(Cuba.generic_integrand!)
+Cuba.integrand_ptr_userdata(Cuba.generic_integrand!, missing)
+Cuba.integrand_ptr_nvec(Cuba.generic_integrand!)
+Cuba.integrand_ptr_nvec_userdata(Cuba.generic_integrand!, missing)

@@ -22,6 +22,7 @@
 
 struct Suave{T} <: Integrand{T}
     func::T
+    userdata::Any
     ndim::Int
     ncomp::Int
     nvec::Int64
@@ -40,6 +41,9 @@ end
 
 @inline function dointegrate!(x::Suave{T}, integrand, integral,
                               error, prob, neval, fail, nregions) where {T}
+
+    userdata = ismissing(x.userdata) ? x.func : (x.func, x.userdata)
+
     ccall((:llSuave, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
@@ -64,7 +68,7 @@ end
            Ptr{Cdouble}, # error
            Ptr{Cdouble}),# prob
           # Input
-          x.ndim, x.ncomp, integrand, x.func, x.nvec,
+          x.ndim, x.ncomp, integrand, userdata, x.nvec,
           x.rtol, x.atol, x.flags, x.seed, x.minevals, x.maxevals,
           x.nnew, x.nmin, x.flatness, x.statefile, x.spin,
           # Output
@@ -80,6 +84,7 @@ components. `ndim` and `ncomp` default to 1.
 
 Accepted keywords:
 
+* `userdata`
 * `nvec`
 * `rtol`
 * `atol`
@@ -99,9 +104,9 @@ function suave(integrand::T, ndim::Integer=1, ncomp::Integer=1;
                minevals::Real=MINEVALS, maxevals::Real=MAXEVALS,
                nnew::Integer=NNEW, nmin::Integer=NMIN, flatness::Real=FLATNESS,
                statefile::AbstractString=STATEFILE, spin::Ptr{Cvoid}=SPIN,
-               reltol=missing, abstol=missing) where {T}
+               reltol=missing, abstol=missing, userdata=missing) where {T}
     atol_,rtol_ = tols(atol,rtol,abstol,reltol)
-    return dointegrate(Suave(integrand, ndim, ncomp, Int64(nvec), Cdouble(rtol_),
+    return dointegrate(Suave(integrand, userdata, ndim, ncomp, Int64(nvec), Cdouble(rtol_),
                              Cdouble(atol_), flags, seed, trunc(Int64, minevals),
                              trunc(Int64, maxevals), Int64(nnew), Int64(nmin),
                              Cdouble(flatness), String(statefile), spin))
