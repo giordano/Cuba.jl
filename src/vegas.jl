@@ -20,9 +20,9 @@
 
 ### Code:
 
-struct Vegas{T} <: Integrand{T}
+struct Vegas{T, D} <: Integrand{T}
     func::T
-    userdata::Any
+    userdata::D
     ndim::Int
     ncomp::Int
     nvec::Int64
@@ -40,8 +40,8 @@ struct Vegas{T} <: Integrand{T}
     spin::Ptr{Cvoid}
 end
 
-@inline function dointegrate!(x::Vegas{T}, integrand, integral,
-                              error, prob, neval, fail, nregions) where {T}
+@inline function dointegrate!(x::Vegas{T, D}, integrand, integral,
+                              error, prob, neval, fail, nregions) where {T, D}
 
     userdata = ismissing(x.userdata) ? x.func : (x.func, x.userdata)
 

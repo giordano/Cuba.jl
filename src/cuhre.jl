@@ -20,9 +20,9 @@
 
 ### Code:
 
-struct Cuhre{T} <: Integrand{T}
+struct Cuhre{T, D} <: Integrand{T}
     func::T
-    userdata::Any
+    userdata::D
     ndim::Int
     ncomp::Int
     nvec::Int64
@@ -36,8 +36,8 @@ struct Cuhre{T} <: Integrand{T}
     spin::Ptr{Cvoid}
 end
 
-@inline function dointegrate!(x::Cuhre{T}, integrand, integral,
-                              error, prob, neval, fail, nregions) where {T}
+@inline function dointegrate!(x::Cuhre{T, D}, integrand, integral,
+                              error, prob, neval, fail, nregions) where {T, D}
 
     userdata = ismissing(x.userdata) ? x.func : (x.func, x.userdata)
 

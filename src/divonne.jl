@@ -20,9 +20,9 @@
 
 ### Code:
 
-struct Divonne{T} <: Integrand{T}
+struct Divonne{T, D} <: Integrand{T}
     func::T
-    userdata::Any
+    userdata::D
     ndim::Int
     ncomp::Int
     nvec::Int64
@@ -48,8 +48,8 @@ struct Divonne{T} <: Integrand{T}
     spin::Ptr{Cvoid}
 end
 
-@inline function dointegrate!(x::Divonne{T}, integrand, integral,
-                              error, prob, neval, fail, nregions) where {T}
+@inline function dointegrate!(x::Divonne{T, D}, integrand, integral,
+                              error, prob, neval, fail, nregions) where {T, D}
 
     userdata = ismissing(x.userdata) ? x.func : (x.func, x.userdata)
 
