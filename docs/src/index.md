@@ -209,7 +209,7 @@ For example, the integral
 
 can be computed with one of the following commands
 
-```jldoctest
+```julia
 julia> vegas((x, f) -> f[1] = cos(x[1]))
 Component:
  1: 0.841491000525961 ± 5.2708169786483034e-5 (prob.: 0.028607201258847748)
@@ -394,6 +394,13 @@ These are optional keywords common to all functions:
     placeholder for the "spinning cores" pointer. `Cuba.jl` does not
     support parallelization, so this keyword should not have a value
     different from `C_NULL`.
+
+-   `userdata` (arbitrary julia type, default: `missing`): user data 
+    passed to the integrand. See [Passing data to the integrand function](@ref) for a usage example.
+
+!!! note "Compatibility"
+
+	The keyword `userdata` is only supported in `Cuba.jl` after the version X.X.X.
 
 #### Vegas-Specific Keywords
 
@@ -650,7 +657,7 @@ convergent and its value is ``-4``. `Cuba.jl` integrator routines can
 handle this class of functions and you can easily compute the numerical
 approximation of this integral using one of the following commands:
 
-```jldoctest
+```julia
 julia> vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
 Component:
  1: -3.9981623937128448 ± 0.00044066437168409865 (prob.: 0.28430529712907515)
@@ -904,9 +911,7 @@ Exact result:   1.0 + 1.0im
 
 Cuba Library allows program written in C and Fortran to pass extra data
 to the integrand function with `userdata` argument. This is useful, for
-example, when the integrand function depends on changing parameters. In
-`Cuba.jl` the `userdata` argument is not available, but you do not
-normally need it.
+example, when the integrand function depends on changing parameters.
 
 For example, the [cumulative distribution
 function](https://en.wikipedia.org/wiki/Cumulative_distribution_function)
