@@ -209,7 +209,7 @@ For example, the integral
 
 can be computed with one of the following commands
 
-```julia
+```jldoctest
 julia> vegas((x, f) -> f[1] = cos(x[1]))
 Component:
  1: 0.841491000525961 ± 5.2708169786483034e-5 (prob.: 0.028607201258847748)
@@ -657,7 +657,7 @@ convergent and its value is ``-4``. `Cuba.jl` integrator routines can
 handle this class of functions and you can easily compute the numerical
 approximation of this integral using one of the following commands:
 
-```julia
+```jldoctest
 julia> vegas( (x,f) -> f[1] = log(x[1])/sqrt(x[1]))
 Component:
  1: -3.9981623937128448 ± 0.00044066437168409865 (prob.: 0.28430529712907515)
