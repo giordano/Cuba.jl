@@ -15,14 +15,18 @@ task:
   install_script: |
     URL="https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh"
     set -x
-    if [ ! -z "$(which curl)" ]; then
-        echo "wget"
+    if command -v apt; then
+        sudo apt update
+        sudo apt install -y curl
+        sh -c "$(curl ...)"
+    elif [ ! -z "$(which curl)" ]; then
         sh -c "$(curl ${URL})"
     elif [ ! -z "$(which wget)" ]; then
-        echo "wget"
         sh -c "$(wget ${URL} -O-)"
     elif command -v fetch; then
         sh -c "$(fetch ${URL} -o -)"
+    else
+        echo "No downloader installed! :( Install one! :)"
     fi
   build_script:
     - cirrusjl build
