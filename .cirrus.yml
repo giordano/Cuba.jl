@@ -15,10 +15,10 @@ task:
   install_script: |
     URL="https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh"
     set -x
-    if command -v curl; then
+    if [ ! -z "$(which curl)" ]; then
         echo "wget"
         sh -c "$(curl ${URL})"
-    elif command -v wget; then
+    elif [ ! -z "$(which wget)" ]; then
         echo "wget"
         sh -c "$(wget ${URL} -O-)"
     elif command -v fetch; then
