@@ -16,10 +16,10 @@ task:
     URL="https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh"
     set -x
     if command -v apt; then
-        sudo apt update
-        sudo apt install -y curl
-        sh -c "$(curl ...)"
-    elif [ ! -z "$(which curl)" ]; then
+        apt update
+        apt install -y curl
+    fi
+    if [ ! -z "$(which curl)" ]; then
         sh -c "$(curl ${URL})"
     elif [ ! -z "$(which wget)" ]; then
         sh -c "$(wget ${URL} -O-)"
