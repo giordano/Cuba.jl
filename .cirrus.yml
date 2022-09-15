@@ -17,7 +17,7 @@ task:
     if command -v curl; then
         sh -c "$(curl ${URL})"
     elif command -v wget; then
-        sh -c "$(wget ${URL} -q -O-)"
+        sh -c "$(wget ${URL} -O-)"
     elif command -v fetch; then
         sh -c "$(fetch ${URL} -o -)"
     fi
