@@ -31,8 +31,7 @@ Integration is performed on the n-dimensional unit hypercube [0, 1]^n.  For more
 details on the algorithms see the manual included in Cuba library and available
 in `deps/usr/share/cuba.pdf` after successful installation of `Cuba.jl`.
 
-`Cuba.jl` is available for GNU/Linux, FreeBSD, Mac OS, and Windows (`i686` and
-`x86_64` architectures).
+`Cuba.jl` is available on all platforms supported by Julia.
 
 Installation
 ------------
