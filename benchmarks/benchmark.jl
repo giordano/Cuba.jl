@@ -1,30 +1,5 @@
 ### benchmark.jl --- Benchmark Cuba.jl and Cuba C Library
 
-# Copyright (C) 2016-2019  Mosè Giordano
-
-# Maintainer: Mosè Giordano <mose AT gnu DOT org>
-# Keywords: numeric integration
-
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-# License for more details.
-
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-### Commentary:
-
-# Load this file in order to compare performance of Cuba.jl and original Cuba
-# Library in C.
-
-### Code:
-
 using Cuba, Printf
 
 const ndim=3
