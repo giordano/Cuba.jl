@@ -25,7 +25,7 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
 * [Vegas](https://en.wikipedia.org/wiki/VEGAS_algorithm):
 
   | Basic integration method                                                                | Type                                                                 | [Variance reduction](https://en.wikipedia.org/wiki/Variance_reduction)   |
-  |-----------------------------------------------------------------------------------------|----------------------------------------------------------------------|--------------------------------------------------------------------------|
+  | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
   | [Sobol quasi-random sample](https://en.wikipedia.org/wiki/Sobol_sequence)               | [Monte Carlo](https://en.wikipedia.org/wiki/Monte_Carlo_integration) | [importance sampling](https://en.wikipedia.org/wiki/Importance_sampling) |
   | [Mersenne Twister pseudo-random sample](https://en.wikipedia.org/wiki/Mersenne_Twister) | "                                                                    | "                                                                        |
   | [Ranlux pseudo-random sample](http://arxiv.org/abs/hep-lat/9309020)                     | "                                                                    | "                                                                        |
@@ -33,7 +33,7 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
 * Suave
 
   | Basic integration method              | Type        | Variance reduction                                                                                         |
-  |---------------------------------------|-------------|------------------------------------------------------------------------------------------------------------|
+  | ------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------- |
   | Sobol quasi-random sample             | Monte Carlo | globally [adaptive subdivision](https://en.wikipedia.org/wiki/Adaptive_quadrature) and importance sampling |
   | Mersenne Twister pseudo-random sample | "           | "                                                                                                          |
   | Ranlux pseudo-random sample           | "           | "                                                                                                          |
@@ -41,7 +41,7 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
 * Divonne
 
   | Basic integration method              | Type          | Variance reduction                                                                                                    |
-  |---------------------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------|
+  | ------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------- |
   | Korobov quasi-random sample           | Monte Carlo   | [stratified sampling](https://en.wikipedia.org/wiki/Stratified_sampling) aided by methods from numerical optimization |
   | Sobol quasi-random sample             | "             | "                                                                                                                     |
   | Mersenne Twister pseudo-random sample | "             | "                                                                                                                     |
@@ -51,7 +51,7 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
 * Cuhre
 
   | Basic integration method | Type          | Variance reduction            |
-  |--------------------------|---------------|-------------------------------|
+  | ------------------------ | ------------- | ----------------------------- |
   | cubature rules           | deterministic | globally adaptive subdivision |
 
 For more details on the algorithms see the manual included in Cuba
@@ -342,7 +342,7 @@ These are optional keywords common to all functions:
   follows:
 
   | `seed`   | `level` (bits 8--31 of `flags`) | Generator                        |
-  |----------|---------------------------------|----------------------------------|
+  | -------- | ------------------------------- | -------------------------------- |
   | zero     | N/A                             | Sobol (quasi-random)             |
   | non-zero | zero                            | Mersenne Twister (pseudo-random) |
   | non-zero | non-zero                        | Ranlux (pseudo-random)           |
@@ -400,7 +400,7 @@ These are optional keywords common to all functions:
 
 !!! note "Compatibility"
 
-	The keyword `userdata` is only supported in `Cuba.jl` after the version X.X.X.
+	The keyword `userdata` is only supported in `Cuba.jl` after the version 2.3.0.
 
 #### Vegas-Specific Keywords
 
