@@ -6,3 +6,6 @@
 /benchmarks/benchmark-c
 Manifest.toml
 /docs/build/
+
+*.history
+*.vscode

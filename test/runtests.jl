@@ -4,9 +4,9 @@ using Cuba
 using Test
 using Distributed, LinearAlgebra
 
-f1(x,y,z) = sin(x)*cos(y)*exp(z)
-f2(x,y,z) = exp(-(x*x + y*y + z*z))
-f3(x,y,z) = 1/(1 - x*y*z)
+f1(x, y, z) = sin(x) * cos(y) * exp(z)
+f2(x, y, z) = exp(-(x * x + y * y + z * z))
+f3(x, y, z) = 1 / (1 - x * y * z)
 
 function integrand1(x, f)
     f[1] = f1(x[1], x[2], x[3])
@@ -17,73 +17,125 @@ end
 # Make sure using "addprocs" doesn't make the program segfault.
 addprocs(1)
 Cuba.cores(0, 10000)
-Cuba.accel(0,1000)
+Cuba.accel(0, 1000)
 
 # Test results and make sure the estimation of error is exact.
 ncomp = 3
 @testset "$alg" for (alg, atol) in ((vegas, 1e-4), (suave, 1e-3),
-                      (divonne, 1e-4), (cuhre, 1e-8))
+    (divonne, 1e-4), (cuhre, 1e-8))
     # Make sure that using maxevals > typemax(Int32) doesn't result into InexactError.
     if alg == divonne
         result = @inferred alg(integrand1, 3, ncomp, atol=atol, rtol=1e-8,
-                               flags=0, border = 1e-5, maxevals = 3000000000)
+            flags=0, border=1e-5, maxevals=3000000000)
     else
         result = @inferred alg(integrand1, 3, ncomp, atol=atol, rtol=1e-8,
-                               flags=0, maxevals = 3e9)
+            flags=0, maxevals=3e9)
     end
     # Analytic expressions: ((e-1)*(1-cos(1))*sin(1), (sqrt(pi)*erf(1)/2)^3, zeta(3))
     for (i, answer) in enumerate((0.6646696797813771, 0.41653838588663805, 1.2020569031595951))
-        @test result[1][i] ≈ answer atol=result[2][i]
+        @test result[1][i] ≈ answer atol = result[2][i]
+    end
+end
+
+struct UserData
+    para::Float64
+end
+function integrand2(x, f, userdata)
+    f[1] = f1(x[1], x[2], x[3]) + userdata.para
+    f[2] = f2(x[1], x[2], x[3]) + userdata.para
+    f[3] = f3(x[1], x[2], x[3]) + userdata.para
+end
+@testset "$alg with userdata" for (alg, atol) in ((vegas, 1e-4), (suave, 1e-3),
+    (divonne, 1e-4), (cuhre, 1e-8))
+    # Make sure that using maxevals > typemax(Int32) doesn't result into InexactError.
+    if alg == divonne
+        result = @inferred alg(integrand2, 3, ncomp, atol=atol, rtol=1e-8,
+            flags=0, border=1e-5, maxevals=3000000000, userdata=UserData(0.1))
+    else
+        result = @inferred alg(integrand2, 3, ncomp, atol=atol, rtol=1e-8,
+            flags=0, maxevals=3e9, userdata=UserData(0.1))
+    end
+    # Analytic expressions: ((e-1)*(1-cos(1))*sin(1)+1.0, (sqrt(pi)*erf(1)/2)^3+1.0, zeta(3)+1.0)
+    for (i, answer) in enumerate((0.7646696797813771, 0.51653838588663805, 1.3020569031595951))
+        @test result[1][i] ≈ answer atol = result[2][i]
     end
 end
 
 @testset "ndim" begin
     func(x, f) = (f[] = norm(x))
-    answer_1d = 1/2 # integral of abs(x) in 1D
-    answer_2d = (8 * asinh(1) + 2^(7/2))/24 # integral of sqrt(x^2 + y^2) in 2D
-    @test @inferred(vegas(func))[1][1]   ≈ answer_1d rtol = 1e-4
-    @test @inferred(suave(func))[1][1]   ≈ answer_1d rtol = 1e-2
+    answer_1d = 1 / 2 # integral of abs(x) in 1D
+    answer_2d = (8 * asinh(1) + 2^(7 / 2)) / 24 # integral of sqrt(x^2 + y^2) in 2D
+    @test @inferred(vegas(func))[1][1] ≈ answer_1d rtol = 1e-4
+    @test @inferred(suave(func))[1][1] ≈ answer_1d rtol = 1e-2
     @test @inferred(divonne(func))[1][1] ≈ answer_2d rtol = 1e-4
-    @test @inferred(cuhre(func))[1][1]   ≈ answer_2d rtol = 1e-4
+    @test @inferred(cuhre(func))[1][1] ≈ answer_2d rtol = 1e-4
     @test_throws ArgumentError cuhre(func, 1)
     @test_throws ArgumentError divonne(func, 1)
 end
 
 @testset "Integral over infinite domain" begin
-    func(x) = log(1 + x^2)/(1 + x^2)
-    result, rest = @inferred cuhre((x, f) -> f[1] = func(x[1]/(1 - x[1]))/(1 - x[1])^2,
-                                   atol = 1e-12, rtol = 1e-10)
+    func(x) = log(1 + x^2) / (1 + x^2)
+    result, rest = @inferred cuhre((x, f) -> f[1] = func(x[1] / (1 - x[1])) / (1 - x[1])^2,
+        atol=1e-12, rtol=1e-10)
     @test result[1] ≈ pi * log(2) atol = 3e-12
 end
 
 @testset "Vectorization" begin
     for alg in (vegas, suave, divonne, cuhre)
-        result1, err1, _ = @inferred alg((x,f) -> f[1] = x[1] + cos(x[2]) - exp(x[3]), 3)
-        result2, err2, _ = @inferred alg((x,f) -> f[1,:] .= x[1,:] .+ cos.(x[2,:]) .- exp.(x[3,:]),
-                                         3, nvec = 10)
+        result1, err1, _ = @inferred alg((x, f) -> f[1] = x[1] + cos(x[2]) - exp(x[3]), 3)
+        result2, err2, _ = @inferred alg((x, f) -> f[1, :] .= x[1, :] .+ cos.(x[2, :]) .- exp.(x[3, :]),
+            3, nvec=10)
         @test result1 == result2
-        @test err1    == err2
-        result1, err1, _ = @inferred alg((x,f) -> begin f[1] = sin(x[1]); f[2] = sqrt(x[2]) end, 2, 2)
-        result2, err2, _ = @inferred alg((x,f) -> begin f[1,:] .= sin.(x[1,:]); f[2,:] .= sqrt.(x[2,:]) end,
-                                         2, 2, nvec = 10)
+        @test err1 == err2
+        result1, err1, _ = @inferred alg((x, f) -> begin
+                f[1] = sin(x[1])
+                f[2] = sqrt(x[2])
+            end, 2, 2)
+        result2, err2, _ = @inferred alg((x, f) -> begin
+                f[1, :] .= sin.(x[1, :])
+                f[2, :] .= sqrt.(x[2, :])
+            end,
+            2, 2, nvec=10)
         @test result1 == result2
-        @test err1    == err2
+        @test err1 == err2
     end
 end
 
+@testset "Vectorization with userdata" begin
+    for alg in (vegas, suave, divonne, cuhre)
+        result1, err1, _ = @inferred alg((x, f, u) -> f[1] = u.para + x[1] + cos(x[2]) - exp(x[3]), 3; userdata=UserData(0.1))
+        result2, err2, _ = @inferred alg((x, f, u) -> f[1, :] .= u.para .+ x[1, :] .+ cos.(x[2, :]) .- exp.(x[3, :]),
+            3, nvec=10, userdata=UserData(0.1))
+        @test result1 == result2
+        @test err1 == err2
+        result1, err1, _ = @inferred alg((x, f, u) -> begin
+                f[1] = sin(x[1]) + u.para
+                f[2] = sqrt(x[2]) + u.para
+            end, 2, 2; userdata=UserData(0.1))
+        result2, err2, _ = @inferred alg((x, f, u) -> begin
+                f[1, :] .= sin.(x[1, :]) .+ u.para
+                f[2, :] .= sqrt.(x[2, :]) .+ u.para
+            end,
+            2, 2, nvec=10, userdata=UserData(0.1))
+        @test result1 == result2
+        @test err1 == err2
+    end
+end
+
+
 @testset "Show" begin
     @test occursin("Note: The desired accuracy was reached",
-                   repr(vegas((x, f) -> f[1] = x[1])))
+        repr(vegas((x, f) -> f[1] = x[1])))
     @test occursin("Note: The accuracy was not met",
-                   repr(suave((x,f) -> f[1] = x[1], atol = 1e-12, rtol = 1e-12)))
+        repr(suave((x, f) -> f[1] = x[1], atol=1e-12, rtol=1e-12)))
     @test occursin("Try increasing `maxevals` to",
-                   repr(divonne((x, f) -> f[1] = exp(x[1])*cos(x[1]),
-                                atol = 1e-9, rtol = 1e-9)))
+        repr(divonne((x, f) -> f[1] = exp(x[1]) * cos(x[1]),
+            atol=1e-9, rtol=1e-9)))
     @test occursin("Note: Dimension out of range",
-                   repr(Cuba.dointegrate(Cuba.Cuhre((x, f) -> f[1] = x[1], 1, 1, Int64(Cuba.NVEC),
-                                                    Cuba.RTOL, Cuba.ATOL, Cuba.FLAGS,
-                                                    Int64(Cuba.MINEVALS), Int64(Cuba.MAXEVALS),
-                                                    Cuba.KEY, Cuba.STATEFILE, Cuba.SPIN))))
+        repr(Cuba.dointegrate(Cuba.Cuhre((x, f) -> f[1] = x[1], missing, 1, 1, Int64(Cuba.NVEC),
+            Cuba.RTOL, Cuba.ATOL, Cuba.FLAGS,
+            Int64(Cuba.MINEVALS), Int64(Cuba.MAXEVALS),
+            Cuba.KEY, Cuba.STATEFILE, Cuba.SPIN))))
 end
 
 
@@ -93,3 +145,6 @@ Cuba.exit(C_NULL, C_NULL)
 
 # Dummy call just to increase code coverage
 Cuba.integrand_ptr(Cuba.generic_integrand!)
+Cuba.integrand_ptr_userdata(Cuba.generic_integrand!, missing)
+Cuba.integrand_ptr_nvec(Cuba.generic_integrand!)
+Cuba.integrand_ptr_nvec_userdata(Cuba.generic_integrand!, missing)

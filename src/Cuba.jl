@@ -72,12 +72,30 @@ function generic_integrand!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
     func!(x, f)
     return Cint(0)
 end
+function generic_integrand_userdata!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
+                            f_::Ptr{Cdouble}, func!_and_userdata)
+    func!, userdata = func!_and_userdata
+    # Get arrays from "x_" and "f_" pointers.
+    x = unsafe_wrap(Array, x_, (ndim,))
+    f = unsafe_wrap(Array, f_, (ncomp,))
+    func!(x, f, userdata)
+    return Cint(0)
+end
 function generic_integrand!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
                             f_::Ptr{Cdouble}, func!, nvec::Cint)
     # Get arrays from "x_" and "f_" pointers.
     x = unsafe_wrap(Array, x_, (ndim, nvec))
     f = unsafe_wrap(Array, f_, (ncomp, nvec))
     func!(x, f)
+    return Cint(0)
+end
+function generic_integrand_userdata!(ndim::Cint, x_::Ptr{Cdouble}, ncomp::Cint,
+                            f_::Ptr{Cdouble}, func!_and_userdata, nvec::Cint)
+    func!, userdata = func!_and_userdata
+    # Get arrays from "x_" and "f_" pointers.
+    x = unsafe_wrap(Array, x_, (ndim, nvec))
+    f = unsafe_wrap(Array, f_, (ncomp, nvec))
+    func!(x, f, userdata)
     return Cint(0)
 end
 
@@ -88,12 +106,28 @@ integrand_ptr(integrand::T)  where {T} = @cfunction(generic_integrand!, Cint,
                                                      Ref{Cint}, # ncomp
                                                      Ptr{Cdouble}, # f
                                                      Ref{T})) # userdata
+
+integrand_ptr_userdata(integrand::T, userdata::D)  where {T, D} = @cfunction(generic_integrand_userdata!, Cint,
+                                                    (Ref{Cint}, # ndim
+                                                     Ptr{Cdouble}, # x
+                                                     Ref{Cint}, # ncomp
+                                                     Ptr{Cdouble}, # f
+                                                     Ref{Tuple{T, D}})) # userdata
+
 integrand_ptr_nvec(integrand::T) where {T} = @cfunction(generic_integrand!, Cint,
                                                         (Ref{Cint}, # ndim
                                                          Ptr{Cdouble}, # x
                                                          Ref{Cint}, # ncomp
                                                          Ptr{Cdouble}, # f
                                                          Ref{T}, # userdata
+                                                         Ref{Cint})) # nvec
+
+integrand_ptr_nvec_userdata(integrand::T, userdata::D) where {T, D} = @cfunction(generic_integrand_userdata!, Cint,
+                                                        (Ref{Cint}, # ndim
+                                                         Ptr{Cdouble}, # x
+                                                         Ref{Cint}, # ncomp
+                                                         Ptr{Cdouble}, # f
+                                                         Ref{Tuple{T, D}}, # userdata
                                                          Ref{Cint})) # nvec
 
 abstract type Integrand{T} end
@@ -162,9 +196,9 @@ end
     # Choose the integrand function wrapper based on the value of `nvec`.  This function is
     # called only once, so the overhead of the following if should be negligible.
     if x.nvec == 1
-        integrand = integrand_ptr(x.func)
+        integrand = ismissing(x.userdata) ? integrand_ptr(x.func) : integrand_ptr_userdata(x.func, x.userdata)
     else
-        integrand = integrand_ptr_nvec(x.func)
+        integrand = ismissing(x.userdata) ? integrand_ptr_nvec(x.func) : integrand_ptr_nvec_userdata(x.func, x.userdata)
     end
     integral  = Vector{Cdouble}(undef, x.ncomp)
     error     = Vector{Cdouble}(undef, x.ncomp)

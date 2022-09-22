@@ -25,7 +25,7 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
 * [Vegas](https://en.wikipedia.org/wiki/VEGAS_algorithm):
 
   | Basic integration method                                                                | Type                                                                 | [Variance reduction](https://en.wikipedia.org/wiki/Variance_reduction)   |
-  |-----------------------------------------------------------------------------------------|----------------------------------------------------------------------|--------------------------------------------------------------------------|
+  | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
   | [Sobol quasi-random sample](https://en.wikipedia.org/wiki/Sobol_sequence)               | [Monte Carlo](https://en.wikipedia.org/wiki/Monte_Carlo_integration) | [importance sampling](https://en.wikipedia.org/wiki/Importance_sampling) |
   | [Mersenne Twister pseudo-random sample](https://en.wikipedia.org/wiki/Mersenne_Twister) | "                                                                    | "                                                                        |
   | [Ranlux pseudo-random sample](http://arxiv.org/abs/hep-lat/9309020)                     | "                                                                    | "                                                                        |
@@ -33,7 +33,7 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
 * Suave
 
   | Basic integration method              | Type        | Variance reduction                                                                                         |
-  |---------------------------------------|-------------|------------------------------------------------------------------------------------------------------------|
+  | ------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------- |
   | Sobol quasi-random sample             | Monte Carlo | globally [adaptive subdivision](https://en.wikipedia.org/wiki/Adaptive_quadrature) and importance sampling |
   | Mersenne Twister pseudo-random sample | "           | "                                                                                                          |
   | Ranlux pseudo-random sample           | "           | "                                                                                                          |
@@ -41,7 +41,7 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
 * Divonne
 
   | Basic integration method              | Type          | Variance reduction                                                                                                    |
-  |---------------------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------|
+  | ------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------- |
   | Korobov quasi-random sample           | Monte Carlo   | [stratified sampling](https://en.wikipedia.org/wiki/Stratified_sampling) aided by methods from numerical optimization |
   | Sobol quasi-random sample             | "             | "                                                                                                                     |
   | Mersenne Twister pseudo-random sample | "             | "                                                                                                                     |
@@ -51,7 +51,7 @@ All algorithms provided by Cuba library are supported in `Cuba.jl`:
 * Cuhre
 
   | Basic integration method | Type          | Variance reduction            |
-  |--------------------------|---------------|-------------------------------|
+  | ------------------------ | ------------- | ----------------------------- |
   | cubature rules           | deterministic | globally adaptive subdivision |
 
 For more details on the algorithms see the manual included in Cuba
@@ -341,7 +341,7 @@ These are optional keywords common to all functions:
   follows:
 
   | `seed`   | `level` (bits 8--31 of `flags`) | Generator                        |
-  |----------|---------------------------------|----------------------------------|
+  | -------- | ------------------------------- | -------------------------------- |
   | zero     | N/A                             | Sobol (quasi-random)             |
   | non-zero | zero                            | Mersenne Twister (pseudo-random) |
   | non-zero | non-zero                        | Ranlux (pseudo-random)           |
@@ -393,6 +393,13 @@ These are optional keywords common to all functions:
     placeholder for the "spinning cores" pointer. `Cuba.jl` does not
     support parallelization, so this keyword should not have a value
     different from `C_NULL`.
+
+-   `userdata` (arbitrary julia type, default: `missing`): user data 
+    passed to the integrand. See [Passing data to the integrand function](@ref) for a usage example.
+
+!!! note "Compatibility"
+
+	The keyword `userdata` is only supported in `Cuba.jl` after the version 2.3.0.
 
 #### Vegas-Specific Keywords
 
@@ -903,9 +910,7 @@ Exact result:   1.0 + 1.0im
 
 Cuba Library allows program written in C and Fortran to pass extra data
 to the integrand function with `userdata` argument. This is useful, for
-example, when the integrand function depends on changing parameters. In
-`Cuba.jl` the `userdata` argument is not available, but you do not
-normally need it.
+example, when the integrand function depends on changing parameters.
 
 For example, the [cumulative distribution
 function](https://en.wikipedia.org/wiki/Cumulative_distribution_function)
@@ -915,19 +920,47 @@ defined by
 
 ```math
 F(x; k) = \int_{0}^{x} \frac{t^{k/2 - 1}\exp(-t/2)}{2^{k/2}\Gamma(k/2)}
+\,\mathrm{d}t = \frac{x}{2^{k/2}\Gamma(k/2)} \int_{0}^{1} (xt)^{k/2 - 1}\exp(-xt/2)
 \,\mathrm{d}t
 ```
 
-The cumulative distribution function depends on parameter ``k``, but the
-function passed as integrand to `Cuba.jl` integrator routines accepts as
-arguments only the input and output vectors. However you can easily define a
-function to calculate a numerical approximation of ``F(x; k)`` based on the
-above integral expression because the integrand can access any variable visible
-in its [scope](https://docs.julialang.org/en/v1/manual/variables-and-scoping/).
-The following Julia script computes ``F(x = \pi; k)`` for different ``k`` and
-compares the result with more precise values, based on the analytic expression
-of the cumulative distribution function, provided by
+The integrand depends on user-defined parameters ``x`` and ``k``. One option is
+passing a tuple `(x, k)` to the integrand using the `userdata` keyword argument
+in [`vegas`](@ref), [`suave`](@ref), [`divonne`](@ref) or [`cuhre`](@ref).
+The following julia script uses this trick to compute ``F(x = \pi; k)`` for 
+different ``k`` and compares the result with more precise values, based on the 
+analytic expression of the cumulative distribution function, provided by 
 [GSL.jl](https://github.com/jiahao/GSL.jl) package.
+
+```julia
+julia> using Cuba, GSL, Printf, SpecialFunctions
+
+julia> function integrand(t, f, userdata)
+           # Chi-squared probability density function, without constant denominator.
+           # The result of integration will be divided by that factor.
+           # userdata is a tuple (x, k/2), see below
+           x, k = userdata
+           f[1] = (t[1]*x)^(k/2 - 1.0)*exp(-(t[1]*x)/2)
+       end
+
+julia> chi2cdf(x::Real, k::Real) = x*cuhre(integrand; userdata = (x, k))[1][1]/(2^(k/2)*gamma(k/2))
+chi2cdf (generic function with 1 method)
+
+julia> x = float(pi);
+
+julia> begin
+            @printf("Result of Cuba: %.6f %.6f %.6f %.6f %.6f\n",
+                    map((k) -> chi2cdf(x, k), collect(1:5))...)
+            @printf("Exact result:   %.6f %.6f %.6f %.6f %.6f\n",
+                    map((k) -> cdf_chisq_P(x, k), collect(1:5))...)
+        end
+Result of Cuba: 0.923681 0.792120 0.629694 0.465584 0.321833
+Exact result:   0.923681 0.792120 0.629695 0.465584 0.321833
+```
+
+An alternative solution to pass the user-defined data is implementing the integrand 
+as a nested inner function. The inner function can access any variable visible
+in its [scope](https://docs.julialang.org/en/v1/manual/variables-and-scoping/).
 
 ```julia
 julia> using Cuba, GSL, Printf, SpecialFunctions

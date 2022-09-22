@@ -1,7 +1,8 @@
 ### divonne.jl --- Integrate with Divonne method
 
-struct Divonne{T} <: Integrand{T}
+struct Divonne{T, D} <: Integrand{T}
     func::T
+    userdata::D
     ndim::Int
     ncomp::Int
     nvec::Int64
@@ -27,8 +28,11 @@ struct Divonne{T} <: Integrand{T}
     spin::Ptr{Cvoid}
 end
 
-@inline function dointegrate!(x::Divonne{T}, integrand, integral,
-                              error, prob, neval, fail, nregions) where {T}
+@inline function dointegrate!(x::Divonne{T, D}, integrand, integral,
+                              error, prob, neval, fail, nregions) where {T, D}
+
+    userdata = ismissing(x.userdata) ? x.func : (x.func, x.userdata)
+
     ccall((:llDivonne, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
@@ -62,7 +66,7 @@ end
            Ptr{Cdouble}, # error
            Ptr{Cdouble}),# prob
           # Input
-          x.ndim, x.ncomp, integrand, x.func, x.nvec, x.rtol,
+          x.ndim, x.ncomp, integrand, userdata, x.nvec, x.rtol,
           x.atol, x.flags, x.seed, x.minevals, x.maxevals, x.key1, x.key2,
           x.key3, x.maxpass, x.border, x.maxchisq, x.mindeviation, x.ngiven,
           x.ldxgiven, x.xgiven, x.nextra, x.peakfinder, x.statefile, x.spin,
@@ -79,6 +83,7 @@ components. `ncomp` defaults to 1, `ndim` defaults to 2 and must be ≥ 2.
 
 Accepted keywords:
 
+* `userdata`
 * `nvec`
 * `rtol`
 * `atol`
@@ -116,13 +121,13 @@ function divonne(integrand::T, ndim::Integer=2, ncomp::Integer=1;
                  nextra::Integer=NEXTRA,
                  peakfinder::Ptr{Cvoid}=PEAKFINDER,
                  statefile::AbstractString=STATEFILE,
-                 spin::Ptr{Cvoid}=SPIN, reltol=missing, abstol=missing) where {T}
+                 spin::Ptr{Cvoid}=SPIN, reltol=missing, abstol=missing, userdata=missing) where {T}
     atol_,rtol_ = tols(atol,rtol,abstol,reltol)
     # Divonne requires "ndim" to be at least 2, even for an integral over a one
     # dimensional domain.  Instead, we don't prevent users from setting wrong
     # "ndim" values like 0 or negative ones.
     ndim >=2 || throw(ArgumentError("In Divonne ndim must be ≥ 2"))
-    return dointegrate(Divonne(integrand, ndim, ncomp, Int64(nvec), Cdouble(rtol_),
+    return dointegrate(Divonne(integrand, userdata, ndim, ncomp, Int64(nvec), Cdouble(rtol_),
                                Cdouble(atol_), flags, seed, trunc(Int64, minevals),
                                trunc(Int64, maxevals), key1, key2, key3, maxpass,
                                Cdouble(border), Cdouble(maxchisq), Cdouble(mindeviation),

@@ -1,7 +1,8 @@
 ### cuhre.jl --- Integrate with Cuhre method
 
-struct Cuhre{T} <: Integrand{T}
+struct Cuhre{T, D} <: Integrand{T}
     func::T
+    userdata::D
     ndim::Int
     ncomp::Int
     nvec::Int64
@@ -15,8 +16,11 @@ struct Cuhre{T} <: Integrand{T}
     spin::Ptr{Cvoid}
 end
 
-@inline function dointegrate!(x::Cuhre{T}, integrand, integral,
-                              error, prob, neval, fail, nregions) where {T}
+@inline function dointegrate!(x::Cuhre{T, D}, integrand, integral,
+                              error, prob, neval, fail, nregions) where {T, D}
+
+    userdata = ismissing(x.userdata) ? x.func : (x.func, x.userdata)
+
     ccall((:llCuhre, libcuba), Cdouble,
           (Cint, # ndim
            Cint, # ncomp
@@ -38,7 +42,7 @@ end
            Ptr{Cdouble}, # error
            Ptr{Cdouble}),# prob
           # Input
-          x.ndim, x.ncomp, integrand, x.func, x.nvec, x.rtol, x.atol,
+          x.ndim, x.ncomp, integrand, userdata, x.nvec, x.rtol, x.atol,
           x.flags, x.minevals, x.maxevals, x.key, x.statefile, x.spin,
           # Output
           nregions, neval, fail, integral, error, prob)
@@ -53,6 +57,7 @@ components.  `ncomp` defaults to 1, `ndim` defaults to 2 and must be ≥ 2.
 
 Accepted keywords:
 
+* `userdata`
 * `nvec`
 * `rtol`
 * `atol`
@@ -68,13 +73,13 @@ function cuhre(integrand::T, ndim::Integer=2, ncomp::Integer=1;
                flags::Integer=FLAGS, minevals::Real=MINEVALS,
                maxevals::Real=MAXEVALS, key::Integer=KEY,
                statefile::AbstractString=STATEFILE, spin::Ptr{Cvoid}=SPIN,
-               abstol=missing, reltol=missing) where {T}
+               abstol=missing, reltol=missing, userdata=missing) where {T}
     atol_,rtol_ = tols(atol,rtol,abstol,reltol)
     # Cuhre requires "ndim" to be at least 2, even for an integral over a one
     # dimensional domain.  Instead, we don't prevent users from setting wrong
     # "ndim" values like 0 or negative ones.
     ndim >=2 || throw(ArgumentError("In Cuhre ndim must be ≥ 2"))
-    return dointegrate(Cuhre(integrand, ndim, ncomp, Int64(nvec), Cdouble(rtol_),
+    return dointegrate(Cuhre(integrand, userdata, ndim, ncomp, Int64(nvec), Cdouble(rtol_),
                              Cdouble(atol_), flags, trunc(Int64, minevals),
                              trunc(Int64, maxevals), key, String(statefile), spin))
 end
