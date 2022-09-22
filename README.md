@@ -173,12 +173,13 @@ There are other Julia packages for multidimenensional numerical integration:
 License
 -------
 
-The Cuba.jl package is licensed under the GNU Lesser General Public License, the
-same as [Cuba library](http://www.feynarts.de/cuba/).  The original author is
+The Cuba.jl package is released under the terms of the MIT "Expat" License.
+Note that the binary library [Cuba](http://www.feynarts.de/cuba/) is distributed
+with the GNU Lesser General Public License.  The original author of Cuba.jl is
 Mosè Giordano.  If you use this library for your work, please credit Thomas Hahn
 (citable papers about Cuba library:
-http://adsabs.harvard.edu/abs/2005CoPhC.168...78H and
-http://adsabs.harvard.edu/abs/2015JPhCS.608a2066H).
+<https://ui.adsabs.harvard.edu/abs/2005CoPhC.168...78H/abstract> and
+<https://ui.adsabs.harvard.edu/abs/2015JPhCS.608a2066H/abstract>).
 
 
 
