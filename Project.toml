@@ -1,7 +1,7 @@
 name = "Cuba"
 uuid = "8a292aeb-7a57-582c-b821-06e4c11590b1"
 authors = ["Mosè Giordano <mose@gnu.org>"]
-version = "2.2.0"
+version = "2.3.0"
 
 [deps]
 Cuba_jll = "3bed1096-5ab2-53a1-92e2-6c1cc31d0f4b"

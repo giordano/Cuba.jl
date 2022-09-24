@@ -1,5 +1,17 @@
 # History of Cuba.jl
 
+## v2.3.0 (2022-09-24)
+
+### New Features
+
+* License was changed to MIT "Expat"
+  ([#40](https://github.com/giordano/Cuba.jl/issues/40), [#43](https://github.com/giordano/Cuba.jl/pull/43)).
+* It is now possible to directly pass data to the integrand function with the
+  `userdata` keyword argument
+  ([#39](https://github.com/giordano/Cuba.jl/pull/39)).  See the [example in the
+  documentation](https://giordano.github.io/Cuba.jl/v2.3.0/#Passing-data-to-the-integrand-function)
+  for more details.
+
 ## v2.2.0 (2021-01-28)
 
 ### New Features
