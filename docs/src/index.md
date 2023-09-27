@@ -444,7 +444,7 @@ These optional keywords can be passed only to [`suave`](@ref):
     samples a former pass must contribute to a subregion to be
     considered in that region's compound integral value. Increasing
     `nmin` may reduce jumps in the ``\chi^2`` value
--   `flatness` (type: `Real`, default: `.25`): the type of norm used to
+-   `flatness` (type: `Real`, default: `25`): the type of norm used to
     compute the fluctuation of a sample. This determines how prominently
     "outliers", i.e. individual samples with a large fluctuation,
     figure in the total fluctuation, which in turn determines how a
