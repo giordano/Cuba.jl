@@ -86,6 +86,9 @@ function suave(integrand::T, ndim::Integer=1, ncomp::Integer=1;
                statefile::AbstractString=STATEFILE, spin::Ptr{Cvoid}=SPIN,
                reltol=missing, abstol=missing, userdata=missing) where {T}
     atol_,rtol_ = tols(atol,rtol,abstol,reltol)
+    # See <https://github.com/giordano/Cuba.jl/issues/27>.
+    max_maxevals = typemax(Int64) ÷ 2
+    maxevals > max_maxevals && throw(ArgumentError("`maxevals` can't be larger than $(max_maxevals) in `suave`, found $(maxevals)"))
     return dointegrate(Suave(integrand, userdata, ndim, ncomp, Int64(nvec), Cdouble(rtol_),
                              Cdouble(atol_), flags, seed, trunc(Int64, minevals),
                              trunc(Int64, maxevals), Int64(nnew), Int64(nmin),

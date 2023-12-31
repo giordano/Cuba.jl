@@ -138,6 +138,10 @@ end
             Cuba.KEY, Cuba.STATEFILE, Cuba.SPIN))))
 end
 
+@testset "Misc" begin
+    # https://github.com/giordano/Cuba.jl/issues/27
+    @test_throws ArgumentError suave((x,f) -> f[1] = 1; maxevals=typemax(Int64)÷2 + 1)
+end
 
 # Make sure these functions don't crash.
 Cuba.init(C_NULL, C_NULL)
