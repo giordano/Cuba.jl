@@ -167,6 +167,12 @@ julia> typemax(Int64)
 9223372036854775807
 ```
 
+!!! warning "`maxevals` in Suave"
+
+    Due to an [upstream bug](https://github.com/giordano/Cuba.jl/issues/27),
+	the `suave` routine cannot handle `maxevals` larger than 4611686018427387903
+	(== `typemax(Int) ÷ 2`).
+
 There is no way to overcome this limit. See the following sections for
 the meaning of each argument.
 
