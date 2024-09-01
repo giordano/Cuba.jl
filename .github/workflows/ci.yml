@@ -23,8 +23,8 @@ jobs:
           # - macos-latest
           - windows-latest
         julia-arch:
-          - x64
-          # - x86
+          # - x64
+          - x86
         # 32-bit Julia binaries are not available on macOS
         exclude:
           - os: macOS-latest
