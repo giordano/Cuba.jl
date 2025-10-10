@@ -1,7 +1,7 @@
 name: CompatHelper
 on:
   schedule:
-    - cron: 26 10 * * *
+    - cron: 26 10 * * 5
 jobs:
   build:
     runs-on: ubuntu-latest
