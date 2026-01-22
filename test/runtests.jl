@@ -143,6 +143,14 @@ end
     @test_throws ArgumentError suave((x,f) -> f[1] = 1; maxevals=typemax(Int64)÷2 + 1)
 end
 
+@testset "divonne with xgiven" begin
+    # Inspired by https://discourse.julialang.org/t/slow-cubature/116120/20
+    gauss(x, x₀=0.5, μ=0.0001) = exp(-((x - x₀) / μ) ^ 2)
+    # Note: the syntax [0.5;;] to define a 1x1 matrix was introduced only in
+    # Julia v1.7, so we can't use it here.
+    @test divonne((x, y) ->  y[1] = gauss(x[1]); ngiven=1, xgiven=reshape([0.5], 1, 1)).integral[1] ≈ 0.0001772453850905516 rtol=6e-6
+end
+
 # Make sure these functions don't crash.
 Cuba.init(C_NULL, C_NULL)
 Cuba.exit(C_NULL, C_NULL)

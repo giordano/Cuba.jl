@@ -115,7 +115,7 @@ function divonne(integrand::T, ndim::Integer=2, ncomp::Integer=1;
                  maxpass::Integer=MAXPASS, border::Real=BORDER,
                  maxchisq::Real=MAXCHISQ,
                  mindeviation::Real=MINDEVIATION,
-                 ngiven::Integer=NGIVEN, ldxgiven::Integer=LDXGIVEN,
+                 ngiven::Integer=NGIVEN, ldxgiven::Integer=ndim,
                  xgiven::Array{Cdouble,2}=zeros(Cdouble, ldxgiven,
                                                 ngiven),
                  nextra::Integer=NEXTRA,

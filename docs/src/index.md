@@ -539,9 +539,9 @@ These optional keywords can be passed only to [`divonne`](@ref):
     treated.
 -   `ngiven` (type: `Integer`, default: `0`): the number of points in
     the `xgiven` array
--   `ldxgiven` (type: `Integer`, default: `0`): the leading dimension of
+-   `ldxgiven` (type: `Integer`, default: `ndim`): the leading dimension of
     `xgiven`, i.e. the offset between one point and the next in memory
--   `xgiven` (type: `AbstractArray{Real}`, default:
+-   `xgiven` (type: `AbstractMatrix{Real}`, default:
     `zeros(Cdouble, ldxgiven, ngiven)`): a list of points where the
     integrand might have peaks. Divonne will consider these points when
     partitioning the integration region. The idea here is to help the
